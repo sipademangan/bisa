@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Sistem Informasi Padukuhan Demangan | Sipade AI Humanis</title>
+  <link rel="icon" type="image/webp" href="2.webp" sizes="128x128">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="assets/js/api.js"></script>
+  <style>
+    /* ========== GLOBAL & RESET ========== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+      padding-bottom: 0;
+    }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: #5a67d8; border-radius: 10px; }
+
+    /* ========== DESKTOP NAVBAR ========== */
+    .navbar.desktop-nav {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+      transition: all 0.3s ease;
+      padding: 0.8rem 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1030;
+    }
+    .navbar.desktop-nav.scrolled { padding: 0.5rem 0; background: rgba(255, 255, 255, 0.97); }
+    .navbar-brand {
+      font-weight: 800;
+      background: linear-gradient(135deg, #2d3748, #5a67d8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .navbar-brand img { width: 36px; border-radius: 12px; }
+    .nav-link { font-weight: 500; color: #334155; transition: 0.2s; }
+    .nav-link:hover, .nav-link.active { color: #5a67d8; }
+    .nav-indicator {
+      position: absolute; bottom: 0; height: 3px;
+      background: linear-gradient(90deg, #5a67d8, #9f7aea);
+      border-radius: 3px; transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+
+    /* ========== BOTTOM NAVIGATION (Telegram style) ========== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 8px 12px 12px;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      z-index: 1040;
+      transition: transform 0.2s ease;
+    }
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: #6c757d;
+      font-size: 12px;
+      font-weight: 500;
+      transition: 0.2s;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 30px;
+    }
+    .bottom-nav-item i {
+      font-size: 22px;
+      margin-bottom: 2px;
+    }
+    .bottom-nav-item.active {
+      color: #5a67d8;
+      background: rgba(90, 103, 216, 0.12);
+    }
+    .bottom-nav-item .label {
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* ========== HERO SECTION ========== */
+    .hero {
+      background: linear-gradient(135deg, rgba(90, 103, 216, 0.85), rgba(118, 75, 162, 0.9)), url('1.webp');
+      background-size: cover; background-position: center 30%; background-attachment: fixed;
+      color: white; padding: 110px 0; margin-bottom: 40px; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background-image: radial-gradient(circle at 20% 40%, rgba(255,255,255,0.1) 1.5px, transparent 1.5px);
+      background-size: 32px 32px; pointer-events: none; animation: drift 20s linear infinite;
+    }
+    @keyframes drift { 0% { background-position: 0 0; } 100% { background-position: 64px 64px; } }
+    .hero h1 { font-weight: 800; background: linear-gradient(135deg, #ffffff, #e0e7ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .btn-login { background: rgba(255,255,255,0.98); color: #5a67d8; border-radius: 60px; padding: 12px 36px; font-weight: 700; transition: 0.3s; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+    .btn-login:hover { transform: translateY(-5px); background: white; color: #4c51bf; }
+
+    /* ========== CARDS & OTHER COMPONENTS ========== */
+    .stat-card { background: white; border-radius: 2rem; padding: 1.5rem; transition: 0.3s; box-shadow: 0 8px 20px rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.03); }
+    .stat-card:hover { transform: translateY(-6px); box-shadow: 0 20px 35px rgba(90,103,216,0.1); }
+    .stat-number { font-size: 2.8rem; font-weight: 800; background: linear-gradient(135deg, #2d3748, #5a67d8); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .feature-card { border: none; border-radius: 2rem; background: white; transition: 0.35s; box-shadow: 0 12px 28px rgba(0,0,0,0.04); position: relative; overflow: hidden; }
+    .feature-card:hover { transform: translateY(-12px); box-shadow: 0 28px 40px rgba(90,103,216,0.18); }
+    .feature-icon { font-size: 2.6rem; background: linear-gradient(135deg, #5a67d8, #9f7aea); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 1.2rem; }
+    .berita-card { border-radius: 1.5rem; overflow: hidden; transition: 0.3s; border: none; background: white; }
+    .berita-card:hover { transform: translateY(-8px); box-shadow: 0 20px 35px rgba(0,0,0,0.1); }
+    .berita-card-img { height: 200px; width: 100%; object-fit: cover; transition: 0.5s; }
+    .berita-card:hover .berita-card-img { transform: scale(1.03); }
+    .galeri-carousel-container { position: relative; overflow: hidden; border-radius: 1.5rem; background: #f1f5f9; padding: 0.5rem 0; }
+    .galeri-carousel-track { display: flex; transition: transform 0.4s ease; gap: 1.5rem; padding: 0.5rem 0; }
+    .galeri-carousel-item { flex: 0 0 calc(25% - 1.125rem); border-radius: 1.2rem; overflow: hidden; cursor: pointer; transition: 0.3s; background: white; box-shadow: 0 6px 14px rgba(0,0,0,0.05); }
+    .galeri-carousel-item:hover { transform: translateY(-6px); }
+    .galeri-carousel-thumb { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+    .carousel-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: white; border: none; width: 40px; height: 40px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; cursor: pointer; color: #5a67d8; }
+    .carousel-nav-btn:hover { background: #5a67d8; color: white; }
+    .carousel-nav-prev { left: 10px; }
+    .carousel-nav-next { right: 10px; }
+    @media (max-width: 992px) { .galeri-carousel-item { flex: 0 0 calc(33.333% - 1rem); } }
+    @media (max-width: 768px) { .galeri-carousel-item { flex: 0 0 calc(50% - 0.75rem); } }
+    @media (max-width: 480px) { .galeri-carousel-item { flex: 0 0 100%; } }
+    .cta-gradient { background: linear-gradient(125deg, #5a67d8 0%, #805ad5 100%); border-radius: 3rem; }
+    footer { background: #0f172a; color: #cbd5e1; padding: 3rem 0 1.5rem; margin-top: 60px; }
+    footer h5 { color: white; font-weight: 700; margin-bottom: 1.2rem; position: relative; display: inline-block; }
+    footer h5:after { content: ''; position: absolute; bottom: -8px; left: 0; width: 40px; height: 3px; background: linear-gradient(90deg, #5a67d8, #9f7aea); border-radius: 3px; }
+    footer .footer-link { color: #94a3b8; text-decoration: none; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+    footer .footer-link:hover { color: white; transform: translateX(4px); }
+    footer .social-icons a { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; background: rgba(255,255,255,0.08); border-radius: 50%; color: #cbd5e1; transition: 0.25s; margin-right: 10px; }
+    footer .social-icons a:hover { background: #5a67d8; color: white; transform: translateY(-3px); }
+    .copyright { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.5rem; margin-top: 2rem; font-size: 0.85rem; text-align: center; color: #64748b; }
+
+    /* ========== CHATBOT ========== */
+    .chatbot-button {
+      position: fixed; bottom: 24px; right: 24px; width: 65px; height: 65px; border-radius: 50%;
+      background: linear-gradient(145deg, #5a67d8, #4c51bf); color: white; border: none;
+      box-shadow: 0 10px 25px rgba(90, 103, 216, 0.5); cursor: pointer; z-index: 1060;
+      transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: 30px;
+      animation: pulse-glow 2s infinite;
+    }
+    @keyframes pulse-glow { 0% { box-shadow: 0 0 0 0 rgba(90,103,216,0.6); transform: scale(1); } 70% { box-shadow: 0 0 0 15px rgba(90,103,216,0); transform: scale(1.02); } 100% { box-shadow: 0 0 0 0 rgba(90,103,216,0); transform: scale(1); } }
+    .chatbot-button:hover { transform: scale(1.1) rotate(5deg); background: linear-gradient(145deg, #4c51bf, #3c44a0); }
+    .chatbot-window {
+      position: fixed; bottom: 100px; right: 24px; width: 400px; max-width: calc(100vw - 48px);
+      height: 600px; max-height: calc(100vh - 120px); background: white;
+      border-radius: 28px; box-shadow: 0 20px 35px rgba(0, 0, 0, 0.25); display: flex; flex-direction: column;
+      overflow: hidden; z-index: 1065; transition: all 0.3s ease; border: 1px solid rgba(90, 103, 216, 0.3);
+    }
+    .chatbot-window.hidden { display: none; }
+    .chatbot-header {
+      background: linear-gradient(135deg, #5a67d8, #4c51bf); color: white; padding: 16px 20px;
+      display: flex; justify-content: space-between; align-items: center; font-weight: 600;
+    }
+    .chatbot-header h6 { margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+    .chatbot-header i.fa-times { cursor: pointer; font-size: 1.3rem; transition: transform 0.2s; }
+    .chatbot-header i.fa-times:hover { transform: scale(1.2); }
+    .chatbot-messages {
+      flex: 1; overflow-y: auto; padding: 20px; background: #f9fafb;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .message {
+      max-width: 85%; padding: 12px 16px; border-radius: 20px; font-size: 0.9rem; line-height: 1.45;
+      word-wrap: break-word; animation: fadeInMsg 0.3s ease;
+    }
+    @keyframes fadeInMsg { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .message.user { align-self: flex-end; background: #5a67d8; color: white; border-bottom-right-radius: 6px; }
+    .message.bot { align-self: flex-start; background: white; color: #1f2937; border: 1px solid #e5e7eb; border-bottom-left-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+    .typing-indicator { display: flex; gap: 5px; padding: 10px 14px; background: white; border-radius: 20px; width: fit-content; }
+    .typing-indicator span { width: 8px; height: 8px; background: #9ca3af; border-radius: 50%; animation: typingAnim 1.4s infinite ease-in-out; }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingAnim { 0%,60%,100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-6px); opacity: 1; } }
+    .whatsapp-btn { background: #25D366; color: white; border: none; border-radius: 30px; padding: 8px 14px; font-size: 0.8rem; margin-top: 6px; cursor: pointer; transition: 0.2s; }
+    .whatsapp-btn:hover { background: #128C7E; transform: scale(0.98); }
+    .chatbot-input { display: flex; padding: 12px 16px; background: white; border-top: 1px solid #e5e7eb; gap: 10px; }
+    .chatbot-input input { flex: 1; border-radius: 40px; padding: 12px 18px; border: 1px solid #d1d5db; outline: none; font-size: 0.9rem; transition: 0.2s; }
+    .chatbot-input input:focus { border-color: #5a67d8; box-shadow: 0 0 0 2px rgba(90,103,216,0.2); }
+    .chatbot-input button { background: #5a67d8; border: none; border-radius: 40px; padding: 0 20px; color: white; font-weight: 600; transition: 0.2s; }
+    .chatbot-input button:hover { background: #4c51bf; transform: scale(0.97); }
+    .suggestion-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .suggestion-chip { background: #eef2ff; color: #5a67d8; border-radius: 30px; padding: 6px 14px; font-size: 0.75rem; cursor: pointer; transition: 0.2s; border: none; }
+    .suggestion-chip:hover { background: #5a67d8; color: white; }
+    .skeleton { background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; border-radius: 1rem; }
+    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .knowledge-list-item { border-left: 3px solid #5a67d8; margin-bottom: 12px; }
+
+    /* ========== RESPONSIVE: HIDE DESKTOP NAVBAR ON MOBILE, SHOW BOTTOM NAV ========== */
+    @media (max-width: 768px) {
+      .navbar.desktop-nav {
+        display: none;
+      }
+      body {
+        padding-bottom: 70px;
+      }
+      .hero {
+        margin-top: 0;
+        padding-top: 80px;
+      }
+      .bottom-nav {
+        display: flex;
+      }
+      .chatbot-button {
+        bottom: 80px;
+      }
+      .chatbot-window {
+        bottom: 90px;
+        right: 16px;
+        width: calc(100vw - 32px);
+        max-height: 70vh;
+      }
+    }
+    @media (min-width: 769px) {
+      .bottom-nav {
+        display: none;
+      }
+      .navbar.desktop-nav {
+        display: block;
+      }
+      body {
+        padding-bottom: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- DESKTOP NAVBAR -->
+<nav class="navbar desktop-nav fixed-top">
+  <div class="container position-relative">
+    <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="#">
+      <img src="1.webp" alt="Logo"> Padukuhan Demangan
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-center gap-1" id="navMenu">
+        <li class="nav-item"><a class="nav-link" href="#fitur">Fitur</a></li>
+        <li class="nav-item"><a class="nav-link" href="#tentang">Tentang</a></li>
+        <li class="nav-item"><a class="nav-link" href="#berita">Berita</a></li>
+        <li class="nav-item"><a class="nav-link" href="#galeri">Galeri</a></li>
+        <li class="nav-item"><a class="nav-link" href="#kontak">Kontak</a></li>
+        <li class="nav-item"><a class="nav-link" href="verifikasi_surat.html">Verifikasi Surat</a></li>
+        <li class="nav-item ms-lg-2" id="loginNavItem"><a class="btn btn-primary rounded-pill px-4" href="login.html"><i class="fas fa-sign-in-alt me-2"></i>Masuk</a></li>
+      </ul>
+    </div>
+    <div class="nav-indicator" id="navIndicator"></div>
+  </div>
+</nav>
+
+<!-- BOTTOM NAVIGATION (Telegram style) -->
+<div class="bottom-nav" id="bottomNav">
+  <button class="bottom-nav-item" data-section="hero">
+    <i class="fas fa-home"></i>
+    <span class="label">Beranda</span>
+  </button>
+  <button class="bottom-nav-item" data-section="fitur">
+    <i class="fas fa-star"></i>
+    <span class="label">Fitur</span>
+  </button>
+  <button class="bottom-nav-item" data-section="berita">
+    <i class="fas fa-newspaper"></i>
+    <span class="label">Berita</span>
+  </button>
+  <button class="bottom-nav-item" data-section="galeri">
+    <i class="fas fa-images"></i>
+    <span class="label">Galeri</span>
+  </button>
+  <button class="bottom-nav-item" data-section="profile">
+    <i class="fas fa-user"></i>
+    <span class="label">Akun</span>
+  </button>
+</div>
+
+<!-- HERO SECTION -->
+<section class="hero" id="hero">
+  <div class="container text-center" data-aos="fade-up">
+    <h1 class="display-4 fw-bold mb-3">Sistem Informasi Padukuhan Demangan</h1>
+    <p class="lead mb-4 opacity-90">Kelola data warga, pengajuan surat, dan pemetaan rumah secara digital untuk 7 RT yang lebih maju dan transparan.</p>
+    <div id="heroButtonContainer"><a href="login.html" class="btn btn-login btn-lg"><i class="fas fa-arrow-right me-2"></i>Mulai Sekarang</a></div>
+    <p class="mt-4 text-white-50 small" id="heroSubText">Gunakan akun yang terdaftar di sistem</p>
+  </div>
+</section>
+
+<!-- STATISTIK -->
+<div class="container mb-5">
+  <div class="row g-4 text-center">
+    <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100"><div class="stat-card"><div class="stat-number" id="statRt">7</div><div class="stat-label text-uppercase fw-semibold text-muted">Rukun Tetangga</div></div></div>
+    <div class="col-md-4" data-aos="zoom-in" data-aos-delay="200"><div class="stat-card"><div class="stat-number" id="statWarga">0</div><div class="stat-label text-uppercase fw-semibold text-muted">Warga Terdata</div></div></div>
+    <div class="col-md-4" data-aos="zoom-in" data-aos-delay="300"><div class="stat-card"><div class="stat-number" id="statSurat">0</div><div class="stat-label text-uppercase fw-semibold text-muted">Surat Terbit</div></div></div>
+  </div>
+</div>
+
+<!-- FITUR -->
+<section id="fitur" class="container py-5">
+  <h2 class="text-center fw-bold mb-5" data-aos="fade-up">✨ Fitur Unggulan</h2>
+  <div class="row g-4">
+    <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="50"><div class="feature-card p-4"><div class="feature-icon"><i class="fas fa-users"></i></div><h5 class="fw-bold">Pendataan Warga Lengkap</h5><p class="text-muted">Data warga meliputi NIK, NKK, kontak, pekerjaan, pendidikan, serta unggah foto diri dan foto rumah.</p></div></div>
+    <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100"><div class="feature-card p-4"><div class="feature-icon"><i class="fas fa-map-marked-alt"></i></div><h5 class="fw-bold">Pemetaan OpenStreetMap</h5><p class="text-muted">Tandai lokasi rumah secara akurat menggunakan peta interaktif.</p></div></div>
+    <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="150"><div class="feature-card p-4"><div class="feature-icon"><i class="fas fa-file-signature"></i></div><h5 class="fw-bold">Penerbitan Surat Online</h5><p class="text-muted">Warga mengajukan surat, Ketua RT & Admin memproses.</p></div></div>
+    <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200"><div class="feature-card p-4"><div class="feature-icon"><i class="fas fa-lock"></i></div><h5 class="fw-bold">3 Level Akses (Role)</h5><p class="text-muted">Admin, Ketua RT, Member dengan hak akses berbeda.</p></div></div>
+    <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="250"><div class="feature-card p-4"><div class="feature-icon"><i class="fas fa-search"></i></div><h5 class="fw-bold">Pencarian & Filter</h5><p class="text-muted">Temukan data warga cepat berdasarkan nama, NIK, RT.</p></div></div>
+    <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300"><div class="feature-card p-4"><div class="feature-icon"><i class="fas fa-chart-pie"></i></div><h5 class="fw-bold">Dashboard Statistik</h5><p class="text-muted">Grafik sebaran penduduk per RT, pekerjaan, pendidikan.</p></div></div>
+    <div class="col-md-6 col-lg-4 offset-lg-2" data-aos="fade-up" data-aos-delay="350"><div class="feature-card p-4"><div class="feature-icon"><i class="fas fa-check-circle"></i></div><h5 class="fw-bold">Verifikasi Keaslian Surat</h5><p class="text-muted">Cek keabsahan surat resmi via nomor surat atau QR code.</p><a href="verifikasi_surat.html" class="btn btn-sm btn-outline-primary rounded-pill mt-2">Verifikasi →</a></div></div>
+  </div>
+</section>
+
+<!-- TENTANG -->
+<section id="tentang" class="container py-5">
+  <div class="row align-items-center g-5">
+    <div class="col-lg-6" data-aos="fade-right">
+      <h2 class="fw-bold mb-3">Tentang Padukuhan Demangan</h2>
+      <p class="text-muted">Padukuhan Demangan terdiri dari 7 Rukun Tetangga (RT) yang aktif dan bersinergi dalam pembangunan masyarakat. Dengan sistem informasi ini, kami berupaya mewujudkan layanan administrasi yang cepat, transparan, dan akurat.</p>
+      <button type="button" class="btn btn-outline-primary rounded-pill px-4 mt-2" data-bs-toggle="modal" data-bs-target="#profilModal"><i class="fas fa-info-circle me-2"></i>Profil Lengkap</button>
+    </div>
+    <div class="col-lg-6" data-aos="fade-left"><img src="maps.webp" alt="Peta Padukuhan" class="img-fluid rounded-4 shadow-lg"></div>
+  </div>
+</section>
+
+<!-- BERITA -->
+<section id="berita" class="container py-5">
+  <h2 class="text-center fw-bold mb-5" data-aos="fade-up">📰 Berita & Informasi</h2>
+  <div class="row g-4" id="beritaContainer">
+    <div class="col-md-4"><div class="skeleton" style="height: 280px;"></div></div>
+    <div class="col-md-4"><div class="skeleton" style="height: 280px;"></div></div>
+    <div class="col-md-4"><div class="skeleton" style="height: 280px;"></div></div>
+  </div>
+</section>
+
+<!-- GALERI -->
+<section id="galeri" class="container py-5">
+  <h2 class="text-center fw-bold mb-4" data-aos="fade-up">📸 Galeri Kegiatan</h2>
+  <div class="galeri-carousel-container" id="galeriCarouselContainer">
+    <div class="galeri-carousel-track" id="galeriTrack"></div>
+    <button class="carousel-nav-btn carousel-nav-prev" id="galeriPrevBtn"><i class="fas fa-chevron-left"></i></button>
+    <button class="carousel-nav-btn carousel-nav-next" id="galeriNextBtn"><i class="fas fa-chevron-right"></i></button>
+  </div>
+</section>
+
+<!-- MODALS -->
+<div class="modal fade modal-zoom" id="imageModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content bg-transparent border-0"><div class="modal-body text-center"><img src="" alt="Zoom" id="modalImage" class="rounded-4 shadow-lg" style="max-width:100%;max-height:85vh"></div><button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 mt-3 me-3" data-bs-dismiss="modal"></button></div></div></div>
+<div class="modal fade modal-berita" id="beritaModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"><div class="modal-content rounded-4"><div class="modal-header border-0"><h5 class="modal-title fw-bold" id="beritaModalTitle"></h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="small text-muted mb-2" id="beritaModalDate"></div><img id="beritaModalImage" class="img-fluid rounded-3 mb-3 w-100" style="display:none"><div id="beritaModalContent"></div></div><div class="modal-footer border-0"><button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Tutup</button></div></div></div></div>
+
+<div class="modal fade modal-profil" id="profilModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+    <div class="modal-content rounded-4">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title fw-bold"><i class="fas fa-landmark me-2"></i>Profil Lengkap Padukuhan Demangan</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-3"><img src="1.webp" style="width:80px" class="rounded shadow-sm"></div>
+        <h5>📍 Sejarah & Wilayah</h5>
+        <p>Padukuhan Demangan terletak di <strong>Kalurahan Bangunharjo, Kapanewon Sewon, Kabupaten Bantul, Daerah Istimewa Yogyakarta</strong>. Secara administratif terdiri dari <strong>7 Rukun Tetangga (RT)</strong>. Padukuhan ini berdiri sejak tahun 1982 dan dikenal dengan semangat gotong royong serta partisipasi aktif warganya dalam pembangunan infrastruktur dan sosial kemasyarakatan.</p>
+        <h5 class="mt-4">🌟 Visi & Misi</h5>
+        <p><strong>Visi:</strong> Terwujudnya Padukuhan Demangan yang maju, mandiri, berbudaya, dan berkelanjutan berbasis partisipasi aktif warga.</p>
+        <p><strong>Misi:</strong></p>
+        <ul><li>Meningkatkan kualitas pelayanan administrasi kependudukan secara digital dan transparan.</li><li>Mengembangkan infrastruktur padukuhan yang ramah lingkungan.</li><li>Memperkuat ekonomi kreatif warga melalui pelatihan dan pemasaran produk lokal.</li><li>Menjaga kerukunan dan nilai-nilai budaya Jawa.</li></ul>
+        <h5>👤 Perangkat Padukuhan</h5>
+        <ul><li><strong>Dukuh Demangan:</strong> Bapak H. Sariyana, BA</li><li><strong>Sekretaris Padukuhan:</strong> Ibu Sri Rahayu</li><li><strong>Bendahara:</strong> Bapak Joko Supriyanto</li></ul>
+        <h5>🏘️ Ketua Rukun Tetangga (RT)</h5>
+        <div class="table-responsive"><table class="table table-bordered table-hover"><thead class="table-light"><tr><th>RT</th><th>Nama Ketua RT</th><th>Kontak</th></tr></thead><tbody>
+          <tr><td>01</td><td>Bapak Tugi Antara</td><td>0812-2702-2424</td></tr>
+          <tr><td>02</td><td>Bapak Supriyanta</td><td>0858-7751-1761</td></tr>
+          <tr><td>03</td><td>Bapak Suroto</td><td>0896-7499-7187</td></tr>
+          <tr><td>04</td><td>Bapak Jeriyanto</td><td>0852-1581-0017</td></tr>
+          <tr><td>05</td><td>Bapak Paryanto</td><td>0851-0162-5000</td></tr>
+          <tr><td>06</td><td>Bapak Suryanto</td><td>0882-2531-4439</td></tr>
+          <tr><td>07</td><td>Bapak Nur Widayatno</td><td>0813-2834-5357</td></tr>
+        </tbody></table></div>
+        <h5>📊 Data Umum & Statistik</h5>
+        <ul><li>Jumlah RT: <strong>7</strong></li><li>Luas wilayah: ± 45 hektar</li><li>Jumlah penduduk terdata: <span id="modalStatWarga">-</span> jiwa (update berkala)</li><li>Jumlah KK: ± 850 KK</li><li>Kode Pos: 55185</li><li>Potensi Unggulan: Kerajinan batik, pertanian organik, UMKM makanan ringan</li></ul>
+        <p class="small text-muted mt-2">Informasi ini bersumber dari data resmi Padukuhan Demangan tahun 2026.</p>
+      </div>
+      <div class="modal-footer"><button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Tutup</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="kelolaSipadeModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title"><i class="fas fa-database me-2"></i>Kelola Data Pengetahuan Sipade</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted">Tambahkan informasi kegiatan, pengumuman, atau FAQ yang akan digunakan AI Sipade untuk menjawab pertanyaan warga.</p>
+        <form id="formKnowledge">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Judul Informasi</label>
+            <input type="text" class="form-control" id="knowledgeTitle" placeholder="Contoh: Jadwal Posyandu Mei 2026" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Kategori</label>
+            <select class="form-select" id="knowledgeCategory">
+              <option value="Kegiatan">Kegiatan</option>
+              <option value="Pengumuman">Pengumuman</option>
+              <option value="FAQ">FAQ</option>
+              <option value="Lainnya">Lainnya</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Isi Informasi</label>
+            <textarea class="form-control" id="knowledgeContent" rows="3" placeholder="Tulis informasi detail..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary rounded-pill"><i class="fas fa-save"></i> Simpan Data</button>
+        </form>
+        <hr>
+        <h6 class="fw-bold mt-3"><i class="fas fa-list"></i> Data Tersimpan</h6>
+        <div id="knowledgeList" class="mt-2"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHATBOT SIPADE -->
+<div class="chatbot-button" id="chatbotToggleBtn"><i class="fas fa-robot"></i></div>
+<div class="chatbot-window hidden" id="chatbotWindow">
+  <div class="chatbot-header"><h6><i class="fas fa-robot me-1"></i> Sipade · Asisten Humanis</h6><i class="fas fa-times" id="chatbotCloseBtn"></i></div>
+  <div class="chatbot-messages" id="chatMessages">
+    <div class="message bot">🌾 Halo, warga Demangan! Saya <strong>Sipade</strong>. Ada yang bisa saya bantu? (info kegiatan, surat, atau semangat gotong royong)</div>
+    <div class="message bot"><button class="whatsapp-btn" onclick="startContactFlow()"><i class="fab fa-whatsapp"></i> 📨 Kirim Masukan ke Perangkat</button></div>
+    <div class="suggestion-buttons" id="suggestionButtons">
+      <button class="suggestion-chip" onclick="askSuggestion('info kegiatan')">📅 Info Kegiatan</button>
+      <button class="suggestion-chip" onclick="askSuggestion('semangat gotong royong')">🤝 Gotong Royong</button>
+      <button class="suggestion-chip" onclick="askSuggestion('donor darah')">🩸 Donor Darah</button>
+      <button class="suggestion-chip" onclick="askSuggestion('kerja bakti')">🧹 Kerja Bakti</button>
+    </div>
+  </div>
+  <div class="chatbot-input"><input type="text" id="chatInput" placeholder="Tanya Sipade..."><button id="chatSendBtn"><i class="fas fa-paper-plane"></i></button></div>
+</div>
+
+<!-- CTA -->
+<section class="container py-5">
+  <div class="cta-gradient text-white p-5 text-center rounded-5 shadow-lg" data-aos="flip-up">
+    <h3 class="fw-bold mb-3">Siap untuk mengelola padukuhan secara digital?</h3>
+    <p class="mb-4 opacity-90" id="ctaText">Login sekarang menggunakan akun yang terdaftar dan mulai gunakan berbagai fitur unggulan.</p>
+    <div id="ctaButtonContainer"><a href="login.html" class="btn btn-light btn-lg rounded-pill px-5 py-3 fw-bold shadow-sm"><i class="fas fa-sign-in-alt me-2"></i>Masuk</a></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="kontak">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-5"><h5><i class="fas fa-map-marked-alt me-2"></i> Padukuhan Demangan</h5><p class="small text-secondary-emphasis">Sistem Informasi Padukuhan v2.0 - Digitalisasi Layanan Warga untuk 7 RT yang lebih transparan dan akuntabel.</p><div class="social-icons mt-3"><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-youtube"></i></a><a href="#"><i class="fab fa-twitter"></i></a></div></div>
+      <div class="col-md-3"><h5>Tautan Cepat</h5><ul class="list-unstyled"><li class="mb-2"><a href="#fitur" class="footer-link"><i class="fas fa-angle-right"></i> Fitur</a></li><li class="mb-2"><a href="#tentang" class="footer-link"><i class="fas fa-angle-right"></i> Tentang</a></li><li class="mb-2"><a href="#berita" class="footer-link"><i class="fas fa-angle-right"></i> Berita</a></li><li class="mb-2"><a href="#galeri" class="footer-link"><i class="fas fa-angle-right"></i> Galeri</a></li><li class="mb-2"><a href="verifikasi_surat.html" class="footer-link"><i class="fas fa-angle-right"></i> Verifikasi Surat</a></li></ul></div>
+      <div class="col-md-4"><h5>Kontak Kami</h5><ul class="list-unstyled"><li class="mb-2"><i class="fas fa-map-pin me-2 text-primary"></i> Demangan, Bangunharjo, Sewon, Bantul</li><li class="mb-2"><i class="fas fa-phone me-2 text-primary"></i> (0274) 123456</li><li class="mb-2"><i class="fas fa-envelope me-2 text-primary"></i> info@demangan.desa.id</li><li class="mb-2"><i class="fas fa-clock me-2 text-primary"></i> Senin - Jumat: 08.00 - 14.00</li></ul></div>
+    </div>
+    <div class="copyright"><p class="mb-0">&copy; 2026 Padukuhan Demangan. All rights reserved. | <a href="#">Kebijakan Privasi</a> | <a href="#">Syarat & Ketentuan</a></p></div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  // ========== INISIALISASI AOS ==========
+  AOS.init({ duration: 700, once: true, offset: 50 });
+
+  // ========== BOTTOM NAVIGATION HANDLER ==========
+  const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+  function setActiveBottomNav(sectionId) {
+    bottomNavItems.forEach(item => {
+      item.classList.remove('active');
+      if (item.getAttribute('data-section') === sectionId) item.classList.add('active');
+    });
+  }
+  function scrollToSection(sectionId) {
+    if (sectionId === 'profile') {
+      const user = getLoggedInUser();
+      if (user) {
+        let dashboardUrl = '';
+        if (user.role === 'admin') dashboardUrl = 'dashboard_admin.html';
+        else if (user.role === 'ketua_rt') dashboardUrl = 'dashboard_ketua_rt.html';
+        else dashboardUrl = 'dashboard_member.html';
+        window.location.href = dashboardUrl;
+      } else {
+        window.location.href = 'login.html';
+      }
+      return;
+    }
+    const target = document.getElementById(sectionId);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setActiveBottomNav(sectionId);
+    }
+  }
+  bottomNavItems.forEach(item => {
+    item.addEventListener('click', (e) => {
+      const section = item.getAttribute('data-section');
+      scrollToSection(section);
+    });
+  });
+  // Set active bottom nav based on scroll
+  function updateBottomNavOnScroll() {
+    const sections = ['hero', 'fitur', 'berita', 'galeri'];
+    const scrollPos = window.scrollY + 150;
+    let current = 'hero';
+    for (let s of sections) {
+      const el = document.getElementById(s);
+      if (el && scrollPos >= el.offsetTop - 80) current = s;
+    }
+    setActiveBottomNav(current);
+  }
+  window.addEventListener('scroll', updateBottomNavOnScroll);
+  window.addEventListener('load', updateBottomNavOnScroll);
+
+  // ========== SEMUA FUNGSI ASLI (dari index.html) ==========
+  function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+  function formatNumber(num) { return num >= 1000 ? (num/1000).toFixed(1)+'K+' : num; }
+  function getYouTubeThumb(url) { if (!url) return null; const match = url.match(/^.*(youtu.be\/|v\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/); return (match && match[2].length===11) ? `https://img.youtube.com/vi/${match[2]}/hqdefault.jpg` : null; }
+  function getYouTubeEmbedUrl(url) { if (url.includes('youtube.com/watch?v=')) return url.replace('watch?v=', 'embed/'); else if (url.includes('youtu.be/')) return `https://www.youtube.com/embed/${url.split('youtu.be/')[1]}`; return url; }
+
+  let statsData = { total_warga: 0, total_surat_terbit: 0 };
+  let beritaData = [];
+  let galeriItems = [];
+  let currentSlide = 0, itemsPerSlide = 4;
+  let knowledgeBase = [];
+
+  function renderStats() {
+    document.getElementById('statWarga').innerText = formatNumber(statsData.total_warga);
+    document.getElementById('statSurat').innerText = formatNumber(statsData.total_surat_terbit);
+    document.getElementById('modalStatWarga').innerText = formatNumber(statsData.total_warga);
+  }
+  function renderBerita() {
+    const cont = document.getElementById('beritaContainer');
+    if (!beritaData.length) { cont.innerHTML = '<p class="text-center text-muted">Belum ada berita.</p>'; return; }
+    cont.innerHTML = beritaData.slice(0, 6).map(b => `
+      <div class="col-md-6 col-lg-4">
+        <div class="card berita-card h-100 border-0 shadow-sm">
+          <img src="${b.gambar_url || 'https://placehold.co/400x200?text=Berita'}" class="berita-card-img" onerror="this.src='https://placehold.co/400x200?text=No+Image'">
+          <div class="card-body">
+            <h5 class="card-title fw-bold">${escapeHtml(b.judul)}</h5>
+            <p class="text-muted small">${new Date(b.tgl_publikasi).toLocaleDateString()}</p>
+            <p class="card-text">${escapeHtml(b.isi.substring(0, 100))}...</p>
+          </div>
+          <div class="card-footer bg-transparent border-0 pb-3">
+            <button class="btn btn-sm btn-outline-primary rounded-pill" onclick="showBeritaModal(${b.id})">Baca</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+  window.showBeritaModal = function(id) {
+    const b = beritaData.find(x => x.id == id);
+    if (!b) return;
+    document.getElementById('beritaModalTitle').innerText = b.judul;
+    document.getElementById('beritaModalDate').innerText = new Date(b.tgl_publikasi).toLocaleDateString('id-ID');
+    const img = document.getElementById('beritaModalImage');
+    if (b.gambar_url && b.gambar_url.trim()) { img.src = b.gambar_url; img.style.display = 'block'; } else img.style.display = 'none';
+    document.getElementById('beritaModalContent').innerHTML = escapeHtml(b.isi).replace(/\n/g, '<br>');
+    new bootstrap.Modal(document.getElementById('beritaModal')).show();
+  };
+  function updateItemsPerSlide() { if(window.innerWidth<576) itemsPerSlide=1; else if(window.innerWidth<768) itemsPerSlide=2; else if(window.innerWidth<992) itemsPerSlide=3; else itemsPerSlide=4; }
+  function renderGaleri() {
+    const track = document.getElementById('galeriTrack');
+    if (!galeriItems.length) { track.innerHTML = '<p class="text-center text-muted">Belum ada galeri.</p>'; return; }
+    updateItemsPerSlide();
+    const totalSlides = Math.ceil(galeriItems.length / itemsPerSlide);
+    if (currentSlide >= totalSlides) currentSlide = 0;
+    const start = currentSlide * itemsPerSlide;
+    const visible = galeriItems.slice(start, start + itemsPerSlide);
+    track.innerHTML = visible.map(item => {
+      const isVideo = item.tipe === 'video';
+      let thumb = item.gambar_url, embed = item.gambar_url;
+      if (isVideo) { const yt = getYouTubeThumb(item.gambar_url); if (yt) { thumb = yt; embed = getYouTubeEmbedUrl(item.gambar_url); } }
+      const onclick = isVideo ? `window.open('${embed}','_blank')` : `showImageZoom('${thumb}')`;
+      const badge = isVideo ? '<div class="video-badge position-absolute top-0 end-0 bg-dark text-white p-1 rounded"><i class="fas fa-play"></i></div>' : '';
+      return `<div class="galeri-carousel-item position-relative" onclick="${onclick}">${badge}<img src="${thumb}" class="galeri-carousel-thumb" onerror="this.src='https://placehold.co/500x500?text=No+Image'"><div class="galeri-carousel-deskripsi">${escapeHtml(item.deskripsi || '')}</div></div>`;
+    }).join('');
+    const total = Math.ceil(galeriItems.length / itemsPerSlide);
+    const prevBtn = document.getElementById('galeriPrevBtn');
+    const nextBtn = document.getElementById('galeriNextBtn');
+    if (prevBtn) prevBtn.style.display = total <= 1 ? 'none' : 'flex';
+    if (nextBtn) nextBtn.style.display = total <= 1 ? 'none' : 'flex';
+  }
+  function nextSlide() { const total = Math.ceil(galeriItems.length / itemsPerSlide); if (total > 1) { currentSlide = (currentSlide + 1) % total; renderGaleri(); } }
+  function prevSlide() { const total = Math.ceil(galeriItems.length / itemsPerSlide); if (total > 1) { currentSlide = (currentSlide - 1 + total) % total; renderGaleri(); } }
+  window.addEventListener('resize', () => renderGaleri());
+  window.showImageZoom = (url) => { document.getElementById('modalImage').src = url; new bootstrap.Modal(document.getElementById('imageModal')).show(); };
+  document.getElementById('galeriPrevBtn')?.addEventListener('click', prevSlide);
+  document.getElementById('galeriNextBtn')?.addEventListener('click', nextSlide);
+
+  async function loadAllPublicData() {
+    try { const stats = await getPublicStatistik(); if (stats) { statsData = stats; renderStats(); } } catch(e) { console.warn(e); }
+    try { const berita = await getPublicBerita(); if (berita) { beritaData = berita; renderBerita(); } } catch(e) { console.warn(e); }
+    try { const galeri = await getPublicGaleri(); if (galeri) { galeriItems = galeri; renderGaleri(); } } catch(e) { console.warn(e); }
+  }
+
+  async function syncKnowledgeBaseFromAPI() {
+    try { const data = await getSipadeKnowledge(); if (data && Array.isArray(data)) { knowledgeBase = data; localStorage.setItem('sipade_knowledge', JSON.stringify(knowledgeBase)); renderKnowledgeList(); } } catch(e) { console.warn(e); }
+  }
+  function loadKnowledgeBaseFromLocal() { const stored = localStorage.getItem('sipade_knowledge'); if (stored) knowledgeBase = JSON.parse(stored); else knowledgeBase = []; }
+  async function addKnowledge(judul, kategori, isi) { try { await createSipadeKnowledge({ judul, kategori, isi }); await syncKnowledgeBaseFromAPI(); } catch(e) { alert('Gagal: '+e.message); } }
+  async function deleteKnowledge(id) { try { await deleteSipadeKnowledge(id); await syncKnowledgeBaseFromAPI(); } catch(e) { alert('Gagal hapus: '+e.message); } }
+  function renderKnowledgeList() {
+    const container = document.getElementById('knowledgeList');
+    if (!container) return;
+    if (knowledgeBase.length === 0) { container.innerHTML = '<p class="text-muted">Belum ada data.</p>'; return; }
+    container.innerHTML = knowledgeBase.map(item => `
+      <div class="knowledge-list-item p-2 bg-light rounded mb-2">
+        <div class="d-flex justify-content-between align-items-start">
+          <div><span class="badge bg-primary me-2">${escapeHtml(item.kategori)}</span><strong>${escapeHtml(item.judul)}</strong></div>
+          <button class="btn btn-sm btn-outline-danger rounded-pill" onclick="deleteKnowledgeHandler('${item.id}')"><i class="fas fa-trash"></i></button>
+        </div>
+        <p class="small mt-1 mb-0">${escapeHtml(item.isi.substring(0,100))}${item.isi.length>100?'...':''}</p>
+      </div>
+    `).join('');
+  }
+  window.deleteKnowledgeHandler = (id) => { if (confirm('Hapus?')) deleteKnowledge(id); };
+
+  // Chatbot
+  const kontakPerangkat = [
+    { jenis: "Dukuh", nama: "Bapak H. Sariyana, BA", nomor: "6281227844244" },
+    { jenis: "RT 01", nama: "Bapak Tugi Antara", nomor: "6281227022424" }, { jenis: "RT 02", nama: "Bapak Supriyanta", nomor: "6285877511761" },
+    { jenis: "RT 03", nama: "Bapak Suroto", nomor: "6289674997187" }, { jenis: "RT 04", nama: "Bapak Jeriyanto", nomor: "6285215810017" },
+    { jenis: "RT 05", nama: "Bapak Paryanto", nomor: "6285101625000" }, { jenis: "RT 06", nama: "Bapak Suryanto", nomor: "6288225314439" },
+    { jenis: "RT 07", nama: "Bapak Nur Widayatno", nomor: "6281328345357" }
+  ];
+  let chatFlowState = null;
+  function addMessageBot(text, isHtml = false) { addMessage(text, false, isHtml); }
+  function addMessage(text, isUser, isHtml = false) {
+    const msgDiv = document.createElement('div'); msgDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+    if (isHtml) msgDiv.innerHTML = text; else msgDiv.innerHTML = escapeHtml(text).replace(/\n/g, '<br>');
+    document.getElementById('chatMessages').appendChild(msgDiv); msgDiv.scrollIntoView({ behavior: 'smooth' });
+  }
+  window.startContactFlow = function() {
+    if (chatFlowState) { addMessageBot("Sipade: Anda sedang dalam proses. Ketik 'batal'."); return; }
+    addMessageBot("📨 **Kirim Masukan via WhatsApp**\nPilih tujuan:", true);
+    let btns = '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">';
+    kontakPerangkat.forEach((k, idx) => { btns += `<button class="whatsapp-btn" onclick="pilihTujuan(${idx})">${k.jenis} - ${k.nama}</button>`; });
+    btns += '</div><p class="small mt-2">Atau ketik nomor (1=Dukuh, 2-8=RT01-07)</p>';
+    addMessageBot(btns, true);
+    chatFlowState = { step: 'pilih_tujuan', tujuanIndex: null, nama: '', alamat: '', pesan: '' };
+  };
+  window.pilihTujuan = function(idx) { if (!chatFlowState || chatFlowState.step !== 'pilih_tujuan') return; chatFlowState.tujuanIndex = idx; chatFlowState.step = 'nama'; addMessageBot(`Anda memilih ${kontakPerangkat[idx].jenis} - ${kontakPerangkat[idx].nama}. Masukkan NAMA Anda:`); };
+  async function processFlowInput(userText) {
+    if (userText.toLowerCase() === 'batal') { addMessageBot("❌ Dibatalkan."); chatFlowState = null; return true; }
+    const s = chatFlowState.step;
+    if (s === 'pilih_tujuan') {
+      let idx = null;
+      if (!isNaN(userText) && userText >= 1 && userText <= 8) idx = userText - 1;
+      else if (userText.includes('dukuh')) idx = 0;
+      else for (let i = 1; i <= 7; i++) if (userText.includes(`rt 0${i}`) || userText.includes(`rt ${i}`)) idx = i;
+      if (idx !== null && idx >= 0 && idx < kontakPerangkat.length) { chatFlowState.tujuanIndex = idx; chatFlowState.step = 'nama'; addMessageBot(`Terpilih: ${kontakPerangkat[idx].jenis} - ${kontakPerangkat[idx].nama}. Masukkan NAMA Anda:`); } else addMessageBot("Pilihan tidak valid. Coba lagi.");
+      return true;
+    }
+    if (s === 'nama') { if (userText.trim().length < 2) { addMessageBot("Nama minimal 2 huruf."); return true; } chatFlowState.nama = userText.trim(); chatFlowState.step = 'alamat'; addMessageBot("Masukkan ALAMAT (contoh: RT 02, Gang Mawar 5):"); return true; }
+    if (s === 'alamat') { if (userText.trim().length < 3) { addMessageBot("Alamat lebih jelas."); return true; } chatFlowState.alamat = userText.trim(); chatFlowState.step = 'pesan'; addMessageBot("Tulis PESAN / MASUKAN Anda:"); return true; }
+    if (s === 'pesan') { if (userText.trim().length < 2) { addMessageBot("Pesan terlalu pendek."); return true; } chatFlowState.pesan = userText.trim(); const t = kontakPerangkat[chatFlowState.tujuanIndex]; addMessageBot(`📋 Ringkasan:\nTujuan: ${t.jenis} ${t.nama}\nNama: ${chatFlowState.nama}\nAlamat: ${chatFlowState.alamat}\nPesan: ${chatFlowState.pesan}\n\nKetik YA untuk kirim, BATAL batal.`); chatFlowState.step = 'konfirmasi'; return true; }
+    if (s === 'konfirmasi') {
+      if (userText.toLowerCase() === 'ya') { const t = kontakPerangkat[chatFlowState.tujuanIndex]; const waText = `*Laporan Warga Demangan*\nNama: ${chatFlowState.nama}\nAlamat: ${chatFlowState.alamat}\nPesan: ${chatFlowState.pesan}`; const waLink = `https://wa.me/${t.nomor}?text=${encodeURIComponent(waText)}`; addMessageBot(`✅ <a href="${waLink}" target="_blank">Klik untuk buka WhatsApp</a>`, true); window.open(waLink, '_blank'); chatFlowState = null; }
+      else if (userText.toLowerCase() === 'batal') { addMessageBot("Dibatalkan."); chatFlowState = null; } else addMessageBot("Ketik YA atau BATAL.");
+      return true;
+    }
+    return false;
+  }
+  async function getBotReply(message) {
+    try { const result = await chatWithBot(message); return result.reply; } catch(e) { return "Maaf, layanan chatbot sedang sibuk. Silakan coba lagi nanti."; }
+  }
+  async function handleSend() {
+    const inp = document.getElementById('chatInput'); const msg = inp.value.trim();
+    if (!msg) return;
+    addMessage(msg, true); inp.value = '';
+    if (chatFlowState) { const handled = await processFlowInput(msg); if (handled) return; }
+    const typingDiv = document.createElement('div'); typingDiv.className = 'typing-indicator'; typingDiv.innerHTML = '<span></span><span></span><span></span>';
+    document.getElementById('chatMessages').appendChild(typingDiv);
+    const reply = await getBotReply(msg);
+    typingDiv.remove(); addMessageBot(reply);
+  }
+  window.askSuggestion = async (topic) => { document.getElementById('chatInput').value = topic; handleSend(); };
+  document.getElementById('chatbotToggleBtn').addEventListener('click', () => { document.getElementById('chatbotWindow').classList.toggle('hidden'); });
+  document.getElementById('chatbotCloseBtn').addEventListener('click', () => { document.getElementById('chatbotWindow').classList.add('hidden'); });
+  document.getElementById('chatSendBtn').addEventListener('click', handleSend);
+  document.getElementById('chatInput').addEventListener('keypress', e => { if (e.key === 'Enter') handleSend(); });
+
+  // Login handling
+  function getDashboardLink(role) { if (role === 'admin') return 'dashboard_admin.html'; if (role === 'ketua_rt') return 'dashboard_ketua_rt.html'; return 'dashboard_member.html'; }
+  function createUserDropdown(user) {
+    const div = document.createElement('div'); div.className = 'dropdown';
+    const btn = document.createElement('button'); btn.className = 'btn btn-outline-primary rounded-pill dropdown-toggle px-4'; btn.setAttribute('data-bs-toggle', 'dropdown');
+    btn.innerHTML = `<i class="fas fa-user-circle me-2"></i>${user.nama ? user.nama : user.role}`;
+    const menu = document.createElement('ul'); menu.className = 'dropdown-menu dropdown-menu-end';
+    let menuHtml = `<li><a class="dropdown-item" href="${getDashboardLink(user.role)}"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>`;
+    if (user.role === 'admin' || user.role === 'ketua_rt') menuHtml += `<li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#kelolaSipadeModal"><i class="fas fa-database me-2"></i> Kelola Data Sipade</a></li>`;
+    menuHtml += `<li><hr class="dropdown-divider"></li><li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>`;
+    menu.innerHTML = menuHtml;
+    div.appendChild(btn); div.appendChild(menu); return div;
+  }
+  function updateButtons() {
+    const user = getLoggedInUser();
+    const loginNav = document.getElementById('loginNavItem');
+    const heroBtn = document.getElementById('heroButtonContainer');
+    const ctaBtn = document.getElementById('ctaButtonContainer');
+    const heroSub = document.getElementById('heroSubText');
+    const ctaText = document.getElementById('ctaText');
+    if (user) {
+      loginNav.innerHTML = ''; loginNav.appendChild(createUserDropdown(user));
+      if (heroBtn) heroBtn.innerHTML = `<a href="${getDashboardLink(user.role)}" class="btn btn-login btn-lg"><i class="fas fa-user-circle me-2"></i> Dashboard</a>`;
+      if (heroSub) heroSub.innerHTML = `Selamat datang, ${user.nama}! <a href="#" id="logoutHero" class="text-white-50">Logout</a>`;
+      if (ctaBtn) ctaBtn.innerHTML = `<a href="${getDashboardLink(user.role)}" class="btn btn-light btn-lg rounded-pill px-5 py-3 fw-bold">Dashboard</a>`;
+      if (ctaText) ctaText.innerText = 'Akses dashboard untuk kelola data.';
+      document.getElementById('logoutHero')?.addEventListener('click', (e) => { e.preventDefault(); localStorage.removeItem('user'); location.reload(); });
+      document.getElementById('logoutBtn')?.addEventListener('click', (e) => { e.preventDefault(); localStorage.removeItem('user'); location.reload(); });
+      if (user.role === 'admin' || user.role === 'ketua_rt') { loadKnowledgeBaseFromLocal(); renderKnowledgeList(); syncKnowledgeBaseFromAPI(); }
+    } else {
+      loginNav.innerHTML = '<a class="btn btn-primary rounded-pill px-4" href="login.html"><i class="fas fa-sign-in-alt me-2"></i>Masuk</a>';
+      if (heroBtn) heroBtn.innerHTML = '<a href="login.html" class="btn btn-login btn-lg"><i class="fas fa-arrow-right me-2"></i>Mulai Sekarang</a>';
+      if (heroSub) heroSub.innerHTML = 'Gunakan akun yang terdaftar di sistem';
+      if (ctaBtn) ctaBtn.innerHTML = '<a href="login.html" class="btn btn-light btn-lg rounded-pill px-5 py-3 fw-bold"><i class="fas fa-sign-in-alt me-2"></i>Masuk</a>';
+      if (ctaText) ctaText.innerText = 'Login sekarang menggunakan akun yang telah terdaftar.';
+    }
+  }
+
+  let refreshInterval = null;
+  function startBackgroundRefresh(intervalMs = 30000) {
+    if (refreshInterval) clearInterval(refreshInterval);
+    refreshInterval = setInterval(async () => {
+      try { await loadAllPublicData(); } catch(e) {}
+    }, intervalMs);
+  }
+
+  document.getElementById('formKnowledge')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const judul = document.getElementById('knowledgeTitle').value.trim();
+    const kategori = document.getElementById('knowledgeCategory').value;
+    const isi = document.getElementById('knowledgeContent').value.trim();
+    if (judul && isi) { await addKnowledge(judul, kategori, isi); document.getElementById('knowledgeTitle').value = ''; document.getElementById('knowledgeContent').value = ''; alert('Data berhasil ditambahkan!'); }
+    else alert('Judul dan isi harus diisi.');
+  });
+
+  (async function init() {
+    await loadAllPublicData();
+    startBackgroundRefresh(30000);
+    updateButtons();
+    window.addEventListener('storage', () => updateButtons());
+    // trigger bottom nav scroll after load
+    setTimeout(updateBottomNavOnScroll, 100);
+  })();
+</script>
+</body>
+</html>

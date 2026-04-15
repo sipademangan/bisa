@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Keuangan RT - Ketua RT | SIP Demangan</title>
+  <link rel="icon" type="image/webp" href="2.webp">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --primary: #2ecc71;
+      --sidebar-bg: #ffffff;
+      --sidebar-width: 280px;
+      --sidebar-collapsed-width: 80px;
+      --header-height: 70px;
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e293b; overflow-x: hidden; }
+    .app-wrapper { display: flex; width: 100%; min-height: 100vh; }
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--sidebar-bg);
+      box-shadow: 4px 0 20px rgba(0,0,0,0.03);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      transition: width 0.3s ease;
+      z-index: 1000;
+      flex-shrink: 0;
+    }
+    .sidebar-collapsed { width: var(--sidebar-collapsed-width); }
+    .sidebar-header {
+      padding: 1.5rem 1rem 0.5rem;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sidebar-collapsed .sidebar-header { padding: 1.5rem 0.5rem 0.5rem; justify-content: center; }
+    .sidebar-brand {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      overflow: hidden;
+    }
+    .logo-wrapper { width: 48px; height: 48px; border-radius: 16px; overflow: hidden; box-shadow: 0 6px 12px rgba(46,204,113,0.25); flex-shrink: 0; }
+    .logo-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+    .sidebar-brand h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      white-space: nowrap;
+    }
+    .sidebar-collapsed .sidebar-brand h3 { display: none; }
+    .sidebar-header p { color: #64748b; font-size: 0.8rem; margin-top: 0.5rem; padding-left: calc(48px + 0.75rem); }
+    .sidebar-collapsed .sidebar-header p { display: none; }
+    #sidebarCollapseBtn {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      cursor: pointer;
+    }
+    .nav-menu { padding: 1rem 0.5rem; list-style: none; }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      margin: 0.25rem 0;
+      color: #475569;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s;
+      overflow: hidden;
+    }
+    .nav-link i { width: 24px; font-size: 1.2rem; margin-right: 0.75rem; color: #94a3b8; flex-shrink: 0; text-align: center; }
+    .sidebar-collapsed .nav-link span { display: none; }
+    .sidebar-collapsed .nav-link { justify-content: center; padding: 0.75rem 0; }
+    .sidebar-collapsed .nav-link i { margin-right: 0; }
+    .nav-link:hover { background: rgba(46,204,113,0.1); color: #2ecc71; }
+    .nav-link.active { background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; box-shadow: 0 6px 12px rgba(46,204,113,0.2); }
+    .nav-link.active i { color: white; }
+    .main-content-wrapper { flex: 1; min-width: 0; display: flex; flex-direction: column; background: #f8fafc; }
+    .top-navbar {
+      height: var(--header-height);
+      background: white;
+      box-shadow: var(--shadow);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+    .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, #2ecc71, #27ae60); display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; }
+    .main-content { flex: 1; padding: 2rem; overflow-x: auto; }
+    .card { border: none; border-radius: 24px; box-shadow: var(--shadow); margin-bottom: 1.5rem; background: white; }
+    .card-header { background: transparent; border-bottom: 1px solid rgba(0,0,0,0.05); font-weight: 600; padding: 1.2rem 1.5rem; }
+    .stat-card { background: white; border-radius: 24px; padding: 1.5rem; text-align: center; box-shadow: var(--shadow); height: 100%; transition: transform 0.2s; }
+    .stat-card:hover { transform: translateY(-5px); }
+    .stat-number { font-size: 1.8rem; font-weight: 700; color: #2ecc71; }
+    .stat-label { color: #64748b; font-weight: 500; }
+    .table-responsive { overflow-x: auto; }
+    .sidebar-toggle { display: none; position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; border: none; box-shadow: 0 6px 16px rgba(46,204,113,0.3); z-index: 1050; font-size: 1.3rem; cursor: pointer; align-items: center; justify-content: center; }
+    @media (max-width: 991.98px) {
+      .sidebar { position: fixed; transform: translateX(-100%); transition: transform 0.3s ease; height: 100vh; top: 0; left: 0; }
+      .sidebar.show { transform: translateX(0); }
+      .main-content { padding: 1rem; }
+      .sidebar-toggle { display: flex; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-wrapper">
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html" class="sidebar-brand"><div class="logo-wrapper"><img src="1.webp" alt="Logo"></div><h3>SIP Demangan</h3></a>
+      <button class="btn btn-link text-dark p-0" id="sidebarCollapseBtn"><i class="fas fa-chevron-left"></i></button>
+    </div>
+    <p>Padukuhan Demangan</p>
+    <ul class="nav-menu">
+      <li class="nav-item"><a href="dashboard_ketua_rt.html" class="nav-link"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+      <li class="nav-item"><a href="warga_ketua.html" class="nav-link"><i class="fas fa-users"></i><span>Data Warga</span></a></li>
+      <li class="nav-item"><a href="analisis_ketua.html" class="nav-link"><i class="fas fa-chart-pie"></i><span>Analisis Warga</span></a></li>
+      <li class="nav-item"><a href="keuangan_ketua.html" class="nav-link active"><i class="fas fa-coins"></i><span>Keuangan</span></a></li>
+      <li class="nav-item"><a href="surat_ketua.html" class="nav-link"><i class="fas fa-envelope"></i><span>Surat</span></a></li>
+      <li class="nav-item"><a href="berita.html" class="nav-link"><i class="fas fa-newspaper"></i><span>Berita</span></a></li>
+      <li class="nav-item"><a href="peta_sebaran_ketua.html" class="nav-link"><i class="fas fa-map-marked-alt"></i><span>Peta Sebaran</span></a></li>
+      <li class="nav-item"><a href="pohon_keluarga_ketua_rt.html" class="nav-link"><i class="fas fa-tree"></i><span>Pohon Keluarga</span></a></li>
+    </ul>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content-wrapper">
+    <div class="top-navbar">
+      <div class="user-dropdown d-flex align-items-center gap-3">
+        <span id="displayName" class="fw-semibold"></span>
+        <div class="dropdown">
+          <button class="btn p-0" data-bs-toggle="dropdown"><div class="user-avatar"><i class="fas fa-user"></i></div></button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-id-card me-2"></i> Profil Saya</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <!-- Header & filters -->
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h2 class="fw-bold"><i class="fas fa-coins me-2 text-success"></i>Manajemen Keuangan RT Anda</h2>
+        <div class="d-flex gap-2 align-items-center">
+          <span class="badge bg-info fs-6 p-2"><i class="fas fa-building me-1"></i> RT Anda: <span id="rtBadge">-</span></span>
+          <select id="filterTahun" class="form-select w-auto"></select>
+          <button class="btn btn-success" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> Export PDF</button>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahTransaksiModal"><i class="fas fa-plus"></i> Tambah Transaksi</button>
+          <button class="btn btn-secondary" id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </div>
+      </div>
+
+      <!-- Statistik ringkasan -->
+      <div class="row g-4 mb-4">
+        <div class="col-md-3"><div class="stat-card"><div class="stat-number" id="totalPemasukan">Rp 0</div><div class="stat-label">Total Pemasukan</div></div></div>
+        <div class="col-md-3"><div class="stat-card"><div class="stat-number" id="totalPengeluaran">Rp 0</div><div class="stat-label">Total Pengeluaran</div></div></div>
+        <div class="col-md-3"><div class="stat-card"><div class="stat-number" id="saldoAkhir">Rp 0</div><div class="stat-label">Saldo Akhir</div></div></div>
+        <div class="col-md-3"><div class="stat-card"><div class="stat-number" id="jumlahTransaksi">0</div><div class="stat-label">Jumlah Transaksi</div></div></div>
+      </div>
+
+      <!-- Grafik -->
+      <div class="row g-4">
+        <div class="col-md-6"><div class="card"><div class="card-header"><i class="fas fa-chart-pie me-2"></i>Pemasukan vs Pengeluaran (RT & Padukuhan)</div><div class="card-body"><canvas id="jenisChart" height="250"></canvas></div></div></div>
+        <div class="col-md-6"><div class="card"><div class="card-header"><i class="fas fa-chart-pie me-2"></i>Kategori Pengeluaran (Top 6)</div><div class="card-body"><canvas id="kategoriChart" height="250"></canvas></div></div></div>
+      </div>
+
+      <!-- Tabel transaksi -->
+      <div class="card mt-4">
+        <div class="card-header"><i class="fas fa-list me-2"></i>Daftar Transaksi Keuangan (RT Anda + Padukuhan)</div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-striped mb-0">
+              <thead class="table-light">
+                <tr><th>Unit</th><th>Tanggal</th><th>Jenis</th><th>Kategori</th><th>Deskripsi</th><th>Jumlah</th><th>Aksi</th></tr>
+              </thead>
+              <tbody id="transaksiTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tombol toggle untuk mobile -->
+<button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+
+<!-- Modal Tambah/Edit Transaksi -->
+<div class="modal fade" id="tambahTransaksiModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Tambah / Edit Transaksi Keuangan</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formTransaksi">
+          <input type="hidden" id="editId" value="">
+          <div class="mb-3"><label class="form-label">RT/Unit *</label>
+            <select id="transaksiRt" class="form-select" required>
+              <option value="">Pilih Unit</option>
+              <option value="0">Tingkat Padukuhan</option>
+              <!-- Opsi RT sendiri akan ditambahkan via JS -->
+            </select>
+          </div>
+          <div class="mb-3"><label class="form-label">Tahun *</label><input type="number" id="transaksiTahun" class="form-control" required value="2026"></div>
+          <div class="mb-3"><label class="form-label">Jenis *</label>
+            <select id="transaksiJenis" class="form-select" required>
+              <option value="">Pilih Jenis</option><option value="pemasukan">Pemasukan</option><option value="pengeluaran">Pengeluaran</option>
+            </select>
+          </div>
+          <div class="mb-3"><label class="form-label">Kategori *</label><input type="text" id="transaksiKategori" class="form-control" required placeholder="Contoh: Iuran Warga, Kegiatan RT, Pembangunan"></div>
+          <div class="mb-3"><label class="form-label">Deskripsi</label><textarea id="transaksiDeskripsi" class="form-control" rows="2"></textarea></div>
+          <div class="mb-3"><label class="form-label">Jumlah (Rp) *</label><input type="number" id="transaksiJumlah" class="form-control" required step="1000"></div>
+          <div class="mb-3"><label class="form-label">Tanggal</label><input type="date" id="transaksiTanggal" class="form-control"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-success" id="simpanTransaksiBtn"><i class="fas fa-save"></i> Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/auth.js"></script>
+<script>
+(function() {
+  // ==================== SIDEBAR & MOBILE ====================
+  const sidebar = document.getElementById('sidebar');
+  const collapseBtn = document.getElementById('sidebarCollapseBtn');
+  const mobileToggle = document.getElementById('sidebarToggle');
+  const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+  if (isCollapsed) {
+    sidebar.classList.add('sidebar-collapsed');
+    if(collapseBtn) collapseBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+  } else {
+    if(collapseBtn) collapseBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+  }
+  if(collapseBtn) collapseBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('sidebar-collapsed');
+    const nowCollapsed = sidebar.classList.contains('sidebar-collapsed');
+    localStorage.setItem('sidebarCollapsed', nowCollapsed);
+    collapseBtn.innerHTML = nowCollapsed ? '<i class="fas fa-chevron-right"></i>' : '<i class="fas fa-chevron-left"></i>';
+  });
+  if(mobileToggle) mobileToggle.addEventListener('click', () => sidebar.classList.toggle('show'));
+  document.addEventListener('click', (e) => {
+    if(window.innerWidth <= 991.98 && sidebar && !sidebar.contains(e.target) && mobileToggle && !mobileToggle.contains(e.target) && sidebar.classList.contains('show')) {
+      sidebar.classList.remove('show');
+    }
+  });
+
+  // ==================== AUTHENTIKASI ====================
+  const user = checkAuth();
+  if (!user) return;
+  if (user.role !== 'ketua_rt') {
+    if(user.role === 'admin') window.location.href = 'keuangan_admin.html';
+    else window.location.href = 'dashboard_member.html';
+    return;
+  }
+  document.getElementById('displayName').innerText = user.nama || user.email;
+  const userRt = user.rt;
+  document.getElementById('rtBadge').innerText = `RT ${userRt.toString().padStart(2,'0')}`;
+
+  // ==================== GLOBAL VARIABLES ====================
+  let allTransaksi = [];
+  let charts = {};
+
+  function formatRupiah(angka) {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+  }
+
+  // ==================== LOAD DATA ====================
+  // Backend sudah filter berdasarkan role ketua_rt (hanya rt miliknya + rt=0)
+  async function loadData() {
+    try {
+      allTransaksi = await apiRequest('/keuangan', 'GET');
+      applyFilterAndRender();
+    } catch(err) {
+      console.error(err);
+      alert('Gagal memuat data keuangan: ' + err.message);
+    }
+  }
+
+  function applyFilterAndRender() {
+    const tahun = document.getElementById('filterTahun').value;
+    let filtered = [...allTransaksi];
+    if (tahun) filtered = filtered.filter(t => t.tahun == tahun);
+    renderKeuangan(filtered);
+  }
+
+  // ==================== RENDER ====================
+  function renderKeuangan(transaksi) {
+    // Hitung total
+    let totalPemasukan = 0, totalPengeluaran = 0;
+    transaksi.forEach(t => {
+      if (t.jenis === 'pemasukan') totalPemasukan += t.jumlah;
+      else totalPengeluaran += t.jumlah;
+    });
+    const saldo = totalPemasukan - totalPengeluaran;
+    document.getElementById('totalPemasukan').innerText = formatRupiah(totalPemasukan);
+    document.getElementById('totalPengeluaran').innerText = formatRupiah(totalPengeluaran);
+    document.getElementById('saldoAkhir').innerText = formatRupiah(saldo);
+    document.getElementById('jumlahTransaksi').innerText = transaksi.length;
+
+    // Pie chart: perbandingan pemasukan vs pengeluaran (untuk keseluruhan yang ditampilkan)
+    updatePieChart('jenisChart', ['Pemasukan', 'Pengeluaran'], [totalPemasukan, totalPengeluaran], ['#2ecc71', '#e74c3c']);
+
+    // Pie chart kategori pengeluaran (top 6)
+    const kategoriMap = new Map();
+    transaksi.filter(t => t.jenis === 'pengeluaran').forEach(t => {
+      const kat = t.kategori || 'Lainnya';
+      kategoriMap.set(kat, (kategoriMap.get(kat) || 0) + t.jumlah);
+    });
+    const sortedKat = Array.from(kategoriMap.entries()).sort((a,b)=>b[1]-a[1]).slice(0,6);
+    updatePieChart('kategoriChart', sortedKat.map(v=>v[0]), sortedKat.map(v=>v[1]), ['#3498db','#e67e22','#9b59b6','#1abc9c','#f1c40f','#e74c3c']);
+
+    // Tabel transaksi
+    const tbody = document.getElementById('transaksiTable');
+    tbody.innerHTML = '';
+    transaksi.forEach(t => {
+      const unitLabel = t.rt == 0 ? 'Padukuhan' : `RT ${t.rt.toString().padStart(2,'0')}`;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${unitLabel}</td>
+        <td>${t.tanggal || '-'}</td>
+        <td><span class="badge ${t.jenis === 'pemasukan' ? 'bg-success' : 'bg-danger'}">${t.jenis === 'pemasukan' ? 'Pemasukan' : 'Pengeluaran'}</span></td>
+        <td>${escapeHtml(t.kategori)}</td>
+        <td>${escapeHtml(t.deskripsi || '-')}</td>
+        <td class="fw-bold">${formatRupiah(t.jumlah)}</td>
+        <td><button class="btn btn-sm btn-warning editTransaksi" data-id="${t.id}"><i class="fas fa-edit"></i></button> <button class="btn btn-sm btn-danger deleteTransaksi" data-id="${t.id}"><i class="fas fa-trash"></i></button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    document.querySelectorAll('.editTransaksi').forEach(btn => btn.addEventListener('click', () => editTransaksi(btn.dataset.id)));
+    document.querySelectorAll('.deleteTransaksi').forEach(btn => btn.addEventListener('click', () => deleteTransaksi(btn.dataset.id)));
+  }
+
+  function updatePieChart(canvasId, labels, data, colors) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    if (charts[canvasId]) charts[canvasId].destroy();
+    charts[canvasId] = new Chart(ctx, {
+      type: 'pie',
+      data: { labels: labels, datasets: [{ data: data, backgroundColor: colors }] },
+      options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
+    });
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
+  }
+
+  // ==================== CRUD ====================
+  async function simpanTransaksi() {
+    const id = document.getElementById('editId').value;
+    const data = {
+      rt: parseInt(document.getElementById('transaksiRt').value),
+      tahun: parseInt(document.getElementById('transaksiTahun').value),
+      jenis: document.getElementById('transaksiJenis').value,
+      kategori: document.getElementById('transaksiKategori').value,
+      deskripsi: document.getElementById('transaksiDeskripsi').value,
+      jumlah: parseFloat(document.getElementById('transaksiJumlah').value),
+      tanggal: document.getElementById('transaksiTanggal').value
+    };
+    if (!data.rt || !data.tahun || !data.jenis || !data.kategori || !data.jumlah) {
+      alert('Harap isi semua field wajib (Unit, Tahun, Jenis, Kategori, Jumlah)');
+      return;
+    }
+    // Validasi client: Ketua RT hanya bisa untuk rt sendiri atau padukuhan (0)
+    if (data.rt !== userRt && data.rt !== 0) {
+      alert('Anda hanya dapat menambah transaksi untuk RT Anda sendiri atau Tingkat Padukuhan.');
+      return;
+    }
+    try {
+      if (id) {
+        await apiRequest(`/keuangan/${id}`, 'PUT', data);
+      } else {
+        await apiRequest('/keuangan', 'POST', data);
+      }
+      bootstrap.Modal.getInstance(document.getElementById('tambahTransaksiModal')).hide();
+      document.getElementById('formTransaksi').reset();
+      document.getElementById('editId').value = '';
+      loadData();
+    } catch(err) {
+      alert('Gagal menyimpan: ' + err.message);
+    }
+  }
+
+  function editTransaksi(id) {
+    const t = allTransaksi.find(x => x.id == id);
+    if (!t) return;
+    // Cek apakah transaksi milik RT yang boleh diedit (rt user atau padukuhan)
+    if (t.rt !== userRt && t.rt !== 0) {
+      alert('Anda tidak有权 mengedit transaksi ini.');
+      return;
+    }
+    document.getElementById('editId').value = t.id;
+    document.getElementById('transaksiRt').value = t.rt;
+    document.getElementById('transaksiTahun').value = t.tahun;
+    document.getElementById('transaksiJenis').value = t.jenis;
+    document.getElementById('transaksiKategori').value = t.kategori;
+    document.getElementById('transaksiDeskripsi').value = t.deskripsi || '';
+    document.getElementById('transaksiJumlah').value = t.jumlah;
+    document.getElementById('transaksiTanggal').value = t.tanggal || '';
+    const modal = new bootstrap.Modal(document.getElementById('tambahTransaksiModal'));
+    modal.show();
+  }
+
+  async function deleteTransaksi(id) {
+    const t = allTransaksi.find(x => x.id == id);
+    if (!t) return;
+    if (t.rt !== userRt && t.rt !== 0) {
+      alert('Anda tidak有权 menghapus transaksi ini.');
+      return;
+    }
+    if (!confirm('Yakin ingin menghapus transaksi ini?')) return;
+    try {
+      await apiRequest(`/keuangan/${id}`, 'DELETE');
+      loadData();
+    } catch(err) {
+      alert('Gagal hapus: ' + err.message);
+    }
+  }
+
+  // ==================== EXPORT PDF ====================
+  async function exportPdf() {
+    const tahun = document.getElementById('filterTahun').value;
+    // Untuk ketua, export PDF dengan rt parameter (rt sendiri) agar laporan hanya menampilkan datanya
+    let url = `${API_BASE_URL}?path=/keuangan/export-pdf&method=GET&userEmail=${encodeURIComponent(user.email)}`;
+    if (tahun) url += `&tahun=${tahun}`;
+    // Kirim rt parameter agar laporan lebih spesifik (backend akan filter sesuai role juga)
+    url += `&rt=${userRt}`;
+    try {
+      const response = await fetch(url + `&callback=handleJsonp`, { mode: 'cors' });
+      const text = await response.text();
+      const jsonpMatch = text.match(/handleJsonp\((.*)\)/);
+      if (jsonpMatch) {
+        const data = JSON.parse(jsonpMatch[1]);
+        if (data.success && data.data.url) {
+          window.open(data.data.url, '_blank');
+        } else {
+          alert('Gagal generate PDF: ' + (data.error || 'Unknown error'));
+        }
+      } else {
+        alert('Respons tidak valid dari server');
+      }
+    } catch(err) {
+      alert('Error: ' + err.message);
+    }
+  }
+
+  // ==================== INIT ====================
+  function initTahunFilter() {
+    const select = document.getElementById('filterTahun');
+    const currentYear = new Date().getFullYear();
+    for (let y = currentYear; y >= 2020; y--) {
+      const opt = document.createElement('option');
+      opt.value = y;
+      opt.textContent = y;
+      if (y === currentYear) opt.selected = true;
+      select.appendChild(opt);
+    }
+    select.addEventListener('change', applyFilterAndRender);
+  }
+
+  function initRtSelectForKetua() {
+    const select = document.getElementById('transaksiRt');
+    // Hanya tampilkan opsi: Padukuhan (0) dan RT milik sendiri
+    select.innerHTML = '<option value="">Pilih Unit</option><option value="0">Tingkat Padukuhan</option>';
+    const option = document.createElement('option');
+    option.value = userRt;
+    option.textContent = `RT ${userRt.toString().padStart(2,'0')}`;
+    select.appendChild(option);
+  }
+
+  // Event listeners
+  document.getElementById('refreshBtn').addEventListener('click', loadData);
+  document.getElementById('simpanTransaksiBtn').addEventListener('click', simpanTransaksi);
+  document.getElementById('exportPdfBtn').addEventListener('click', exportPdf);
+  document.getElementById('logoutBtn').addEventListener('click', (e) => {
+    e.preventDefault();
+    localStorage.removeItem('user');
+    window.location.href = 'login.html';
+  });
+
+  initTahunFilter();
+  initRtSelectForKetua();
+  loadData();
+})();
+</script>
+</body>
+</html>

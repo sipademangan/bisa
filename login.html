@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Login - Sistem Informasi Padukuhan Demangan</title>
+  <link rel="icon" type="image/webp" href="2.webp">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: none;
+      border-radius: 32px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .login-header {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      padding: 1.8rem 1.5rem;
+      text-align: center;
+      color: white;
+    }
+
+    .login-logo {
+      width: 56px;
+      height: auto;
+      margin-bottom: 1rem;
+      background: white;
+      border-radius: 16px;
+      padding: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .login-logo:hover {
+      transform: scale(1.05);
+    }
+
+    .login-header h4 {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      font-size: 1.8rem;
+    }
+
+    .login-header p {
+      opacity: 0.9;
+      margin-bottom: 0;
+      font-size: 0.95rem;
+    }
+
+    .login-body {
+      padding: 2rem 1.8rem;
+    }
+
+    .form-floating {
+      margin-bottom: 1rem;
+    }
+
+    .form-floating>.form-control {
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      padding: 1rem 0.75rem;
+      height: auto;
+      background: #f8fafc;
+    }
+
+    .form-floating>.form-control:focus {
+      border-color: #2ecc71;
+      box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
+      background: white;
+    }
+
+    .form-floating>label {
+      padding: 0.85rem 0.75rem;
+      color: #64748b;
+    }
+
+    .btn-login {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      border: none;
+      border-radius: 16px;
+      padding: 0.9rem;
+      font-weight: 600;
+      font-size: 1rem;
+      color: white;
+      width: 100%;
+      transition: all 0.2s;
+      margin-top: 1rem;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px -5px rgba(46, 204, 113, 0.5);
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+    }
+
+    .btn-login:disabled {
+      opacity: 0.6;
+      transform: none;
+    }
+
+    .register-link {
+      color: #2ecc71;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .register-link:hover {
+      text-decoration: underline;
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    .modal-content {
+      border: none;
+      border-radius: 32px;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      border-bottom: none;
+      padding: 1.5rem;
+    }
+
+    .modal-header .btn-close {
+      filter: brightness(0) invert(1);
+      opacity: 0.8;
+    }
+
+    .modal-body {
+      padding: 2rem;
+    }
+
+    .modal-footer {
+      border-top: 1px solid #e2e8f0;
+      padding: 1.2rem 2rem;
+    }
+
+    .spinner-border-sm {
+      width: 1.2rem;
+      height: 1.2rem;
+      border-width: 0.2rem;
+      margin-right: 0.3rem;
+    }
+
+    .alert-message {
+      border-radius: 16px;
+      padding: 0.75rem 1rem;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .text-danger {
+      color: #e74c3c;
+    }
+
+    .text-success {
+      color: #2ecc71;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-card">
+    <div class="login-header">
+      <img src="1.webp" alt="Logo Padukuhan Demangan" class="login-logo">
+      <h4>SIP Demangan</h4>
+      <p>Masuk ke akun Anda</p>
+    </div>
+    <div class="login-body">
+      <form id="loginForm">
+        <div class="form-floating">
+          <input type="email" class="form-control" id="email" placeholder="nama@email.com" required autofocus>
+          <label for="email"><i class="far fa-envelope me-2"></i>Email</label>
+        </div>
+        <div class="form-floating">
+          <input type="password" class="form-control" id="password" placeholder="Password" required>
+          <label for="password"><i class="fas fa-lock me-2"></i>Password</label>
+        </div>
+        <button type="submit" class="btn-login" id="loginButton">
+          <span id="buttonText">Masuk</span>
+          <span id="buttonSpinner" style="display: none;">
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Memuat...
+          </span>
+        </button>
+        <div id="loginMessage" class="alert-message text-center text-danger" style="display: none;"></div>
+      </form>
+      <div class="login-footer">
+        <span>Belum punya akun? </span>
+        <span class="register-link" data-bs-toggle="modal" data-bs-target="#registerModal">Daftar sebagai warga</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Registrasi -->
+  <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold" id="registerModalLabel">Daftar Akun Warga</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="registerForm">
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="regNama" placeholder="Nama Lengkap" required>
+              <label for="regNama"><i class="fas fa-user me-2"></i>Nama Lengkap</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="regNik" placeholder="NIK (16 digit)" required>
+              <label for="regNik"><i class="fas fa-id-card me-2"></i>NIK (Nomor Induk Kependudukan)</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="email" class="form-control" id="regEmail" placeholder="nama@email.com" required>
+              <label for="regEmail"><i class="far fa-envelope me-2"></i>Email</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="password" class="form-control" id="regPassword" placeholder="Password" required>
+              <label for="regPassword"><i class="fas fa-lock me-2"></i>Password</label>
+            </div>
+            <div class="form-floating mb-3">
+              <select class="form-select" id="regRt" required>
+                <option value="">Pilih RT</option>
+                <option value="1">RT 01</option>
+                <option value="2">RT 02</option>
+                <option value="3">RT 03</option>
+                <option value="4">RT 04</option>
+                <option value="5">RT 05</option>
+                <option value="6">RT 06</option>
+                <option value="7">RT 07</option>
+              </select>
+              <label for="regRt"><i class="fas fa-home me-2"></i>RT Domisili</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="regKetuaRt" placeholder="Nama Ketua RT" required>
+              <label for="regKetuaRt"><i class="fas fa-user-tie me-2"></i>Nama Ketua RT (verifikasi awal)</label>
+            </div>
+            <div id="registerMessage" class="alert-message text-center text-danger" style="display: none;"></div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-success" id="registerButton">
+            <span id="registerButtonText">Daftar</span>
+            <span id="registerButtonSpinner" style="display: none;">
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              Mendaftar...
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    (function () {
+      // Jika sudah login, redirect ke dashboard sesuai role
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          if (user.role === 'admin') {
+            window.location.href = 'dashboard_admin.html';
+          } else if (user.role === 'ketua_rt') {
+            window.location.href = 'dashboard_ketua_rt.html';
+          } else if (user.role === 'member') {
+            window.location.href = 'dashboard_member.html';
+          } else {
+            localStorage.removeItem('user');
+          }
+        } catch (e) {
+          localStorage.removeItem('user');
+        }
+      }
+
+      // Login form handler
+      document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const msgDiv = document.getElementById('loginMessage');
+        const button = document.getElementById('loginButton');
+        const buttonText = document.getElementById('buttonText');
+        const buttonSpinner = document.getElementById('buttonSpinner');
+
+        msgDiv.style.display = 'none';
+        msgDiv.innerText = '';
+        button.disabled = true;
+        buttonText.style.display = 'none';
+        buttonSpinner.style.display = 'inline-block';
+
+        try {
+          const userData = await apiRequest('/login', 'POST', { email, password });
+
+          let redirectUrl;
+          if (userData.role === 'admin') {
+            redirectUrl = 'dashboard_admin.html';
+          } else if (userData.role === 'ketua_rt') {
+            redirectUrl = 'dashboard_ketua_rt.html';
+          } else if (userData.role === 'member') {
+            redirectUrl = 'dashboard_member.html';
+          } else {
+            throw new Error('Role tidak dikenali');
+          }
+
+          localStorage.setItem('user', JSON.stringify(userData));
+          window.location.href = redirectUrl;
+        } catch (error) {
+          msgDiv.innerText = error.message || 'Email atau password salah.';
+          msgDiv.style.display = 'block';
+          console.error('Login error:', error);
+          button.disabled = false;
+          buttonText.style.display = 'inline-block';
+          buttonSpinner.style.display = 'none';
+        }
+      });
+
+      // Register form handler
+      document.getElementById('registerButton').addEventListener('click', async function () {
+        const nama = document.getElementById('regNama').value.trim();
+        const nik = document.getElementById('regNik').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const rt = document.getElementById('regRt').value;
+        const ketuaRt = document.getElementById('regKetuaRt').value.trim();
+
+        const msgDiv = document.getElementById('registerMessage');
+        const button = document.getElementById('registerButton');
+        const buttonText = document.getElementById('registerButtonText');
+        const buttonSpinner = document.getElementById('registerButtonSpinner');
+
+        if (!nama || !nik || !email || !password || !rt || !ketuaRt) {
+          msgDiv.innerText = 'Semua field harus diisi (NIK, Nama, Email, Password, RT, Nama Ketua RT).';
+          msgDiv.style.display = 'block';
+          return;
+        }
+
+        if (nik.length < 16 || isNaN(nik)) {
+          msgDiv.innerText = 'NIK harus berupa angka 16 digit.';
+          msgDiv.style.display = 'block';
+          return;
+        }
+
+        msgDiv.style.display = 'none';
+        button.disabled = true;
+        buttonText.style.display = 'none';
+        buttonSpinner.style.display = 'inline-block';
+
+        try {
+          const result = await apiRequest('/register', 'POST', {
+            nik: nik,
+            nama_lengkap: nama,
+            email: email,
+            password: password,
+            rt: rt,
+            ketua_rt_nama: ketuaRt
+          });
+
+          alert('Pendaftaran berhasil! Data warga Anda akan diperbarui jika sudah ada sebelumnya. Silakan tunggu verifikasi dari Ketua RT Anda.');
+          const modal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
+          modal.hide();
+          document.getElementById('registerForm').reset();
+        } catch (error) {
+          msgDiv.innerText = error.message || 'Pendaftaran gagal. Periksa kembali NIK dan nama Ketua RT.';
+          msgDiv.style.display = 'block';
+          console.error('Register error:', error);
+        } finally {
+          button.disabled = false;
+          buttonText.style.display = 'inline-block';
+          buttonSpinner.style.display = 'none';
+        }
+      });
+
+      // Reset pesan saat modal ditutup
+      document.getElementById('registerModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('registerMessage').style.display = 'none';
+        document.getElementById('registerMessage').innerText = '';
+      });
+    })();
+  </script>
+</body>
+
+</html>

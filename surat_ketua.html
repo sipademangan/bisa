@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Surat - SIP Demangan (Ketua RT)</title>
+  <link rel="icon" type="image/webp" href="2.webp">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <style>
+    /* ========== SAME STYLES AS ORIGINAL (unchanged) ========== */
+    :root {
+      --primary: #2ecc71;
+      --primary-dark: #27ae60;
+      --sidebar-bg: #ffffff;
+      --sidebar-width: 280px;
+      --sidebar-collapsed-width: 80px;
+      --header-height: 70px;
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      --shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      min-height: 100vh;
+    }
+
+    .app-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--sidebar-bg);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.03);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      transition: width 0.3s ease;
+      z-index: 1000;
+    }
+
+    .sidebar-collapsed {
+      width: var(--sidebar-collapsed-width);
+    }
+
+    .sidebar-header {
+      padding: 1.5rem 1rem 0.5rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-brand {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.2s ease;
+    }
+
+    .logo-wrapper {
+      width: 48px;
+      height: 48px;
+      background: transparent;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 12px rgba(46, 204, 113, 0.25);
+      transition: all 0.2s;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .logo-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 16px;
+    }
+
+    .sidebar-brand:hover .logo-wrapper {
+      box-shadow: 0 8px 16px rgba(46, 204, 113, 0.4);
+      transform: scale(1.02);
+    }
+
+    .sidebar-brand h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .sidebar-header p {
+      color: #64748b;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      padding-left: calc(48px + 0.75rem);
+    }
+
+    .sidebar-collapsed .sidebar-brand h3,
+    .sidebar-collapsed .sidebar-header p,
+    .sidebar-collapsed .nav-link span {
+      display: none;
+    }
+
+    .sidebar-collapsed .nav-link i {
+      margin-right: 0;
+    }
+
+    .sidebar-collapsed .nav-link {
+      justify-content: center;
+      padding: 0.75rem 0;
+    }
+
+    .sidebar-collapsed .logo-wrapper {
+      width: 40px;
+      height: 40px;
+      font-size: 1.2rem;
+    }
+
+    .sidebar-collapsed .sidebar-brand {
+      gap: 0;
+    }
+
+    #sidebarCollapseBtn {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      transition: transform 0.2s;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .sidebar-collapsed #sidebarCollapseBtn i {
+      transform: rotate(180deg);
+    }
+
+    .nav-menu {
+      padding: 1rem 0.5rem;
+    }
+
+    .nav-item {
+      list-style: none;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      margin: 0.25rem 0;
+      color: #475569;
+      font-weight: 500;
+      border-radius: 30px;
+      transition: all 0.2s;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav-link i {
+      width: 24px;
+      font-size: 1.2rem;
+      margin-right: 0.75rem;
+      color: #94a3b8;
+    }
+
+    .nav-link:hover {
+      background: rgba(46, 204, 113, 0.1);
+      color: #2ecc71;
+    }
+
+    .nav-link:hover i {
+      color: #2ecc71;
+    }
+
+    .nav-link.active {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      box-shadow: 0 6px 12px rgba(46, 204, 113, 0.2);
+    }
+
+    .nav-link.active i {
+      color: white;
+    }
+
+    .badge-notif {
+      background-color: #e74c3c;
+      color: white;
+      border-radius: 20px;
+      padding: 0.2rem 0.6rem;
+      font-size: 0.75rem;
+      margin-left: auto;
+    }
+
+    .sidebar-collapsed .badge-notif {
+      display: none;
+    }
+
+    .top-navbar {
+      height: var(--header-height);
+      background: white;
+      box-shadow: var(--shadow);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    .user-dropdown {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .dropdown-menu {
+      border: none;
+      border-radius: 20px;
+      box-shadow: var(--shadow-hover);
+      padding: 0.5rem;
+    }
+
+    .dropdown-item {
+      border-radius: 30px;
+      padding: 0.5rem 1.2rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(46, 204, 113, 0.1);
+      color: #2ecc71;
+    }
+
+    .dropdown-item i {
+      width: 1.5rem;
+    }
+
+    .main-content {
+      flex: 1;
+      background: #f8fafc;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      border: none;
+      border-radius: 30px;
+      padding: 0.5rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(46, 204, 113, 0.3);
+    }
+
+    .btn-outline-success {
+      border: 2px solid #2ecc71;
+      color: #2ecc71;
+      border-radius: 30px;
+      padding: 0.5rem 1.5rem;
+    }
+
+    .btn-outline-success:hover {
+      background: #2ecc71;
+      color: white;
+    }
+
+    .btn-outline-primary {
+      border: 2px solid #3498db;
+      color: #3498db;
+      border-radius: 30px;
+      padding: 0.4rem 1rem;
+    }
+
+    .btn-outline-primary:hover {
+      background: #3498db;
+      color: white;
+    }
+
+    .btn-outline-info {
+      border: 2px solid #00c0ef;
+      color: #00c0ef;
+      border-radius: 30px;
+      padding: 0.4rem 1rem;
+    }
+
+    .btn-outline-info:hover {
+      background: #00c0ef;
+      color: white;
+    }
+
+    .btn-outline-danger {
+      border: 2px solid #e74c3c;
+      color: #e74c3c;
+      border-radius: 30px;
+      padding: 0.4rem 1rem;
+    }
+
+    .btn-outline-danger:hover {
+      background: #e74c3c;
+      color: white;
+    }
+
+    .card {
+      border: none;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-header {
+      background: transparent;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      font-weight: 600;
+      padding: 1.2rem 1.5rem;
+    }
+
+    .table {
+      --bs-table-striped-bg: rgba(0, 0, 0, 0.02);
+      border-radius: 24px;
+      overflow: hidden;
+    }
+
+    .badge {
+      font-weight: 500;
+      padding: 0.5em 1em;
+      border-radius: 30px;
+    }
+
+    .badge.bg-warning {
+      background: #f39c12 !important;
+    }
+
+    .badge.bg-primary {
+      background: #3498db !important;
+    }
+
+    .badge.bg-success {
+      background: #2ecc71 !important;
+    }
+
+    .badge.bg-danger {
+      background: #e74c3c !important;
+    }
+
+    .modal-content {
+      border: none;
+      border-radius: 24px;
+      box-shadow: var(--shadow-hover);
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      border-radius: 24px 24px 0 0;
+      padding: 1.2rem 1.5rem;
+    }
+
+    .modal-header .btn-close {
+      filter: brightness(0) invert(1);
+    }
+
+    .modal-footer {
+      border-top: none;
+      padding: 1.2rem 1.5rem;
+    }
+
+    .form-control,
+    .form-select {
+      border-radius: 16px;
+      padding: 0.75rem 1rem;
+      border: 1px solid #e2e8f0;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      border-color: #2ecc71;
+      box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
+    }
+
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      border: none;
+      box-shadow: 0 6px 16px rgba(46, 204, 113, 0.3);
+      z-index: 1050;
+      font-size: 1.3rem;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .surat-container {
+      font-family: 'Times New Roman', serif;
+      background: white;
+      padding: 2rem;
+      border: 1px solid #ddd;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .surat-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .surat-header h4 {
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 0.2rem;
+    }
+
+    .surat-body {
+      margin: 1.5rem 0;
+    }
+
+    .surat-footer {
+      margin-top: 2rem;
+    }
+
+    .ttd {
+      margin-top: 3rem;
+      text-align: right;
+    }
+
+    @media (max-width:991.98px) {
+      .sidebar {
+        position: fixed;
+        transform: translateX(-100%);
+        height: 100vh;
+        transition: transform 0.3s ease, width 0.3s ease;
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        padding: 1rem;
+      }
+
+      .sidebar-toggle {
+        display: flex;
+      }
+
+      .logo-wrapper {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+      }
+
+      .sidebar-brand h3 {
+        font-size: 1.2rem;
+      }
+
+      .sidebar-header p {
+        padding-left: calc(40px + 0.75rem);
+      }
+
+      .sidebar-collapsed {
+        width: var(--sidebar-width);
+      }
+
+      .sidebar-collapsed .sidebar-brand h3,
+      .sidebar-collapsed .sidebar-header p,
+      .sidebar-collapsed .nav-link span {
+        display: block;
+      }
+
+      .sidebar-collapsed .nav-link i {
+        margin-right: 0.75rem;
+      }
+
+      .sidebar-collapsed .nav-link {
+        justify-content: flex-start;
+        padding: 0.75rem 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-wrapper">
+    <!-- SIDEBAR (unchanged) -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-brand">
+          <div class="logo-wrapper"><img src="1.webp" alt="Logo SIP Demangan"></div>
+          <h3>SIP Demangan</h3>
+        </a>
+        <button class="btn btn-link text-dark p-0" id="sidebarCollapseBtn"><i class="fas fa-chevron-left"></i></button>
+      </div>
+      <p>Padukuhan Demangan</p>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="dashboard_ketua_rt.html" class="nav-link"><i
+              class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+        <li class="nav-item"><a href="warga_ketua.html" class="nav-link"><i class="fas fa-users"></i><span>Data
+              Warga</span></a></li>
+        <li class="nav-item"><a href="surat_ketua.html" class="nav-link active" id="menuSurat"><i
+              class="fas fa-envelope"></i><span>Surat</span><span class="badge-notif" id="suratNotifBadge"
+              style="display:none;">0</span></a></li>
+        <li class="nav-item"><a href="berita.html" class="nav-link" id="menuBerita"><i
+              class="fas fa-newspaper"></i><span>Berita</span></a></li>
+        <li class="nav-item"><a href="peta_sebaran_ketua.html" class="nav-link"><i
+              class="fas fa-map-marked-alt"></i><span>Peta Sebaran</span></a></li>
+        <li class="nav-item" id="menuKeluargaItem"><a href="pohon_keluarga_ketua_rt.html" class="nav-link"
+            id="menuKeluarga"><i class="fas fa-tree"></i><span>Pohon Keluarga</span></a></li>
+        <li class="nav-item"><a href="verifikasi_pendaftar.html" class="nav-link" id="menuVerifikasi"><i
+              class="fas fa-user-check"></i><span>Verifikasi Pendaftar</span></a></li>
+      </ul>
+    </div>
+
+    <div class="flex-grow-1">
+      <div class="top-navbar">
+        <div class="user-dropdown">
+          <span id="displayName" class="fw-semibold"></span>
+          <div class="dropdown">
+            <button class="btn p-0" data-bs-toggle="dropdown">
+              <div class="user-avatar"><i class="fas fa-user"></i></div>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="profile.html"><i class="fas fa-id-card me-2"></i> Profil Saya</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="main-content">
+        <div id="loadingSpinner" class="text-center my-5" style="display:none;">
+          <div class="spinner-border text-success"></div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+          <h2 class="fw-bold mb-0"><i class="fas fa-envelope me-2 text-success"></i>Manajemen Surat (Ketua RT)</h2>
+          <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#suratModal"
+            onclick="clearSuratForm()"><i class="fas fa-plus me-1"></i>Ajukan Surat</button>
+        </div>
+        <div class="card">
+          <div class="card-header"><i class="fas fa-list me-2"></i>Daftar Pengajuan Surat (Wilayah RT Anda)</div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-striped mb-0">
+                <thead>
+                  <tr>
+                    <th>Jenis Surat</th>
+                    <th>NIK Pemohon</th>
+                    <th>Keperluan</th>
+                    <th>Status</th>
+                    <th>Tanggal Pengajuan</th>
+                    <th>Ditandatangani</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="suratList"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+
+  <!-- Modal Pengajuan Surat -->
+  <div class="modal fade" id="suratModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-pen me-2"></i>Ajukan Surat</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="suratForm">
+            <div class="mb-3">
+              <label class="form-label">Jenis Surat</label>
+              <select class="form-select" id="jenis_surat" required>
+                <option value="">Pilih jenis surat</option>
+                <option value="keterangan_domisili">Keterangan Domisili</option>
+                <option value="keterangan_tidak_mampu">Keterangan Tidak Mampu</option>
+                <option value="pengantar_skck">Pengantar SKCK</option>
+                <option value="pengantar_ktp">Surat Pengantar KTP</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">NIK Pemohon</label>
+              <input type="text" class="form-control" id="nik_pemohon" placeholder="Masukkan NIK" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Keperluan</label>
+              <textarea class="form-control" id="keperluan" rows="3" placeholder="Jelaskan keperluan surat"
+                required></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-success" id="ajukanSuratBtn"><span id="ajukanText">Ajukan</span><span
+              id="ajukanSpinner" style="display:none;"><span class="spinner-border spinner-border-sm"></span>
+              Memproses...</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Proses Surat (upload file) -->
+  <div class="modal fade" id="prosesSuratModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-tasks me-2"></i>Proses / Tandatangani Surat</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="prosesSuratId">
+          <div class="mb-3">
+            <label class="form-label">Ubah Status</label>
+            <select class="form-select" id="statusSurat">
+              <option value="disetujui">Setujui</option>
+              <option value="ditolak">Tolak</option>
+              <option value="selesai">Selesai (terbit)</option>
+            </select>
+          </div>
+          <div class="mb-3" id="uploadSuratField" style="display:none;">
+            <label class="form-label">Upload file surat jadi (PDF)</label>
+            <input type="file" class="form-control" id="file_surat" accept=".pdf">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-success" id="updateStatusBtn"><span id="prosesText">Simpan</span><span
+              id="prosesSpinner" style="display:none;"><span class="spinner-border spinner-border-sm"></span>
+              Menyimpan...</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Edit Surat (Tanda Tangan Digital & QR) -->
+  <div class="modal fade" id="editSuratModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit & Tandatangani Surat <span
+              id="editJenisSuratLabel"></span></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-5">
+              <h6 class="mb-3">Form Data Pemohon</h6>
+              <form id="editSuratForm">
+                <input type="hidden" id="editSuratId">
+                <input type="hidden" id="editJenisSurat">
+                <div class="mb-2"><label class="form-label">Nomor Surat</label><input type="text" class="form-control"
+                    id="editNomorSurat" readonly></div>
+                <div class="mb-2"><label class="form-label">Nama Lengkap</label><input type="text" class="form-control"
+                    id="editNama"></div>
+                <div class="mb-2"><label class="form-label">NIK</label><input type="text" class="form-control"
+                    id="editNik"></div>
+                <div class="mb-2"><label class="form-label">Tempat, Tgl Lahir</label><input type="text"
+                    class="form-control" id="editTempatTgl"></div>
+                <div class="mb-2"><label class="form-label">Jenis Kelamin</label><input type="text" class="form-control"
+                    id="editJenisKelamin"></div>
+                <div class="mb-2"><label class="form-label">Status Perkawinan</label><input type="text"
+                    class="form-control" id="editStatusPerkawinan"></div>
+                <div class="mb-2"><label class="form-label">Pekerjaan</label><input type="text" class="form-control"
+                    id="editPekerjaan"></div>
+                <div class="mb-2"><label class="form-label">Agama</label><input type="text" class="form-control"
+                    id="editAgama"></div>
+                <div class="mb-2"><label class="form-label">Alamat Lengkap</label><textarea class="form-control"
+                    id="editAlamat" rows="2"></textarea></div>
+                <div class="mb-2"><label class="form-label">Keperluan</label><input type="text" class="form-control"
+                    id="editKeperluan"></div>
+                <div class="mb-2"><label class="form-label">Tanggal Surat</label><input type="text" class="form-control"
+                    id="editTanggal"></div>
+                <div class="mb-2"><label class="form-label">Nama Ketua RT</label><input type="text" class="form-control"
+                    id="editNamaKetua"></div>
+                <div class="mb-2"><label class="form-label">Nama Ketua RW</label><input type="text" class="form-control"
+                    id="editNamaKetuaRw" value="Ketua RW"></div>
+              </form>
+            </div>
+            <div class="col-md-7">
+              <h6 class="mb-3">Pratinjau Surat</h6>
+              <div class="surat-container p-3 mb-3" id="previewSurat"
+                style="font-family:'Times New Roman'; background:white; border:1px solid #ccc; min-height:500px;"></div>
+              <div class="card mt-3">
+                <div class="card-header bg-light"><i class="fas fa-signature me-2"></i>Tanda Tangan Digital</div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-7">
+                      <canvas id="signatureCanvas" width="400" height="150"
+                        style="border:1px solid #ccc; background:#fff; touch-action:none;"></canvas>
+                      <div class="mt-2">
+                        <button class="btn btn-sm btn-outline-secondary" type="button" id="clearSignatureBtn"><i
+                            class="fas fa-undo"></i> Hapus</button>
+                        <button class="btn btn-sm btn-outline-primary" type="button" id="generateQrBtn"><i
+                            class="fas fa-qrcode"></i> Gunakan QR Code</button>
+                      </div>
+                    </div>
+                    <div class="col-md-5">
+                      <p class="text-muted small">Gambar tanda tangan di atas menggunakan mouse atau sentuhan.
+                        Alternatif, klik "Gunakan QR Code" untuk membuat QR berisi data surat.</p>
+                      <div id="qrContainer" style="display:none; text-align:center;">
+                        <canvas id="qrCanvas" width="150" height="150"></canvas>
+                        <p class="small mt-1">QR Code (scan untuk verifikasi)</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-success" id="simpanPdfBtn"><span id="simpanPdfText">Buat PDF &
+              Terbitkan</span><span id="simpanPdfSpinner" style="display:none;"><span
+                class="spinner-border spinner-border-sm"></span> Memproses...</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    // ==================== FULLY CORRECTED SCRIPT (IIFE) ====================
+    (async function initKetuaSurat() {
+      // ---------- AUTH CHECK ----------
+      const user = checkAuth();
+      if (!user) return;
+      if (user.role !== 'ketua_rt') {
+        if (user.role === 'admin') window.location.href = 'dashboard_admin.html';
+        else window.location.href = 'dashboard_member.html';
+        return;
+      }
+
+      // ---------- DOM ELEMENTS & GLOBALS ----------
+      const userRt = user.rt;
+      const SURAT_CACHE_KEY = `surat_ketua_${userRt}`;
+      const WARGA_CACHE_KEY = `warga_ketua_${userRt}`;
+      let suratListData = [];
+      let wargaList = [];
+
+      // Helper functions
+      function updateNotifikasi(pendingCount) {
+        const badge = document.getElementById('suratNotifBadge');
+        if (badge) {
+          if (pendingCount > 0) {
+            badge.innerText = pendingCount;
+            badge.style.display = 'inline-block';
+          } else badge.style.display = 'none';
+        }
+      }
+      function formatDate(isoString) {
+        if (!isoString) return '-';
+        return new Date(isoString).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      }
+      function getWargaByNIK(nik) {
+        return wargaList.find(w => w.nik === nik);
+      }
+
+      // ---------- RENDER SURAT TABLE ----------
+      async function renderSuratTable(suratList) {
+        const tbody = document.getElementById('suratList');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        suratList.forEach(s => {
+          let aksiHtml = '';
+          if (s.file_url) aksiHtml += `<a href="${s.file_url}" target="_blank" class="btn btn-sm btn-outline-info me-1"><i class="fas fa-file-pdf"></i> Lihat</a>`;
+          if (s.status === 'diajukan') {
+            aksiHtml += `<button class="btn btn-sm btn-outline-primary me-1" onclick="prosesSurat('${s.id}')"><i class="fas fa-check"></i> Proses</button>`;
+            aksiHtml += `<button class="btn btn-sm btn-success me-1" onclick="bukaModalTtd('${s.id}')"><i class="fas fa-pen"></i> Tandatangani</button>`;
+            aksiHtml += `<button class="btn btn-sm btn-outline-danger me-1" onclick="batalkanSurat('${s.id}')"><i class="fas fa-times"></i> Batalkan</button>`;
+            aksiHtml += `<button class="btn btn-sm btn-outline-primary me-1" onclick="editSurat('${s.id}')"><i class="fas fa-edit"></i> Edit & Terbitkan</button>`;
+          }
+          let ditandatangani = s.ditandatangani_oleh ? '✔️ Ya' : '-';
+          let statusClass = s.status === 'diajukan' ? 'bg-warning' : (s.status === 'disetujui' ? 'bg-primary' : (s.status === 'selesai' ? 'bg-success' : 'bg-danger'));
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${s.jenis_surat}</td>
+            <td>${s.nik_pemohon}</td>
+            <td>${s.keperluan}</td>
+            <td><span class="badge ${statusClass}">${s.status}</span></td>
+            <td>${formatDate(s.tgl_pengajuan)}</td>
+            <td>${ditandatangani}</td>
+            <td>${aksiHtml}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+        updateNotifikasi(suratList.filter(s => s.status === 'diajukan').length);
+      }
+
+      // ---------- DATA FETCH & REFRESH ----------
+      async function fetchFreshData() {
+        const allSurat = await apiRequest('/surat', 'GET');
+        const allWarga = await apiRequest('/warga', 'GET');
+        const nikInRt = allWarga.filter(w => w.alamat_rt == userRt).map(w => w.nik);
+        return {
+          surat: allSurat.filter(s => nikInRt.includes(s.nik_pemohon)),
+          warga: allWarga.filter(w => w.alamat_rt == userRt)
+        };
+      }
+      async function refreshBackground() {
+        try {
+          const fresh = await fetchFreshData();
+          const cachedSurat = sessionStorage.getItem(SURAT_CACHE_KEY);
+          const cachedWarga = sessionStorage.getItem(WARGA_CACHE_KEY);
+          if (JSON.stringify(fresh.surat) !== cachedSurat || JSON.stringify(fresh.warga) !== cachedWarga) {
+            suratListData = fresh.surat;
+            wargaList = fresh.warga;
+            sessionStorage.setItem(SURAT_CACHE_KEY, JSON.stringify(suratListData));
+            sessionStorage.setItem(WARGA_CACHE_KEY, JSON.stringify(wargaList));
+            renderSuratTable(suratListData);
+          }
+        } catch (e) { console.error('refresh bg error', e); }
+      }
+      async function loadData() {
+        const cachedSurat = sessionStorage.getItem(SURAT_CACHE_KEY);
+        const cachedWarga = sessionStorage.getItem(WARGA_CACHE_KEY);
+        if (cachedSurat && cachedWarga) {
+          suratListData = JSON.parse(cachedSurat);
+          wargaList = JSON.parse(cachedWarga);
+          renderSuratTable(suratListData);
+          refreshBackground();
+        } else {
+          const spinner = document.getElementById('loadingSpinner');
+          if (spinner) spinner.style.display = 'block';
+          try {
+            const fresh = await fetchFreshData();
+            suratListData = fresh.surat;
+            wargaList = fresh.warga;
+            sessionStorage.setItem(SURAT_CACHE_KEY, JSON.stringify(suratListData));
+            sessionStorage.setItem(WARGA_CACHE_KEY, JSON.stringify(wargaList));
+            renderSuratTable(suratListData);
+          } catch (e) {
+            alert('Gagal memuat data: ' + e.message);
+          } finally {
+            if (spinner) spinner.style.display = 'none';
+          }
+        }
+      }
+
+      // ---------- SURAT ACTIONS (proses, ttd, batalkan, upload) ----------
+      window.prosesSurat = function (id) {
+        document.getElementById('prosesSuratId').value = id;
+        document.getElementById('statusSurat').value = 'disetujui';
+        document.getElementById('uploadSuratField').style.display = 'none';
+        new bootstrap.Modal(document.getElementById('prosesSuratModal')).show();
+      };
+      window.bukaModalTtd = function (id) {
+        document.getElementById('prosesSuratId').value = id;
+        document.getElementById('statusSurat').value = 'selesai';
+        document.getElementById('uploadSuratField').style.display = 'block';
+        new bootstrap.Modal(document.getElementById('prosesSuratModal')).show();
+      };
+      window.batalkanSurat = async function (id) {
+        if (!confirm('Batalkan pengajuan surat ini?')) return;
+        const btn = event.target;
+        btn.disabled = true;
+        try {
+          await apiRequest('/surat/' + id + '/status', 'PUT', { status: 'ditolak' });
+          await loadData();
+        } catch (e) {
+          alert('Gagal: ' + e.message);
+        } finally {
+          btn.disabled = false;
+        }
+      };
+      async function uploadFile(file) {
+        if (!file) return null;
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = async function (e) {
+            const base64 = e.target.result.split(',')[1];
+            try {
+              const result = await apiRequest('/upload', 'POST', { filename: file.name, data: base64 });
+              resolve(result.url);
+            } catch (err) { reject(err); }
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+      document.getElementById('updateStatusBtn')?.addEventListener('click', async function () {
+        const id = document.getElementById('prosesSuratId').value;
+        const status = document.getElementById('statusSurat').value;
+        let fileUrl = '';
+        if (status === 'selesai') {
+          const file = document.getElementById('file_surat').files[0];
+          if (!file) { alert('File surat harus diupload untuk status selesai.'); return; }
+          try {
+            fileUrl = await uploadFile(file);
+          } catch (err) {
+            alert('Gagal upload file: ' + err.message);
+            return;
+          }
+        }
+        const btn = this;
+        const text = document.getElementById('prosesText');
+        const spinner = document.getElementById('prosesSpinner');
+        btn.disabled = true;
+        text.style.display = 'none';
+        spinner.style.display = 'inline-block';
+        try {
+          await apiRequest('/surat/' + id + '/status', 'PUT', { status, file_url: fileUrl });
+          await loadData();
+          bootstrap.Modal.getInstance(document.getElementById('prosesSuratModal')).hide();
+        } catch (e) {
+          alert('Gagal update status: ' + e.message);
+        } finally {
+          btn.disabled = false;
+          text.style.display = 'inline-block';
+          spinner.style.display = 'none';
+        }
+      });
+      document.getElementById('ajukanSuratBtn')?.addEventListener('click', async function () {
+        const data = {
+          jenis_surat: document.getElementById('jenis_surat').value,
+          nik_pemohon: document.getElementById('nik_pemohon').value,
+          keperluan: document.getElementById('keperluan').value
+        };
+        if (!data.jenis_surat || !data.nik_pemohon || !data.keperluan) {
+          alert('Semua field harus diisi');
+          return;
+        }
+        const btn = this;
+        const text = document.getElementById('ajukanText');
+        const spinner = document.getElementById('ajukanSpinner');
+        btn.disabled = true;
+        text.style.display = 'none';
+        spinner.style.display = 'inline-block';
+        try {
+          await apiRequest('/surat', 'POST', data);
+          alert('Surat berhasil diajukan');
+          bootstrap.Modal.getInstance(document.getElementById('suratModal')).hide();
+          clearSuratForm();
+          await loadData();
+        } catch (e) {
+          alert('Gagal mengajukan surat: ' + e.message);
+        } finally {
+          btn.disabled = false;
+          text.style.display = 'inline-block';
+          spinner.style.display = 'none';
+        }
+      });
+      function clearSuratForm() {
+        document.getElementById('suratForm').reset();
+      }
+      window.clearSuratForm = clearSuratForm;
+
+      // ---------- NOMOR SURAT OTOMATIS ----------
+      function bulanRomawi(bulan) {
+        const romawi = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+        return romawi[bulan - 1] || '';
+      }
+      function getNextSuratNumber(rt, tahun, existingSurat) {
+        const completed = existingSurat.filter(s => {
+          if (s.status !== 'selesai') return false;
+          if (s.nomor_surat) {
+            const parts = s.nomor_surat.split('/');
+            if (parts.length >= 4 && parts[parts.length - 1] == tahun) return true;
+          }
+          const date = new Date(s.tgl_pengajuan);
+          return date.getFullYear() == tahun;
+        });
+        let maxNumber = 0;
+        completed.forEach(s => {
+          if (s.nomor_surat) {
+            const numStr = s.nomor_surat.split('/')[0];
+            const num = parseInt(numStr, 10);
+            if (!isNaN(num) && num > maxNumber) maxNumber = num;
+          }
+        });
+        const nextNumber = maxNumber + 1;
+        const bulanSekarang = new Date().getMonth() + 1;
+        return `${nextNumber}/RT${rt}-RW12/${bulanRomawi(bulanSekarang)}/${tahun}`;
+      }
+
+      // ---------- PREVIEW & SIGNATURE ----------
+      function generateSuratPreview(data) {
+        const defaultRt = data.nomorRt || userRt || '03';
+        const defaultRw = data.nomorRw || '12';
+        const defaultKelurahan = data.kelurahan || 'Demangan';
+        const defaultKecamatan = data.kecamatan || 'Gondokusuman';
+        const defaultKota = data.kota || 'Yogyakarta';
+        const berlaku = data.berlakuSampai || (() => { const d = new Date(); d.setMonth(d.getMonth() + 1); return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }); })();
+        const ttdRtHtml = data.tandaTanganRtBase64 ? `<img src="${data.tandaTanganRtBase64}" style="max-width:150px; max-height:60px;">` : '( .................................... )';
+        const ttdRwHtml = data.tandaTanganRwBase64 ? `<img src="${data.tandaTanganRwBase64}" style="max-width:150px; max-height:60px;">` : '( .................................... )';
+        const qrHtml = data.qrBase64 ? `<div style="text-align:center; margin-top:10px;"><img src="${data.qrBase64}" width="80" height="80"><br><span style="font-size:10px;">Verifikasi Digital</span></div>` : '';
+        return `
+          <div style="font-family:'Times New Roman', Times, serif; font-size:12pt; max-width:800px; margin:0 auto; background:white; padding:2rem; border:1px solid #aaa;">
+            <div style="text-align:center; margin-bottom:1.5rem;">
+              <div style="font-size:16pt; font-weight:bold;">RUKUN TETANGGA ${defaultRt}</div>
+              <div style="font-size:14pt; font-weight:bold;">RUKUN WARGA ${defaultRw}</div>
+              <div style="font-size:12pt;">KELURAHAN ${defaultKelurahan.toUpperCase()}</div>
+              <div style="font-size:12pt;">KECAMATAN ${defaultKecamatan.toUpperCase()}</div>
+              <div style="font-size:12pt;">${defaultKota.toUpperCase()}</div>
+              <hr style="margin:0.5rem 0; border-top:2px solid #000;"><hr style="margin:0.2rem 0; border-top:1px solid #000;">
+            </div>
+            <div style="text-align:center; margin:1rem 0;">
+              <div style="font-size:14pt; font-weight:bold; text-transform:uppercase;">SURAT PENGANTAR / KETERANGAN</div>
+              <div style="font-size:11pt;">Nomor: ${data.nomorSurat}</div>
+            </div>
+            <div style="margin:1rem 0; text-align:justify;">Yang bertanda tangan di bawah ini, Ketua RT ${defaultRt} RW ${defaultRw} Kelurahan ${defaultKelurahan}, menerangkan bahwa:</div>
+            <table style="width:100%; border-collapse:collapse; margin:1rem 0;">
+              <tr style="background:#f2f2f2;"><td style="padding:6px; border:1px solid #ddd; width:30%; font-weight:bold;">Nama Lengkap</td><td style="padding:6px; border:1px solid #ddd;">${data.namaLengkap}</td></tr>
+              <tr><td style="padding:6px; border:1px solid #ddd; font-weight:bold;">Tempat / Tgl. Lahir</td><td style="padding:6px; border:1px solid #ddd;">${data.tempatTglLahir}</td></tr>
+              <tr style="background:#f2f2f2;"><td style="padding:6px; border:1px solid #ddd; font-weight:bold;">Jenis Kelamin</td><td style="padding:6px; border:1px solid #ddd;">${data.jenisKelamin}</td></tr>
+              <tr><td style="padding:6px; border:1px solid #ddd; font-weight:bold;">Status Perkawinan</td><td style="padding:6px; border:1px solid #ddd;">${data.statusPerkawinan}</td></tr>
+              <tr style="background:#f2f2f2;"><td style="padding:6px; border:1px solid #ddd; font-weight:bold;">Pekerjaan</td><td style="padding:6px; border:1px solid #ddd;">${data.pekerjaan}</td></tr>
+              <tr><td style="padding:6px; border:1px solid #ddd; font-weight:bold;">Agama</td><td style="padding:6px; border:1px solid #ddd;">${data.agama}</td></tr>
+              <tr style="background:#f2f2f2;"><td style="padding:6px; border:1px solid #ddd; font-weight:bold;">No. KTP / NIK</td><td style="padding:6px; border:1px solid #ddd;">${data.nik}</td></tr>
+              <tr><td style="padding:6px; border:1px solid #ddd; font-weight:bold;">Alamat Lengkap</td><td style="padding:6px; border:1px solid #ddd;">${data.alamatLengkap}</td></tr>
+            </table>
+            <div style="margin:1rem 0; text-align:justify;">Orang tersebut di atas adalah benar warga kami yang bertempat tinggal di alamat tersebut. Surat keterangan ini diberikan kepada yang bersangkutan untuk dipergunakan sebagai:</div>
+            <div style="margin:0.5rem 0 1rem 1rem; font-weight:bold;">KEPERLUAN: ${data.keperluan}</div>
+            <div style="margin:1rem 0; text-align:justify;">Demikian surat pengantar ini dibuat untuk dapat dipergunakan sebagaimana mestinya dan kepada pihak yang berkepentingan agar maklum.</div>
+            <div style="margin:1rem 0;"><strong>Berlaku s/d:</strong> ${berlaku}</div>
+            <div style="margin-top:2rem;">
+              <div style="float:left; width:45%; text-align:center;">Mengetahui,<br>Ketua RW ${defaultRw}<br><br><br>${ttdRwHtml}<br>( ${data.namaKetuaRw} )</div>
+              <div style="float:right; width:45%; text-align:center;">${data.tanggalSurat}<br>Hormat Kami,<br>Ketua RT ${defaultRt}<br><br><br>${ttdRtHtml}<br>( ${data.namaKetuaRt} )</div>
+              <div style="clear:both;"></div>
+            </div>
+            ${qrHtml}
+          </div>`;
+      }
+
+      const signatureCanvas = document.getElementById('signatureCanvas');
+      const ctx = signatureCanvas.getContext('2d');
+      let drawing = false, lastX, lastY;
+
+      function startDrawing(e) {
+        drawing = true;
+        e.preventDefault();
+        const pos = getCanvasCoordinates(e);
+        lastX = pos.x;
+        lastY = pos.y;
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+      }
+      function draw(e) {
+        if (!drawing) return;
+        e.preventDefault();
+        const pos = getCanvasCoordinates(e);
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+        lastX = pos.x;
+        lastY = pos.y;
+      }
+      function stopDrawing() {
+        drawing = false;
+        ctx.beginPath();
+        updatePreview();
+      }
+      function getCanvasCoordinates(e) {
+        const rect = signatureCanvas.getBoundingClientRect();
+        const scaleX = signatureCanvas.width / rect.width;
+        const scaleY = signatureCanvas.height / rect.height;
+        let clientX, clientY;
+        if (e.touches) {
+          clientX = e.touches[0].clientX;
+          clientY = e.touches[0].clientY;
+        } else {
+          clientX = e.clientX;
+          clientY = e.clientY;
+        }
+        return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+      }
+      signatureCanvas.addEventListener('mousedown', startDrawing);
+      signatureCanvas.addEventListener('mousemove', draw);
+      signatureCanvas.addEventListener('mouseup', stopDrawing);
+      signatureCanvas.addEventListener('mouseleave', stopDrawing);
+      signatureCanvas.addEventListener('touchstart', startDrawing, { passive: false });
+      signatureCanvas.addEventListener('touchmove', draw, { passive: false });
+      signatureCanvas.addEventListener('touchend', stopDrawing);
+      signatureCanvas.addEventListener('touchcancel', stopDrawing);
+
+      document.getElementById('clearSignatureBtn')?.addEventListener('click', function () {
+        ctx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
+        updatePreview();
+      });
+      document.getElementById('generateQrBtn')?.addEventListener('click', function () {
+        const nomor = document.getElementById('editNomorSurat').value;
+        const nama = document.getElementById('editNama').value;
+        const nik = document.getElementById('editNik').value;
+        const data = `Nomor: ${nomor}\nNama: ${nama}\nNIK: ${nik}\nTtd: Ketua RT`;
+        QRCode.toCanvas(document.getElementById('qrCanvas'), data, { width: 150 }, function (error) {
+          if (!error) {
+            document.getElementById('qrContainer').style.display = 'block';
+            updatePreview();
+          } else alert('Gagal generate QR Code');
+        });
+      });
+
+      function updatePreview() {
+        const previewData = {
+          nomorSurat: document.getElementById('editNomorSurat').value,
+          namaLengkap: document.getElementById('editNama').value,
+          nik: document.getElementById('editNik').value,
+          tempatTglLahir: document.getElementById('editTempatTgl').value,
+          jenisKelamin: document.getElementById('editJenisKelamin').value,
+          statusPerkawinan: document.getElementById('editStatusPerkawinan').value || '-',
+          pekerjaan: document.getElementById('editPekerjaan').value,
+          agama: document.getElementById('editAgama').value,
+          alamatLengkap: document.getElementById('editAlamat').value,
+          keperluan: document.getElementById('editKeperluan').value,
+          tanggalSurat: document.getElementById('editTanggal').value,
+          namaKetuaRt: document.getElementById('editNamaKetua').value,
+          namaKetuaRw: document.getElementById('editNamaKetuaRw').value,
+          nomorRt: userRt || '03',
+          nomorRw: '12',
+          kelurahan: 'Demangan',
+          kecamatan: 'Gondokusuman',
+          kota: 'Yogyakarta',
+          tandaTanganRtBase64: signatureCanvas.toDataURL(),
+          tandaTanganRwBase64: null,
+          qrBase64: document.getElementById('qrContainer').style.display === 'block' ? document.getElementById('qrCanvas').toDataURL() : null
+        };
+        document.getElementById('previewSurat').innerHTML = generateSuratPreview(previewData);
+      }
+
+      window.editSurat = async function (id) {
+        let surat = suratListData.find(s => s.id == id);
+        if (!surat) try { surat = await apiRequest('/surat/' + id, 'GET'); } catch (e) { alert('Data surat tidak ditemukan'); return; }
+        const nik = surat.nik_pemohon;
+        let warga = getWargaByNIK(nik);
+        if (!warga) try { const all = await apiRequest('/warga', 'GET'); warga = all.find(w => w.nik === nik); } catch (e) { alert('Data warga tidak ditemukan'); return; }
+        const tahunSekarang = new Date().getFullYear();
+        const nextNumber = getNextSuratNumber(userRt, tahunSekarang, suratListData);
+        document.getElementById('editNomorSurat').value = nextNumber;
+        document.getElementById('editSuratId').value = surat.id;
+        document.getElementById('editJenisSurat').value = surat.jenis_surat;
+        document.getElementById('editJenisSuratLabel').innerText = ' - ' + surat.jenis_surat.replace(/_/g, ' ');
+        document.getElementById('editNama').value = warga.nama || '';
+        document.getElementById('editNik').value = warga.nik || '';
+        const tempatTgl = `${warga.tempat_lahir || '-'}, ${warga.tgl_lahir ? new Date(warga.tgl_lahir).toLocaleDateString('id-ID') : '-'}`;
+        document.getElementById('editTempatTgl').value = tempatTgl;
+        document.getElementById('editJenisKelamin').value = warga.jenis_kelamin || '';
+        document.getElementById('editStatusPerkawinan').value = warga.status_perkawinan || '';
+        document.getElementById('editPekerjaan').value = warga.pekerjaan || '';
+        document.getElementById('editAgama').value = warga.agama || '';
+        document.getElementById('editAlamat').value = warga.alamat || '';
+        document.getElementById('editKeperluan').value = surat.keperluan || '';
+        document.getElementById('editTanggal').value = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('editNamaKetua').value = user.nama || 'Ketua RT';
+        document.getElementById('editNamaKetuaRw').value = 'Ketua RW';
+        ctx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
+        document.getElementById('qrContainer').style.display = 'none';
+        updatePreview();
+        new bootstrap.Modal(document.getElementById('editSuratModal')).show();
+      };
+
+      async function generatePDFWithSignature() {
+        const preview = document.getElementById('previewSurat');
+        const clone = preview.cloneNode(true);
+        clone.style.width = preview.offsetWidth + 'px';
+        clone.style.position = 'absolute';
+        clone.style.left = '-9999px';
+        document.body.appendChild(clone);
+        const canvas = await html2canvas(clone, { scale: 2, backgroundColor: '#ffffff' });
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jspdf.jsPDF({ orientation: 'portrait', unit: 'px', format: [canvas.width * 0.75, canvas.height * 0.75] });
+        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width * 0.75, canvas.height * 0.75);
+        document.body.removeChild(clone);
+        return pdf.output('blob');
+      }
+
+      document.getElementById('simpanPdfBtn')?.addEventListener('click', async function () {
+        const btn = this;
+        const text = document.getElementById('simpanPdfText');
+        const spinner = document.getElementById('simpanPdfSpinner');
+        btn.disabled = true;
+        text.style.display = 'none';
+        spinner.style.display = 'inline-block';
+        try {
+          const pdfBlob = await generatePDFWithSignature();
+          const file = new File([pdfBlob], `Surat_${Date.now()}.pdf`, { type: 'application/pdf' });
+          const fileUrl = await uploadFile(file);
+          const id = document.getElementById('editSuratId').value;
+          const nomorSurat = document.getElementById('editNomorSurat').value;
+          await apiRequest('/surat/' + id + '/status', 'PUT', { status: 'selesai', file_url: fileUrl, nomor_surat: nomorSurat });
+          alert('Surat berhasil diterbitkan dan diupload.');
+          bootstrap.Modal.getInstance(document.getElementById('editSuratModal')).hide();
+          await loadData();
+        } catch (error) {
+          alert('Gagal membuat PDF: ' + error.message);
+        } finally {
+          btn.disabled = false;
+          text.style.display = 'inline-block';
+          spinner.style.display = 'none';
+        }
+      });
+
+      document.querySelectorAll('#editSuratForm input, #editSuratForm textarea').forEach(el => el.addEventListener('input', updatePreview));
+
+      // ---------- SIDEBAR TOGGLE & LOGOUT ----------
+      const sidebar = document.getElementById('sidebar');
+      const collapseBtn = document.getElementById('sidebarCollapseBtn');
+      const mobileToggle = document.getElementById('sidebarToggle');
+      if (sidebar && collapseBtn) {
+        const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        if (isCollapsed) {
+          sidebar.classList.add('sidebar-collapsed');
+          collapseBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        } else {
+          collapseBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        }
+        collapseBtn.addEventListener('click', () => {
+          sidebar.classList.toggle('sidebar-collapsed');
+          localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('sidebar-collapsed'));
+          collapseBtn.innerHTML = sidebar.classList.contains('sidebar-collapsed') ? '<i class="fas fa-chevron-right"></i>' : '<i class="fas fa-chevron-left"></i>';
+        });
+      }
+      if (mobileToggle) {
+        mobileToggle.addEventListener('click', () => sidebar.classList.toggle('show'));
+      }
+      document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 991.98 && sidebar && !sidebar.contains(e.target) && mobileToggle && !mobileToggle.contains(e.target) && sidebar.classList.contains('show')) {
+          sidebar.classList.remove('show');
+        }
+      });
+      const currentPage = window.location.pathname.split('/').pop();
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === currentPage) link.classList.add('active');
+      });
+
+      document.getElementById('displayName').innerText = user.nama || user.email;
+      document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+      });
+
+      // ---------- AUTO REFRESH & INITIAL LOAD ----------
+      let refreshInterval = setInterval(() => {
+        if (document.visibilityState === 'visible') refreshBackground();
+      }, 30000);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') refreshBackground();
+      });
+      window.addEventListener('beforeunload', () => clearInterval(refreshInterval));
+      await loadData();
+    })();
+  </script>
+</body>
+
+</html>

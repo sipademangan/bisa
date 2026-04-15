@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Surat - SIP Demangan (Admin)</title>
+  <link rel="icon" type="image/webp" href="2.webp">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --primary: #2ecc71;
+      --primary-dark: #27ae60;
+      --sidebar-bg: #ffffff;
+      --sidebar-width: 280px;
+      --sidebar-collapsed-width: 80px;
+      --header-height: 70px;
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      --shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e293b; min-height: 100vh; }
+    .app-wrapper { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--sidebar-bg);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.03);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      transition: width 0.3s ease;
+      z-index: 1000;
+    }
+    .sidebar-collapsed { width: var(--sidebar-collapsed-width); }
+    .sidebar-header {
+      padding: 1.5rem 1rem 0.5rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sidebar-brand {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .logo-wrapper {
+      width: 48px;
+      height: 48px;
+      background: transparent;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 12px rgba(46, 204, 113, 0.25);
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .logo-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
+    .sidebar-brand h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .sidebar-header p {
+      color: #64748b;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      padding-left: calc(48px + 0.75rem);
+    }
+    .sidebar-collapsed .sidebar-brand h3,
+    .sidebar-collapsed .sidebar-header p,
+    .sidebar-collapsed .nav-link span { display: none; }
+    .sidebar-collapsed .nav-link i { margin-right: 0; }
+    .sidebar-collapsed .nav-link { justify-content: center; padding: 0.75rem 0; }
+    #sidebarCollapseBtn { background: transparent; border: none; color: #64748b; cursor: pointer; }
+    .nav-menu { padding: 1rem 0.5rem; }
+    .nav-item { list-style: none; }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      margin: 0.25rem 0;
+      color: #475569;
+      font-weight: 500;
+      border-radius: 30px;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .nav-link i {
+      width: 24px;
+      font-size: 1.2rem;
+      margin-right: 0.75rem;
+      color: #94a3b8;
+    }
+    .nav-link:hover { background: rgba(46, 204, 113, 0.1); color: #2ecc71; }
+    .nav-link.active {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      box-shadow: 0 6px 12px rgba(46, 204, 113, 0.2);
+    }
+    .nav-link.active i { color: white; }
+    .badge-notif {
+      background-color: #e74c3c;
+      color: white;
+      border-radius: 20px;
+      padding: 0.2rem 0.6rem;
+      font-size: 0.75rem;
+      margin-left: auto;
+    }
+    .top-navbar {
+      height: var(--header-height);
+      background: white;
+      box-shadow: var(--shadow);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+    .user-dropdown { display: flex; align-items: center; gap: 1rem; }
+    .user-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .dropdown-menu {
+      border: none;
+      border-radius: 20px;
+      box-shadow: var(--shadow-hover);
+      padding: 0.5rem;
+    }
+    .dropdown-item {
+      border-radius: 30px;
+      padding: 0.5rem 1.2rem;
+      font-weight: 500;
+    }
+    .dropdown-item:hover { background: rgba(46, 204, 113, 0.1); color: #2ecc71; }
+    .main-content {
+      flex: 1;
+      background: #f8fafc;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+    .card {
+      border: none;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+    .card-header {
+      background: transparent;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      font-weight: 600;
+      padding: 1.2rem 1.5rem;
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      border: none;
+      border-radius: 30px;
+      padding: 0.6rem 1.8rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(46, 204, 113, 0.3);
+    }
+    .btn-outline-secondary { border-radius: 30px; }
+    .modal-content {
+      border: none;
+      border-radius: 24px;
+      box-shadow: var(--shadow-hover);
+    }
+    .modal-header {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      border-radius: 24px 24px 0 0;
+      padding: 1.2rem 1.5rem;
+    }
+    .modal-header .btn-close { filter: brightness(0) invert(1); }
+    .form-control, .form-select {
+      border-radius: 16px;
+      padding: 0.75rem 1rem;
+      border: 1px solid #e2e8f0;
+    }
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      border: none;
+      box-shadow: 0 6px 16px rgba(46, 204, 113, 0.3);
+      z-index: 1050;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    /* BOTTOM NAVIGATION (TELEGRAM STYLE) */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 8px 12px 12px;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      z-index: 1040;
+      transition: transform 0.2s ease;
+    }
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: #6c757d;
+      font-size: 12px;
+      font-weight: 500;
+      transition: 0.2s;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 30px;
+    }
+    .bottom-nav-item i {
+      font-size: 22px;
+      margin-bottom: 2px;
+    }
+    .bottom-nav-item.active {
+      color: #2ecc71;
+      background: rgba(46, 204, 113, 0.12);
+    }
+    .bottom-nav-item .label {
+      font-size: 11px;
+      font-weight: 500;
+    }
+    @media (max-width: 991.98px) {
+      .sidebar {
+        position: fixed;
+        transform: translateX(-100%);
+        height: 100vh;
+        transition: transform 0.3s ease;
+      }
+      .sidebar.show { transform: translateX(0); }
+      .main-content { padding: 1rem; padding-bottom: 80px; }
+      .sidebar-toggle { display: flex; }
+      .bottom-nav { display: flex; }
+    }
+    @media (min-width: 992px) {
+      .bottom-nav { display: none; }
+      body { padding-bottom: 0; }
+    }
+    .signature-pad {
+      border: 2px dashed #ccc;
+      border-radius: 16px;
+      background: #fff;
+      touch-action: none;
+      width: 100%;
+      height: 180px;
+    }
+    .signature-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      justify-content: center;
+    }
+    .qr-verif {
+      text-align: center;
+      margin-top: 15px;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 16px;
+    }
+    .preview-surat-wrapper {
+      background: #f0f2f5;
+      padding: 15px;
+      border-radius: 16px;
+      overflow-x: auto;
+    }
+    .nav-tabs .nav-link {
+      color: #475569;
+      font-weight: 500;
+      border: none;
+    }
+    .nav-tabs .nav-link.active {
+      color: #2ecc71;
+      border-bottom: 2px solid #2ecc71;
+      background: transparent;
+    }
+    .btn-refresh { margin-left: 1rem; }
+    .warga-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0;
+      background: transparent;
+    }
+    .warga-table td {
+      padding: 4px 4px;
+      border: none;
+      vertical-align: top;
+    }
+    .warga-table td.label {
+      font-weight: 600;
+      text-align: left;
+      white-space: nowrap;
+      padding-right: 8px;
+    }
+    .warga-table td.colon {
+      text-align: center;
+      width: 24px;
+      font-weight: 600;
+      padding: 4px 0;
+    }
+    .warga-table td.value {
+      text-align: left;
+      padding-left: 8px;
+    }
+    .surat-pdf {
+      font-family: 'Times New Roman', serif;
+      font-size: 11pt;
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto !important;
+      background: white;
+      padding: 0.3cm 2cm 1.2cm 2cm !important;
+      box-sizing: border-box;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .qr-ttd-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-top: 20px;
+      gap: 20px;
+    }
+    .qr-box, .ttd-box {
+      flex: 1;
+      text-align: center;
+      background: white;
+      padding: 10px;
+      border: none;
+    }
+    .qr-box img {
+      display: block;
+      margin: 0 auto;
+      max-width: 100px;
+      width: 100px;
+      height: auto;
+    }
+    .ttd-box img {
+      max-width: 180px;
+      max-height: 80px;
+      background: white;
+      border: none;
+      padding: 0;
+    }
+    @media print {
+      body { margin: 0; padding: 0; }
+      .surat-pdf { margin: 0; padding: 0.3cm 2cm 1.2cm 2cm !important; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-wrapper">
+  <!-- SIDEBAR (DESKTOP) -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html" class="sidebar-brand">
+        <div class="logo-wrapper"><img src="1.webp" alt="Logo"></div>
+        <h3>SIP Demangan</h3>
+      </a>
+      <button class="btn btn-link text-dark p-0" id="sidebarCollapseBtn"><i class="fas fa-chevron-left"></i></button>
+    </div>
+    <p>Padukuhan Demangan</p>
+    <ul class="nav-menu">
+      <li class="nav-item"><a href="dashboard_admin.html" class="nav-link"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+      <li class="nav-item"><a href="warga_admin.html" class="nav-link"><i class="fas fa-users"></i><span>Data Warga</span></a></li>
+      <li class="nav-item"><a href="surat_admin.html" class="nav-link active"><i class="fas fa-envelope"></i><span>Surat</span><span class="badge-notif" id="suratNotifBadge" style="display:none;">0</span></a></li>
+      <li class="nav-item"><a href="berita.html" class="nav-link"><i class="fas fa-newspaper"></i><span>Berita</span></a></li>
+      <li class="nav-item"><a href="galeri.html" class="nav-link"><i class="fas fa-images"></i><span>Galeri</span></a></li>
+      <li class="nav-item"><a href="peta_sebaran_admin.html" class="nav-link"><i class="fas fa-map-marked-alt"></i><span>Peta Sebaran</span></a></li>
+      <li class="nav-item"><a href="pohon_keluarga.html" class="nav-link"><i class="fas fa-tree"></i><span>Pohon Keluarga</span></a></li>
+      <li class="nav-item"><a href="users.html" class="nav-link"><i class="fas fa-user-cog"></i><span>Kelola Pengguna</span></a></li>
+      <li class="nav-item"><a href="hash_tool.html" class="nav-link"><i class="fas fa-hashtag"></i><span>Hash/Unhash</span></a></li>
+      <li class="nav-item"><a href="verifikasi_pendaftar.html" class="nav-link"><i class="fas fa-user-check"></i><span>Verifikasi Pendaftar</span></a></li>
+      <li class="nav-item"><a href="verifikasi_surat.html" class="nav-link"><i class="fas fa-qrcode"></i><span>Verifikasi Surat</span></a></li>
+    </ul>
+  </div>
+
+  <!-- BOTTOM NAVIGATION (MOBILE) -->
+  <div class="bottom-nav" id="bottomNav">
+    <button class="bottom-nav-item" data-url="dashboard_admin.html">
+      <i class="fas fa-tachometer-alt"></i><span class="label">Dashboard</span>
+    </button>
+    <button class="bottom-nav-item" data-url="warga_admin.html">
+      <i class="fas fa-users"></i><span class="label">Warga</span>
+    </button>
+    <button class="bottom-nav-item active" data-url="surat_admin.html">
+      <i class="fas fa-envelope"></i><span class="label">Surat</span>
+    </button>
+    <button class="bottom-nav-item" data-url="berita.html">
+      <i class="fas fa-newspaper"></i><span class="label">Berita</span>
+    </button>
+    <button class="bottom-nav-item" data-url="galeri.html">
+      <i class="fas fa-images"></i><span class="label">Galeri</span>
+    </button>
+  </div>
+
+  <div class="flex-grow-1">
+    <div class="top-navbar">
+      <div class="user-dropdown">
+        <span id="displayName" class="fw-semibold"></span>
+        <div class="dropdown">
+          <button class="btn p-0" data-bs-toggle="dropdown">
+            <div class="user-avatar"><i class="fas fa-user"></i></div>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-id-card me-2"></i> Profil Saya</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <div>
+          <h2 class="fw-bold d-inline-block">Manajemen Surat</h2>
+          <button class="btn btn-sm btn-outline-secondary btn-refresh" id="refreshDataBtn" title="Refresh data"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </div>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalSurat" id="btnTambahSurat"><i class="fas fa-plus me-2"></i>Buat Surat Baru</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><i class="fas fa-list me-2 text-success"></i>Daftar Pengajuan Surat</div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table id="tableSurat" class="table table-hover align-middle" style="width:100%">
+              <thead><tr><th>No</th><th>Nomor Surat</th><th>Pengaju</th><th>Jenis Surat</th><th>Tanggal Pengajuan</th><th>Status</th><th>File PDF</th><th>Aksi</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+
+<!-- Modal Tambah/Edit Surat -->
+<div class="modal fade" id="modalSurat" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title" id="modalSuratTitle">Tambah Surat</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <form id="formSurat">
+          <input type="hidden" id="suratId">
+          <div class="mb-3"><label class="form-label">NIK Pemohon</label><input type="text" class="form-control" id="pengajuId" required></div>
+          <div class="mb-3"><label class="form-label">Jenis Surat</label><select class="form-select" id="jenisSurat" required>
+              <option value="">-- Pilih --</option>
+              <option value="keterangan_domisili">Keterangan Domisili</option>
+              <option value="keterangan_tidak_mampu">Keterangan Tidak Mampu</option>
+              <option value="pengantar_skck">Pengantar SKCK</option>
+              <option value="pengantar_ktp">Surat Pengantar KTP</option>
+            </select></div>
+          <div class="mb-3"><label class="form-label">Keperluan</label><textarea class="form-control" id="keterangan" rows="3" required></textarea></div>
+          <div class="mb-3"><label class="form-label">Status</label><select class="form-select" id="statusSurat">
+              <option value="diajukan">Diajukan</option>
+              <option value="disetujui">Disetujui</option>
+              <option value="selesai">Selesai</option>
+              <option value="ditolak">Ditolak</option>
+            </select></div>
+        </form>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button type="button" class="btn btn-success" id="simpanSuratBtn">Simpan</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Pratinjau Surat + Edit Data Warga -->
+<div class="modal fade" id="previewSuratModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white"><h5 class="modal-title"><i class="fas fa-file-alt me-2"></i>Pratinjau & Verifikasi Surat</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-lg-7"><div class="preview-surat-wrapper"><div id="previewSuratContainer"><div class="text-center p-5"><i class="fas fa-spinner fa-spin"></i> Memuat preview...</div></div></div></div>
+          <div class="col-lg-5">
+            <div class="card shadow-sm">
+              <div class="card-header bg-light fw-bold">
+                <ul class="nav nav-tabs card-header-tabs" id="editTab" role="tablist">
+                  <li class="nav-item"><button class="nav-link active" id="edit-surat-tab" data-bs-toggle="tab" data-bs-target="#editSurat" type="button" role="tab">Edit Surat</button></li>
+                  <li class="nav-item"><button class="nav-link" id="edit-warga-tab" data-bs-toggle="tab" data-bs-target="#editWarga" type="button" role="tab">Edit Data Warga</button></li>
+                </ul>
+              </div>
+              <div class="card-body">
+                <div class="tab-content">
+                  <div class="tab-pane fade show active" id="editSurat" role="tabpanel">
+                    <label class="form-label">Jenis Surat</label>
+                    <select id="editJenisSurat" class="form-select mb-2"><option value="keterangan_domisili">Keterangan Domisili</option><option value="keterangan_tidak_mampu">Keterangan Tidak Mampu</option><option value="pengantar_skck">Pengantar SKCK</option><option value="pengantar_ktp">Surat Pengantar KTP</option></select>
+                    <label class="form-label">Keperluan</label><textarea id="editKeperluan" class="form-control mb-2" rows="2"></textarea>
+                    <label class="form-label">Status</label><select id="editStatus" class="form-select mb-3"><option value="diajukan">Diajukan</option><option value="disetujui">Disetujui</option><option value="selesai">Selesai</option><option value="ditolak">Ditolak</option></select>
+                    <button id="saveEditSuratBtn" class="btn btn-success w-100 mb-3"><i class="fas fa-save"></i> Simpan Perubahan Surat</button>
+                    <hr>
+                    <div class="fw-bold mb-2"><i class="fas fa-signature"></i> Tanda Tangan RT (Touchscreen)</div>
+                    <canvas id="signatureCanvas" class="signature-pad" width="400" height="180" style="width:100%; height:180px; background:white;"></canvas>
+                    <div class="signature-actions"><button id="clearSignatureBtn" class="btn btn-outline-secondary btn-sm"><i class="fas fa-eraser"></i> Hapus</button><button id="saveSignatureBtn" class="btn btn-outline-success btn-sm"><i class="fas fa-save"></i> Simpan TTD RT</button></div>
+                    <div class="qr-verif mt-3"><div id="qrContainer"></div><small class="text-muted">QR Code Verifikasi Keaslian Surat</small></div>
+                  </div>
+                  <div class="tab-pane fade" id="editWarga" role="tabpanel">
+                    <form id="formEditWarga">
+                      <input type="hidden" id="editWargaId">
+                      <div class="mb-2"><label class="form-label">Nama Lengkap</label><input type="text" class="form-control" id="editWargaNama" readonly disabled></div>
+                      <div class="mb-2"><label class="form-label">NIK</label><input type="text" class="form-control" id="editWargaNik" readonly disabled></div>
+                      <div class="mb-2"><label class="form-label">Tempat Lahir</label><input type="text" class="form-control" id="editWargaTempatLahir" placeholder="Contoh: Yogyakarta"></div>
+                      <div class="mb-2"><label class="form-label">Tanggal Lahir</label><input type="date" class="form-control" id="editWargaTglLahir"></div>
+                      <div class="mb-2"><label class="form-label">Jenis Kelamin</label><select class="form-select" id="editWargaJenisKelamin"><option value="">-- Pilih --</option><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option></select></div>
+                      <div class="mb-2"><label class="form-label">Status Perkawinan</label><select class="form-select" id="editWargaStatusPerkawinan"><option value="">-- Pilih --</option><option value="Belum Kawin">Belum Kawin</option><option value="Kawin">Kawin</option><option value="Cerai Hidup">Cerai Hidup</option><option value="Cerai Mati">Cerai Mati</option></select></div>
+                      <div class="mb-2"><label class="form-label">Agama</label><select class="form-select" id="editWargaAgama"><option value="">-- Pilih --</option><option value="Islam">Islam</option><option value="Kristen">Kristen</option><option value="Katolik">Katolik</option><option value="Hindu">Hindu</option><option value="Buddha">Buddha</option><option value="Konghucu">Konghucu</option></select></div>
+                      <div class="mb-2"><label class="form-label">Pekerjaan</label><input type="text" class="form-control" id="editWargaPekerjaan"></div>
+                      <div class="mb-2"><label class="form-label">Alamat Lengkap (opsional)</label><textarea class="form-control" id="editWargaAlamat" rows="2" placeholder="Jalan, dusun, dll"></textarea><small class="text-muted">Kosongkan jika ingin menggunakan format "RT xx, Padukuhan Demangan..."</small></div>
+                      <button type="button" id="saveEditWargaBtn" class="btn btn-primary w-100"><i class="fas fa-save"></i> Simpan Data Warga</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button><button type="button" class="btn btn-info" id="saveAsImageBtn"><i class="fas fa-camera"></i> Simpan sebagai Gambar</button></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/auth.js"></script>
+<script>
+  // ======================== HELPER FUNCTIONS (sama seperti asli) ========================
+  function formatDateOnly(timestamp) {
+    const date = timestamp ? new Date(timestamp) : new Date();
+    if (isNaN(date)) return 'Tanggal tidak valid';
+    const days = date.getDate();
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    return `${days} ${months[date.getMonth()]} ${date.getFullYear()}`;
+  }
+  function formatTanggalWithPlace(timestamp) {
+    const date = timestamp ? new Date(timestamp) : new Date();
+    if (isNaN(date)) return 'Bangunharjo, Tanggal tidak valid';
+    const days = date.getDate();
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    return `Bangunharjo, ${days} ${months[date.getMonth()]} ${date.getFullYear()}`;
+  }
+  function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+  function getNamaKetuaRtByRt(rt, daftarKetua) {
+    if (!daftarKetua || daftarKetua.length === 0) return 'Ketua RT (data tidak tersedia)';
+    const rtNum = parseInt(rt, 10);
+    const ketua = daftarKetua.find(k => parseInt(k.rt, 10) === rtNum);
+    return ketua ? ketua.nama : 'Ketua RT';
+  }
+  function formatWargaList(warga) {
+    let tempatTglLahir = '-';
+    if (warga.tempat_lahir && warga.tgl_lahir) {
+      const tglF = formatDateOnly(warga.tgl_lahir);
+      tempatTglLahir = `${warga.tempat_lahir}, ${tglF}`;
+    } else if (warga.tempat_lahir) {
+      tempatTglLahir = warga.tempat_lahir;
+    } else if (warga.tgl_lahir) {
+      tempatTglLahir = formatDateOnly(warga.tgl_lahir);
+    }
+    const alamatLengkap = warga.alamat || `RT ${warga.alamat_rt}, Padukuhan Demangan, Bangunharjo, Sewon, Bantul`;
+    const items = [
+      { label: 'Nama Lengkap', value: warga.nama || '-' },
+      { label: 'Tempat/Tgl Lahir', value: tempatTglLahir },
+      { label: 'Jenis Kelamin', value: warga.jenis_kelamin || '-' },
+      { label: 'Status Perkawinan', value: warga.status_perkawinan || '-' },
+      { label: 'Pekerjaan', value: warga.pekerjaan || '-' },
+      { label: 'Agama', value: warga.agama || '-' },
+      { label: 'No. KTP/NIK', value: warga.nik || '-' },
+      { label: 'Alamat', value: alamatLengkap }
+    ];
+    let html = `<table class="warga-table" style="width:100%; background:transparent;">`;
+    items.forEach(item => {
+      html += `<tr><td class="label">${escapeHtml(item.label)}</td><td class="colon">:</td><td class="value">${escapeHtml(item.value)}</td></tr>`;
+    });
+    html += `</table>`;
+    return html;
+  }
+
+  function getQRDataURL(text, size = 100) {
+    return new Promise((resolve, reject) => {
+      const tempDiv = document.createElement('div');
+      try {
+        new QRCode(tempDiv, { text: text, width: size, height: size });
+        setTimeout(() => {
+          const canvas = tempDiv.querySelector('canvas');
+          if (canvas) resolve(canvas.toDataURL('image/png'));
+          else reject(new Error('Gagal generate QR Code'));
+        }, 150);
+      } catch (err) { reject(err); }
+    });
+  }
+
+  async function buildPreviewHTMLAsync(surat, warga, ttdRtBase64, daftarKetua) {
+    let rtWarga = (warga.alamat_rt || '03').toString().match(/\d+/);
+    rtWarga = rtWarga ? rtWarga[0] : '03';
+    const ketuaRt = getNamaKetuaRtByRt(rtWarga, daftarKetua);
+    const nomorSurat = surat.nomor_surat || `SUR-${surat.id || Date.now()}`;
+    const berlakuDate = new Date(); berlakuDate.setMonth(berlakuDate.getMonth() + 1);
+    const berlaku = formatDateOnly(berlakuDate);
+    const ttdRtImg = (ttdRtBase64 && ttdRtBase64.startsWith('data:image/')) ? `<img src="${ttdRtBase64}" alt="TTD Ketua RT" style="max-width:180px; max-height:80px;">` : '<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>';
+    const verifUrl = `./verifikasi_surat.html?nomor=${encodeURIComponent(nomorSurat)}`;
+    let qrDataUrl = null;
+    try { qrDataUrl = await getQRDataURL(verifUrl, 100); } catch(e) { console.warn(e); qrDataUrl = null; }
+    const wargaListHtml = formatWargaList(warga);
+    const keperluan = escapeHtml(surat.keterangan || surat.keperluan || '-');
+    const tanggalSurat = formatTanggalWithPlace(surat.tgl_pengajuan);
+    const qrImageHtml = qrDataUrl ? `<img src="${qrDataUrl}" alt="QR Verifikasi" style="width:100px; height:100px; display:block; margin:0 auto;">` : '<div style="width:100px; height:100px; background:#f0f0f0; display:flex; align-items:center; justify-content:center;">QR Error</div>';
+    return `<div class="surat-pdf" id="suratToCapture">
+      <div style="text-align:center;"><div style="font-size:14pt; font-weight:bold;">RUKUN TETANGGA</div><div style="font-size:13pt;">NGIJO RT ${String(rtWarga).padStart(2, '0')} PADUKUHAN DEMANGAN</div><div>KALURAHAN BANGUNHARJO</div><hr style="border: none; border-top: 2px solid black; margin: 4px 0;"></div>
+      <div style="text-align:center;"><div style="font-size:13pt; font-weight:bold;">SURAT PENGANTAR / KETERANGAN</div><div>Nomor: ${escapeHtml(nomorSurat)}</div></div>
+      <div style="margin:0.5rem 0;">Yang bertanda tangan di bawah ini, Ketua RT ${String(rtWarga).padStart(2, '0')} Ngijo, Padukuhan Demangan, Kalurahan Bangunharjo, menerangkan bahwa:</div>
+      ${wargaListHtml}
+      <div style="margin-top:0.5rem;">Orang tersebut adalah warga kami. Surat ini diberikan untuk keperluan:</div>
+      <div style="margin:0.2rem 0 0.5rem 1rem; font-weight:bold;">${keperluan}</div>
+      <div>Demikian surat ini dibuat untuk dipergunakan sebagaimana mestinya.</div>
+      <div><strong>Berlaku s/d:</strong> ${berlaku}</div>
+      <div class="qr-ttd-wrapper"><div class="qr-box">${qrImageHtml}<div style="font-size: 9px; margin-top: 8px;">Verifikasi Digital</div></div><div class="ttd-box">${tanggalSurat}<br>Hormat Kami,<br>Ketua RT ${String(rtWarga).padStart(2, '0')}<br>${ttdRtImg}<br>( ${escapeHtml(ketuaRt)} )</div></div>
+    </div>`;
+  }
+
+  // ======================== SIGNATURE PAD ========================
+  function initSignaturePad(canvasId) {
+    const canvas = document.getElementById(canvasId); if (!canvas) return;
+    let drawing = false, lastX = 0, lastY = 0;
+    const ctx = canvas.getContext('2d');
+    ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#000';
+    function getCoords(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
+      let clientX, clientY;
+      if (e.touches) { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; }
+      else { clientX = e.clientX; clientY = e.clientY; }
+      let x = (clientX - rect.left) * scaleX, y = (clientY - rect.top) * scaleY;
+      x = Math.min(Math.max(0, x), canvas.width); y = Math.min(Math.max(0, y), canvas.height);
+      return { x, y };
+    }
+    function start(e) { drawing = true; const { x, y } = getCoords(e); lastX = x; lastY = y; ctx.beginPath(); ctx.moveTo(x, y); e.preventDefault(); }
+    function draw(e) { if (!drawing) return; const { x, y } = getCoords(e); ctx.lineTo(x, y); ctx.stroke(); lastX = x; lastY = y; e.preventDefault(); }
+    function stop() { drawing = false; ctx.beginPath(); }
+    canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', stop);
+    canvas.addEventListener('touchstart', start); canvas.addEventListener('touchmove', draw); canvas.addEventListener('touchend', stop);
+  }
+  function clearSignatureCanvas(canvasId) { const canvas = document.getElementById(canvasId); if (!canvas) return; const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height); }
+  function getSignatureBase64(canvasId) { return document.getElementById(canvasId).toDataURL('image/png'); }
+
+  // ======================== GLOBAL VARIABLES ========================
+  let allSurat = [], daftarWarga = [], daftarKetuaRt = [], tabelSurat;
+  let currentSurat = null, currentWarga = null;
+
+  // ======================== SIDEBAR & BOTTOM NAV ========================
+  (function() {
+    const sidebar = document.getElementById('sidebar'), collapseBtn = document.getElementById('sidebarCollapseBtn'), mobileToggle = document.getElementById('sidebarToggle');
+    if (sidebar && collapseBtn) {
+      const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+      if (isCollapsed) { sidebar.classList.add('sidebar-collapsed'); collapseBtn.innerHTML = '<i class="fas fa-chevron-right"></i>'; } else { collapseBtn.innerHTML = '<i class="fas fa-chevron-left"></i>'; }
+      collapseBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('sidebar-collapsed');
+        localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('sidebar-collapsed'));
+        collapseBtn.innerHTML = sidebar.classList.contains('sidebar-collapsed') ? '<i class="fas fa-chevron-right"></i>' : '<i class="fas fa-chevron-left"></i>';
+      });
+    }
+    if (mobileToggle) mobileToggle.addEventListener('click', () => sidebar.classList.toggle('show'));
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 991.98 && sidebar && !sidebar.contains(e.target) && mobileToggle && !mobileToggle.contains(e.target) && sidebar.classList.contains('show')) sidebar.classList.remove('show');
+    });
+
+    const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+    bottomNavItems.forEach(item => {
+      item.addEventListener('click', () => { const url = item.getAttribute('data-url'); if (url) window.location.href = url; });
+      const currentPath = window.location.pathname.split('/').pop();
+      if (item.getAttribute('data-url') === currentPath) item.classList.add('active');
+    });
+  })();
+
+  const user = checkAuth();
+  if (!user) window.location.href = 'index.html';
+  else if (user.role !== 'admin' && user.role !== 'ketua_rt') window.location.href = 'dashboard_member.html';
+  else {
+    document.getElementById('displayName').innerText = user.nama || user.email;
+
+    async function loadKetuaRt() { try { daftarKetuaRt = await getKetuaRt(); } catch(e) { console.error(e); daftarKetuaRt = []; } }
+    async function loadWarga() { try { daftarWarga = await getWarga(); } catch(e) { console.error(e); } }
+    async function loadSurat() { try { allSurat = await getSurat(); if (tabelSurat) renderTable(allSurat); updateSuratBadge(); } catch(e) { console.error(e); } }
+
+    function formatDate(iso) { return iso ? new Date(iso).toLocaleDateString('id-ID') : '-'; }
+    function getStatusBadge(status) { const map = { diajukan: 'bg-warning', disetujui: 'bg-primary', selesai: 'bg-success', ditolak: 'bg-danger' }; return `<span class="badge ${map[status] || 'bg-secondary'}">${status}</span>`; }
+    function renderTable(suratList) {
+      if (!tabelSurat) return;
+      const data = suratList.map((s, idx) => {
+        let pengajuNama = s.nik_pemohon;
+        const w = daftarWarga.find(w => String(w.nik) === String(s.nik_pemohon));
+        if (w) pengajuNama = w.nama;
+        const nomorSurat = s.nomor_surat || `SUR-${String(s.id).padStart(4, '0')}`;
+        let fileLink = (s.file_url && s.file_url.trim() !== '') ? `<a href="${s.file_url}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-file-pdf"></i> Lihat</a>` : '-';
+        const previewBtn = `<button class="btn btn-sm btn-outline-info previewSuratBtn" data-id="${s.id}" title="Pratinjau & Edit"><i class="fas fa-eye"></i></button>`;
+        const aksi = `${previewBtn} <button class="btn btn-sm btn-outline-success editSurat" data-id="${s.id}"><i class="fas fa-edit"></i></button> <button class="btn btn-sm btn-outline-danger hapusSurat" data-id="${s.id}"><i class="fas fa-trash"></i></button>`;
+        return { no: idx + 1, id: s.id, nomor_surat: nomorSurat, pengaju: pengajuNama, jenis: s.jenis_surat || '-', tanggal: formatDate(s.tgl_pengajuan), statusHtml: getStatusBadge(s.status), fileUrl: fileLink, aksi };
+      });
+      tabelSurat.clear().rows.add(data).draw();
+    }
+    function initDataTable() {
+      if (tabelSurat) return;
+      tabelSurat = $('#tableSurat').DataTable({ columns: [{ data: 'no' }, { data: 'nomor_surat' }, { data: 'pengaju' }, { data: 'jenis' }, { data: 'tanggal' }, { data: 'statusHtml' }, { data: 'fileUrl' }, { data: 'aksi' }], columnDefs: [{ targets: 5, render: (d, t, r) => r.statusHtml }, { targets: 6, render: (d, t, r) => r.fileUrl }, { targets: 7, render: (d, t, r) => r.aksi }] });
+    }
+    async function simpanSurat() {
+      const id = document.getElementById('suratId').value;
+      const data = { nik_pemohon: document.getElementById('pengajuId').value, jenis_surat: document.getElementById('jenisSurat').value, keterangan: document.getElementById('keterangan').value, status: document.getElementById('statusSurat').value };
+      if (!data.nik_pemohon || !data.jenis_surat || !data.keterangan) { alert('Lengkapi data'); return; }
+      const btn = document.getElementById('simpanSuratBtn'), orig = btn.innerHTML;
+      btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+      try { if (id) await updateSurat(id, data); else await createSurat(data); alert('Berhasil'); bootstrap.Modal.getInstance(document.getElementById('modalSurat')).hide(); await loadSurat(); } catch(e) { alert('Gagal: ' + e.message); } finally { btn.disabled = false; btn.innerHTML = orig; }
+    }
+    async function hapusSurat(id) { if (!confirm('Yakin ingin menghapus surat ini?')) return; try { await deleteSurat(id); alert('Terhapus'); await loadSurat(); } catch(e) { alert(e.message); } }
+    window.editSurat = async function(id) {
+      let surat = allSurat.find(s => s.id == id);
+      if (!surat) surat = await getSuratById(id);
+      document.getElementById('suratId').value = surat.id; document.getElementById('pengajuId').value = surat.nik_pemohon; document.getElementById('jenisSurat').value = surat.jenis_surat; document.getElementById('keterangan').value = surat.keterangan; document.getElementById('statusSurat').value = surat.status; document.getElementById('modalSuratTitle').innerText = 'Edit Surat';
+      new bootstrap.Modal(document.getElementById('modalSurat')).show();
+    };
+    $('#tableSurat').on('click', '.editSurat', function() { window.editSurat($(this).data('id')); });
+    $('#tableSurat').on('click', '.hapusSurat', function() { hapusSurat($(this).data('id')); });
+
+    // PREVIEW SURAT
+    $('#tableSurat').on('click', '.previewSuratBtn', async function() {
+      const id = $(this).data('id'); const btn = $(this); const originalHtml = btn.html();
+      btn.html('<i class="fas fa-spinner fa-spin"></i>').prop('disabled', true);
+      try {
+        let surat = allSurat.find(s => s.id == id);
+        if (!surat) { surat = await getSuratById(id); if (surat) allSurat.push(surat); }
+        if (!surat) throw new Error('Surat tidak ditemukan');
+        let warga = daftarWarga.find(w => String(w.nik) === String(surat.nik_pemohon));
+        if (!warga) { const allWarga = await getWarga(); warga = allWarga.find(w => String(w.nik) === String(surat.nik_pemohon)); if (warga) daftarWarga = allWarga; else throw new Error('Data warga tidak ditemukan'); }
+        currentSurat = surat; currentWarga = warga;
+        if (!daftarKetuaRt || daftarKetuaRt.length === 0) await loadKetuaRt();
+        document.getElementById('editJenisSurat').value = surat.jenis_surat || ''; document.getElementById('editKeperluan').value = surat.keterangan || ''; document.getElementById('editStatus').value = surat.status || 'diajukan';
+        document.getElementById('editWargaId').value = warga.id || ''; document.getElementById('editWargaNama').value = warga.nama || ''; document.getElementById('editWargaNik').value = warga.nik || ''; document.getElementById('editWargaTempatLahir').value = warga.tempat_lahir || ''; document.getElementById('editWargaTglLahir').value = warga.tgl_lahir ? warga.tgl_lahir.split('T')[0] : ''; document.getElementById('editWargaJenisKelamin').value = warga.jenis_kelamin || ''; document.getElementById('editWargaStatusPerkawinan').value = warga.status_perkawinan || ''; document.getElementById('editWargaAgama').value = warga.agama || ''; document.getElementById('editWargaPekerjaan').value = warga.pekerjaan || ''; document.getElementById('editWargaAlamat').value = warga.alamat || '';
+        const existingTtd = surat.tanda_tangan_base64 || null;
+        const html = await buildPreviewHTMLAsync(surat, warga, existingTtd, daftarKetuaRt);
+        document.getElementById('previewSuratContainer').innerHTML = html;
+        if (surat.nomor_surat) { const verifUrl = `./verifikasi_surat.html?nomor=${encodeURIComponent(surat.nomor_surat)}`; const qrContainer = document.getElementById('qrContainer'); if (qrContainer) { qrContainer.innerHTML = ''; new QRCode(qrContainer, { text: verifUrl, width: 100, height: 100 }); } }
+        initSignaturePad('signatureCanvas'); clearSignatureCanvas('signatureCanvas');
+        if (existingTtd) { const img = new Image(); img.onload = () => { const canvas = document.getElementById('signatureCanvas'); const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height); }; img.src = existingTtd; }
+        new bootstrap.Modal(document.getElementById('previewSuratModal')).show();
+      } catch(err) { alert('Gagal memuat preview: ' + err.message); } finally { btn.html(originalHtml).prop('disabled', false); }
+    });
+
+    document.getElementById('saveEditSuratBtn').addEventListener('click', async function() {
+      if (!currentSurat) { alert('Tidak ada surat aktif'); return; }
+      const newData = { jenis_surat: document.getElementById('editJenisSurat').value, keterangan: document.getElementById('editKeperluan').value, status: document.getElementById('editStatus').value };
+      try { await updateSurat(currentSurat.id, newData); alert('Data surat berhasil diperbarui'); await loadSurat(); currentSurat = { ...currentSurat, ...newData }; const existingTtd = currentSurat.tanda_tangan_base64 || null; const html = await buildPreviewHTMLAsync(currentSurat, currentWarga, existingTtd, daftarKetuaRt); document.getElementById('previewSuratContainer').innerHTML = html; if (currentSurat.nomor_surat) { const verifUrl = `./verifikasi_surat.html?nomor=${encodeURIComponent(currentSurat.nomor_surat)}`; const qrContainer = document.getElementById('qrContainer'); if (qrContainer) { qrContainer.innerHTML = ''; new QRCode(qrContainer, { text: verifUrl, width: 100, height: 100 }); } } } catch(e) { alert('Gagal update: ' + e.message); }
+    });
+
+    document.getElementById('saveAsImageBtn').addEventListener('click', async function() {
+      const element = document.getElementById('suratToCapture'); if (!element) { alert('Elemen surat tidak ditemukan.'); return; }
+      const btn = this; const originalText = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Memproses...';
+      try { const container = document.getElementById('previewSuratContainer'); const images = container.querySelectorAll('img'); await Promise.all(Array.from(images).map(img => { if (img.complete) return Promise.resolve(); return new Promise((resolve) => { img.onload = resolve; img.onerror = resolve; }); })); await new Promise(resolve => setTimeout(resolve, 200)); const canvas = await html2canvas(element, { scale: 3, backgroundColor: '#ffffff', logging: false, useCORS: true }); const link = document.createElement('a'); const filename = currentSurat && currentSurat.nomor_surat ? `${currentSurat.nomor_surat}.png` : `surat_${Date.now()}.png`; link.download = filename; link.href = canvas.toDataURL('image/png'); link.click(); alert(`Gambar berhasil disimpan sebagai ${filename}`); } catch(err) { console.error(err); alert('Gagal menyimpan gambar: ' + err.message); } finally { btn.disabled = false; btn.innerHTML = originalText; }
+    });
+
+    document.getElementById('saveSignatureBtn').addEventListener('click', async function() {
+      if (!currentSurat) { alert('Tidak ada surat aktif'); return; }
+      const signatureBase64 = getSignatureBase64('signatureCanvas');
+      if (!signatureBase64 || signatureBase64.length < 100) { alert('Tanda tangan kosong, silakan gambar terlebih dahulu'); return; }
+      const btn = this; const originalText = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Memproses...';
+      try {
+        await ttdSurat(currentSurat.id, { tanda_tangan_base64: signatureBase64 });
+        currentSurat.status = 'selesai'; currentSurat.tanda_tangan_base64 = signatureBase64; currentSurat.tgl_selesai = new Date().toISOString();
+        const html = await buildPreviewHTMLAsync(currentSurat, currentWarga, signatureBase64, daftarKetuaRt);
+        document.getElementById('previewSuratContainer').innerHTML = html;
+        const container = document.getElementById('previewSuratContainer'); const images = container.querySelectorAll('img');
+        await Promise.all(Array.from(images).map(img => { if (img.complete) return Promise.resolve(); return new Promise((resolve) => { img.onload = resolve; img.onerror = resolve; }); }));
+        await new Promise(resolve => setTimeout(resolve, 300));
+        const element = document.getElementById('suratToCapture');
+        const canvasTemp = await html2canvas(element, { scale: 2, backgroundColor: '#ffffff', logging: false, useCORS: true });
+        const { jsPDF } = window.jspdf; const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+        const margin = 5; const contentWidth = 210 - (margin * 2); const imgWidth = contentWidth; const imgHeight = (canvasTemp.height * imgWidth) / canvasTemp.width;
+        let finalImgWidth = imgWidth, finalImgHeight = imgHeight;
+        if (imgHeight > 297 - (margin * 2)) { const scale = (297 - (margin * 2)) / imgHeight; finalImgWidth = imgWidth * scale; finalImgHeight = imgHeight * scale; }
+        pdf.addImage(canvasTemp.toDataURL('image/jpeg', 1.0), 'JPEG', margin, margin, finalImgWidth, finalImgHeight, undefined, 'FAST');
+        const pdfBlob = pdf.output('blob');
+        const reader = new FileReader(); const base64Promise = new Promise((resolve, reject) => { reader.onloadend = () => resolve(reader.result.split(',')[1]); reader.onerror = reject; }); reader.readAsDataURL(pdfBlob);
+        const base64Data = await base64Promise; const uploadResult = await uploadFile(base64Data, `${currentSurat.nomor_surat}.pdf`, true);
+        await updateSuratStatus(currentSurat.id, currentSurat.status, uploadResult.url, null);
+        await loadSurat(); alert('PDF berhasil dibuat!');
+      } catch(e) { console.error(e); alert('Gagal: ' + e.message); } finally { btn.disabled = false; btn.innerHTML = originalText; }
+    });
+
+    document.getElementById('clearSignatureBtn').addEventListener('click', () => { clearSignatureCanvas('signatureCanvas'); });
+    document.getElementById('saveEditWargaBtn').addEventListener('click', async function() {
+      if (!currentWarga || !currentWarga.id) { alert('Data warga tidak valid'); return; }
+      const updatedWarga = { tempat_lahir: document.getElementById('editWargaTempatLahir').value, tgl_lahir: document.getElementById('editWargaTglLahir').value, jenis_kelamin: document.getElementById('editWargaJenisKelamin').value, status_perkawinan: document.getElementById('editWargaStatusPerkawinan').value, agama: document.getElementById('editWargaAgama').value, pekerjaan: document.getElementById('editWargaPekerjaan').value, alamat: document.getElementById('editWargaAlamat').value };
+      try { await updateWarga(currentWarga.id, updatedWarga); alert('Data warga berhasil diperbarui'); Object.assign(currentWarga, updatedWarga); const existingTtd = currentSurat.tanda_tangan_base64 || null; const html = await buildPreviewHTMLAsync(currentSurat, currentWarga, existingTtd, daftarKetuaRt); document.getElementById('previewSuratContainer').innerHTML = html; if (currentSurat.nomor_surat) { const verifUrl = `./verifikasi_surat.html?nomor=${encodeURIComponent(currentSurat.nomor_surat)}`; const qrContainer = document.getElementById('qrContainer'); if (qrContainer) { qrContainer.innerHTML = ''; new QRCode(qrContainer, { text: verifUrl, width: 100, height: 100 }); } } daftarWarga = await getWarga(); } catch(e) { alert('Gagal update data warga: ' + e.message); }
+    });
+
+    document.getElementById('simpanSuratBtn').addEventListener('click', simpanSurat);
+    document.getElementById('btnTambahSurat').addEventListener('click', () => { document.getElementById('formSurat').reset(); document.getElementById('suratId').value = ''; document.getElementById('modalSuratTitle').innerText = 'Tambah Surat'; });
+    document.getElementById('refreshDataBtn').addEventListener('click', async () => { const btn = document.getElementById('refreshDataBtn'); const origIcon = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true; try { await loadSurat(); alert('Data berhasil dimuat ulang'); } catch(e) { alert('Gagal refresh: ' + e.message); } finally { btn.innerHTML = origIcon; btn.disabled = false; } });
+    async function updateSuratBadge() { try { const count = allSurat.filter(s => s.status === 'diajukan').length; const badge = document.getElementById('suratNotifBadge'); if (badge) { if (count > 0) { badge.innerText = count; badge.style.display = 'inline-block'; } else badge.style.display = 'none'; } } catch(e) {} }
+    initDataTable();
+    (async () => { await loadKetuaRt(); await loadWarga(); await loadSurat(); })();
+    document.getElementById('logoutBtn').addEventListener('click', (e) => { e.preventDefault(); localStorage.removeItem('user'); window.location.href = 'index.html'; });
+  }
+</script>
+</body>
+</html>

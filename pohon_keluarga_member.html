@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pohon Keluarga - SIP Demangan (Warga)</title>
+    <!-- Favicon (WebP) -->
+    <link rel="icon" type="image/webp" href="2.webp">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+        rel="stylesheet">
+    <!-- html2canvas dan jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #2ecc71;
+            --primary-dark: #27ae60;
+            --sidebar-bg: #ffffff;
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 80px;
+            --header-height: 70px;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        .app-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.03);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar-collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem 0.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-brand {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-brand:hover {
+            transform: translateY(-2px);
+        }
+
+        .logo-wrapper {
+            width: 48px;
+            height: 48px;
+            background: transparent;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 12px rgba(46, 204, 113, 0.25);
+            transition: all 0.2s;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .logo-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 16px;
+        }
+
+        .sidebar-brand:hover .logo-wrapper {
+            box-shadow: 0 8px 16px rgba(46, 204, 113, 0.4);
+            transform: scale(1.02);
+        }
+
+        .sidebar-brand h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-header p {
+            color: #64748b;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            padding-left: calc(48px + 0.75rem);
+        }
+
+        .sidebar-collapsed .sidebar-brand h3,
+        .sidebar-collapsed .sidebar-header p,
+        .sidebar-collapsed .nav-link span {
+            display: none;
+        }
+
+        .sidebar-collapsed .nav-link i {
+            margin-right: 0;
+        }
+
+        .sidebar-collapsed .nav-link {
+            justify-content: center;
+            padding: 0.75rem 0;
+        }
+
+        .sidebar-collapsed .logo-wrapper {
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+        }
+
+        .sidebar-collapsed .sidebar-brand {
+            gap: 0;
+        }
+
+        #sidebarCollapseBtn {
+            background: transparent;
+            border: none;
+            color: #64748b;
+            transition: transform 0.2s;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .sidebar-collapsed #sidebarCollapseBtn i {
+            transform: rotate(180deg);
+        }
+
+        .nav-menu {
+            padding: 1rem 0.5rem;
+        }
+
+        .nav-item {
+            list-style: none;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            color: #475569;
+            font-weight: 500;
+            border-radius: 30px;
+            transition: all 0.2s;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .nav-link i {
+            width: 24px;
+            font-size: 1.2rem;
+            margin-right: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .nav-link:hover {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+
+        .nav-link:hover i {
+            color: #2ecc71;
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            box-shadow: 0 6px 12px rgba(46, 204, 113, 0.2);
+        }
+
+        .nav-link.active i {
+            color: white;
+        }
+
+        .badge-notif {
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 20px;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.75rem;
+            margin-left: auto;
+        }
+
+        .sidebar-collapsed .badge-notif {
+            display: none;
+        }
+
+        .top-navbar {
+            height: var(--header-height);
+            background: white;
+            box-shadow: var(--shadow);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .user-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .dropdown-menu {
+            border: none;
+            border-radius: 20px;
+            box-shadow: var(--shadow-hover);
+            padding: 0.5rem;
+        }
+
+        .dropdown-item {
+            border-radius: 30px;
+            padding: 0.5rem 1.2rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+
+        .dropdown-item i {
+            width: 1.5rem;
+        }
+
+        .main-content {
+            flex: 1;
+            background: #f8fafc;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            border: none;
+            border-radius: 30px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-outline-primary {
+            border: 2px solid #3498db;
+            color: #3498db;
+            border-radius: 30px;
+            padding: 0.4rem 1rem;
+            transition: all 0.2s;
+        }
+
+        .btn-outline-primary:hover {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .card {
+            border: none;
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+            padding: 1.2rem 1.5rem;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 16px;
+            padding: 0.75rem 1rem;
+        }
+
+        .modal-content {
+            border-radius: 24px;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border-radius: 24px 24px 0 0;
+        }
+
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            box-shadow: 0 6px 16px rgba(46, 204, 113, 0.3);
+            z-index: 1050;
+            font-size: 1.3rem;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 991.98px) {
+            .sidebar {
+                position: fixed;
+                transform: translateX(-100%);
+                height: 100vh;
+                transition: transform 0.3s ease, width 0.3s ease;
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .sidebar-toggle {
+                display: flex;
+            }
+
+            .logo-wrapper {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .sidebar-brand h3 {
+                font-size: 1.2rem;
+            }
+
+            .sidebar-header p {
+                padding-left: calc(40px + 0.75rem);
+            }
+
+            .sidebar-collapsed {
+                width: var(--sidebar-width);
+            }
+
+            .sidebar-collapsed .sidebar-brand h3,
+            .sidebar-collapsed .sidebar-header p,
+            .sidebar-collapsed .nav-link span {
+                display: block;
+            }
+
+            .sidebar-collapsed .nav-link i {
+                margin-right: 0.75rem;
+            }
+
+            .sidebar-collapsed .nav-link {
+                justify-content: flex-start;
+                padding: 0.75rem 1rem;
+            }
+        }
+
+        /* Family tree styling */
+        .tree-node {
+            display: inline-block;
+            text-align: center;
+            margin: 0 10px;
+            vertical-align: top;
+        }
+
+        .tree-card {
+            background: white;
+            border-radius: 16px;
+            padding: 10px;
+            box-shadow: var(--shadow);
+            width: 180px;
+            margin-bottom: 10px;
+        }
+
+        .tree-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 8px;
+        }
+
+        .tree-card strong {
+            display: block;
+        }
+
+        .tree-actions {
+            margin-top: 8px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tree-actions button {
+            background: none;
+            border: none;
+            padding: 4px 6px;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+
+        .tree-actions button:hover {
+            background: #e9ecef;
+        }
+
+        .tree-children {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .tree-child {
+            margin: 0 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-wrapper">
+        <!-- SIDEBAR (Member) -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="sidebar-brand">
+                    <div class="logo-wrapper">
+                        <img src="1.webp" alt="Logo SIP Demangan">
+                    </div>
+                    <h3>SIP Demangan</h3>
+                </a>
+                <button class="btn btn-link text-dark p-0" id="sidebarCollapseBtn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <p>Padukuhan Demangan</p>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="dashboard_member.html" class="nav-link" id="menuDashboard"><i
+                            class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                <li class="nav-item"><a href="warga_member.html" class="nav-link" id="menuWarga"><i
+                            class="fas fa-users"></i> <span>Data Warga</span></a></li>
+                <li class="nav-item">
+                    <a href="surat_member.html" class="nav-link" id="menuSurat">
+                        <i class="fas fa-envelope"></i> <span>Surat</span>
+                        <span class="badge-notif" id="suratNotifBadge" style="display:none;">0</span>
+                    </a>
+                </li>
+                <li class="nav-item"><a href="peta_sebaran_member.html" class="nav-link" id="menuPeta"><i
+                            class="fas fa-map-marked-alt"></i> <span>Lokasi Saya</span></a></li>
+                <li class="nav-item"><a href="pohon_keluarga_member.html" class="nav-link active" id="menuKeluarga"><i
+                            class="fas fa-tree"></i> <span>Pohon Keluarga</span></a></li>
+            </ul>
+        </div>
+
+        <div class="flex-grow-1">
+            <div class="top-navbar">
+                <div class="user-dropdown">
+                    <span id="displayName" class="fw-semibold"></span>
+                    <div class="dropdown">
+                        <button class="btn p-0" data-bs-toggle="dropdown">
+                            <div class="user-avatar"><i class="fas fa-user"></i></div>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-id-card me-2"></i> Profil
+                                    Saya</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn"><i
+                                        class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <h2 class="fw-bold mb-0"><i class="fas fa-tree me-2 text-success"></i>Pohon Keluarga</h2>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#familyModal"
+                            onclick="clearFamilyForm()"><i class="fas fa-plus me-1"></i>Tambah Anggota Keluarga</button>
+                        <button class="btn btn-outline-primary" id="exportPdfBtn"><i
+                                class="fas fa-file-pdf me-1"></i>Ekspor PDF</button>
+                    </div>
+                </div>
+
+                <!-- Daftar anggota -->
+                <div class="card mb-4">
+                    <div class="card-header"><i class="fas fa-list me-2"></i>Daftar Anggota Keluarga</div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Nama</th>
+                                        <th>Foto</th>
+                                        <th>Ayah</th>
+                                        <th>Ibu</th>
+                                        <th>Peran</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="familyList"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualisasi Pohon -->
+                <div class="card">
+                    <div class="card-header"><i class="fas fa-sitemap me-2"></i>Diagram Pohon Keluarga</div>
+                    <div class="card-body">
+                        <div id="treeVisualization" class="text-center"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+
+    <!-- Modal Tambah/Edit -->
+    <div class="modal fade" id="familyModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="familyModalTitle">Tambah Anggota Keluarga</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="familyForm">
+                        <input type="hidden" id="familyId">
+                        <div class="mb-3"><label class="form-label">Nama Lengkap</label><input type="text"
+                                class="form-control" id="nama" required></div>
+                        <div class="mb-3"><label class="form-label">URL Foto (opsional)</label><input type="url"
+                                class="form-control" id="foto" placeholder="https://..."></div>
+                        <div class="mb-3"><label class="form-label">Ayah</label><select class="form-select" id="ayahId">
+                                <option value="">-- Pilih --</option>
+                            </select></div>
+                        <div class="mb-3"><label class="form-label">Ibu</label><select class="form-select" id="ibuId">
+                                <option value="">-- Pilih --</option>
+                            </select></div>
+                        <div class="mb-3"><label class="form-label">Peran (opsional)</label><input type="text"
+                                class="form-control" id="role" placeholder="Kakek, Nenek, Buyut, Cucu, dll"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-success" id="saveFamilyBtn">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script>
+        (function () {
+            // ==================== SIDEBAR COLLAPSE ====================
+            const sidebar = document.getElementById('sidebar');
+            const collapseBtn = document.getElementById('sidebarCollapseBtn');
+            const mobileToggle = document.getElementById('sidebarToggle');
+            if (sidebar && collapseBtn) {
+                const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+                if (isCollapsed) sidebar.classList.add('sidebar-collapsed');
+                collapseBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('sidebar-collapsed');
+                    localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('sidebar-collapsed'));
+                    collapseBtn.innerHTML = sidebar.classList.contains('sidebar-collapsed') ? '<i class="fas fa-chevron-right"></i>' : '<i class="fas fa-chevron-left"></i>';
+                });
+            }
+            if (mobileToggle) mobileToggle.addEventListener('click', () => sidebar.classList.toggle('show'));
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 991.98 && sidebar && !sidebar.contains(e.target) && mobileToggle && !mobileToggle.contains(e.target) && sidebar.classList.contains('show')) {
+                    sidebar.classList.remove('show');
+                }
+            });
+
+            // ==================== AUTENTIKASI ====================
+            const user = checkAuth();
+            if (!user) return;
+
+            // Set display name
+            document.getElementById('displayName').innerText = user.nama || user.email;
+
+            const GLOBAL_FAMILY_KEY = `global_family_${user.email}`;
+            let familyData = [];
+
+            function renderFamilyList(data) {
+                const tbody = document.getElementById('familyList');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                data.forEach(m => {
+                    const father = data.find(f => f.id === m.ayahId);
+                    const mother = data.find(f => f.id === m.ibuId);
+                    const fotoHtml = m.foto ? `<img src="${m.foto}" width="40" height="40" style="object-fit:cover; border-radius:50%;">` : '-';
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                         <td>${escapeHtml(m.nama)}</td>
+                         <td>${fotoHtml}</td>
+                         <td>${father ? escapeHtml(father.nama) : '-'}</td>
+                         <td>${mother ? escapeHtml(mother.nama) : '-'}</td>
+                         <td>${escapeHtml(m.role || '-')}</td>
+                         <td>
+                            <button class="btn btn-sm btn-outline-warning me-1" onclick="editFamily('${m.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-outline-danger me-1" onclick="deleteFamily('${m.id}')"><i class="fas fa-trash"></i></button>
+                            <button class="btn btn-sm btn-outline-info" onclick="moveFamily('${m.id}')"><i class="fas fa-arrows-alt"></i> Move</button>
+                         </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            function buildTreeHtml(member, allMembers, visited = new Set()) {
+                if (visited.has(member.id)) return '';
+                visited.add(member.id);
+                let children = allMembers.filter(m => m.ayahId === member.id || m.ibuId === member.id);
+                let childrenHtml = '';
+                if (children.length) {
+                    childrenHtml = '<div class="tree-children">';
+                    children.forEach(child => {
+                        childrenHtml += `<div class="tree-child">${buildTreeHtml(child, allMembers, new Set(visited))}</div>`;
+                    });
+                    childrenHtml += '</div>';
+                }
+                return `
+                    <div class="tree-node">
+                        <div class="tree-card">
+                            ${member.foto ? `<img src="${member.foto}" alt="${escapeHtml(member.nama)}">` : '<div style="width:80px;height:80px;background:#e2e8f0;border-radius:50%;margin:0 auto 8px;"></div>'}
+                            <div><strong>${escapeHtml(member.nama)}</strong></div>
+                            ${member.role ? `<small class="text-muted">${escapeHtml(member.role)}</small>` : ''}
+                            <div class="tree-actions">
+                                <button class="btn btn-sm" onclick="editFamily('${member.id}')" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm" onclick="deleteFamily('${member.id}')" title="Hapus"><i class="fas fa-trash"></i></button>
+                                <button class="btn btn-sm" onclick="moveFamily('${member.id}')" title="Pindahkan"><i class="fas fa-arrows-alt"></i></button>
+                            </div>
+                        </div>
+                        ${childrenHtml}
+                    </div>
+                `;
+            }
+
+            function renderTree(data) {
+                const container = document.getElementById('treeVisualization');
+                if (!container) return;
+                const roots = data.filter(m => !m.ayahId && !m.ibuId);
+                if (roots.length === 0) {
+                    container.innerHTML = '<p class="text-muted">Belum ada data keluarga. Tambahkan anggota keluarga terlebih dahulu.</p>';
+                    return;
+                }
+                let html = '<div style="display:flex; flex-wrap:wrap; justify-content:center;">';
+                roots.forEach(root => {
+                    html += `<div style="margin:0 20px;">${buildTreeHtml(root, data)}</div>`;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+            }
+
+            function populateSelectOptions(data, selectedAyahId = '', selectedIbuId = '') {
+                const ayahSelect = document.getElementById('ayahId');
+                const ibuSelect = document.getElementById('ibuId');
+                ayahSelect.innerHTML = '<option value="">-- Pilih --</option>';
+                ibuSelect.innerHTML = '<option value="">-- Pilih --</option>';
+                data.forEach(m => {
+                    const option = document.createElement('option');
+                    option.value = m.id;
+                    option.textContent = m.nama;
+                    ayahSelect.appendChild(option.cloneNode(true));
+                    ibuSelect.appendChild(option);
+                });
+                ayahSelect.value = selectedAyahId;
+                ibuSelect.value = selectedIbuId;
+            }
+
+            window.clearFamilyForm = function () {
+                document.getElementById('familyForm').reset();
+                document.getElementById('familyId').value = '';
+                document.getElementById('familyModalTitle').innerText = 'Tambah Anggota Keluarga';
+                populateSelectOptions(familyData);
+            };
+
+            window.saveFamily = async function () {
+                const id = document.getElementById('familyId').value;
+                const nama = document.getElementById('nama').value.trim();
+                const foto = document.getElementById('foto').value.trim();
+                const ayahId = document.getElementById('ayahId').value || null;
+                const ibuId = document.getElementById('ibuId').value || null;
+                const role = document.getElementById('role').value.trim() || '';
+                if (!nama) {
+                    alert('Nama harus diisi');
+                    return;
+                }
+                const payload = { nama, foto, ayahId, ibuId, role };
+                try {
+                    if (id) {
+                        await apiRequest(`/family/${id}`, 'PUT', payload);
+                    } else {
+                        await apiRequest('/family', 'POST', payload);
+                    }
+                    bootstrap.Modal.getInstance(document.getElementById('familyModal')).hide();
+                    await loadFamilyData();
+                } catch (err) {
+                    console.error(err);
+                    alert('Gagal menyimpan data: ' + err.message);
+                }
+            };
+
+            window.editFamily = async (id) => {
+                const member = familyData.find(m => m.id === id);
+                if (!member) return;
+                document.getElementById('familyId').value = member.id;
+                document.getElementById('nama').value = member.nama;
+                document.getElementById('foto').value = member.foto || '';
+                document.getElementById('role').value = member.role || '';
+                populateSelectOptions(familyData, member.ayahId || '', member.ibuId || '');
+                document.getElementById('familyModalTitle').innerText = 'Edit Anggota Keluarga';
+                new bootstrap.Modal(document.getElementById('familyModal')).show();
+            };
+
+            window.deleteFamily = async (id) => {
+                if (!confirm('Hapus anggota keluarga ini?')) return;
+                try {
+                    await apiRequest(`/family/${id}`, 'DELETE');
+                    await loadFamilyData();
+                } catch (err) {
+                    console.error(err);
+                    alert('Gagal menghapus: ' + err.message);
+                }
+            };
+
+            window.moveFamily = (id) => {
+                editFamily(id);
+            };
+
+            function escapeHtml(str) {
+                if (!str) return '';
+                return str.replace(/[&<>]/g, function (m) {
+                    if (m === '&') return '&amp;';
+                    if (m === '<') return '&lt;';
+                    if (m === '>') return '&gt;';
+                    return m;
+                });
+            }
+
+            // ==================== BADGE NOTIFIKASI SURAT ====================
+            async function updateSuratBadge() {
+                try {
+                    let count = 0;
+                    const cached = sessionStorage.getItem(`global_surat_${user.email}`);
+                    if (cached) count = JSON.parse(cached).filter(s => s.status === 'diajukan').length;
+                    else {
+                        const allSurat = await apiRequest('/surat', 'GET');
+                        const mySurat = allSurat.filter(s => s.created_by === user.email);
+                        count = mySurat.filter(s => s.status === 'diajukan').length;
+                        sessionStorage.setItem(`global_surat_${user.email}`, JSON.stringify(mySurat));
+                    }
+                    const badge = document.getElementById('suratNotifBadge');
+                    if (badge) {
+                        if (count > 0) { badge.innerText = count; badge.style.display = 'inline-block'; }
+                        else badge.style.display = 'none';
+                    }
+                } catch (error) { console.error('Gagal update badge:', error); }
+            }
+
+            // ==================== DATA KELUARGA (CACHING & BACKGROUND) ====================
+            async function refreshFamilyBackground() {
+                try {
+                    const fresh = await apiRequest('/family', 'GET');
+                    const cached = sessionStorage.getItem(GLOBAL_FAMILY_KEY);
+                    if (JSON.stringify(fresh) !== cached) {
+                        familyData = fresh;
+                        sessionStorage.setItem(GLOBAL_FAMILY_KEY, JSON.stringify(familyData));
+                        renderFamilyList(familyData);
+                        renderTree(familyData);
+                        populateSelectOptions(familyData);
+                        console.log('Data keluarga diperbarui otomatis');
+                    }
+                } catch (error) {
+                    console.error('Gagal refresh keluarga background:', error);
+                }
+            }
+
+            async function loadFamilyData() {
+                const cached = sessionStorage.getItem(GLOBAL_FAMILY_KEY);
+                if (cached) {
+                    familyData = JSON.parse(cached);
+                    renderFamilyList(familyData);
+                    renderTree(familyData);
+                    populateSelectOptions(familyData);
+                } else {
+                    familyData = await apiRequest('/family', 'GET');
+                    sessionStorage.setItem(GLOBAL_FAMILY_KEY, JSON.stringify(familyData));
+                    renderFamilyList(familyData);
+                    renderTree(familyData);
+                    populateSelectOptions(familyData);
+                }
+                refreshFamilyBackground();
+            }
+
+            document.getElementById('saveFamilyBtn').addEventListener('click', () => saveFamily());
+            loadFamilyData().then(() => updateSuratBadge());
+
+            let refreshInterval = setInterval(() => {
+                if (document.visibilityState === 'visible') refreshFamilyBackground();
+            }, 30000);
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') refreshFamilyBackground();
+            });
+            window.addEventListener('beforeunload', () => clearInterval(refreshInterval));
+
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('user');
+                window.location.href = 'login.html';
+            });
+
+            // ==================== EKSPOR PDF ====================
+            const exportBtn = document.getElementById('exportPdfBtn');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', async function () {
+                    const element = document.getElementById('treeVisualization');
+                    if (!element || element.innerHTML.trim() === '' || element.innerHTML.includes('Belum ada data')) {
+                        alert('Tidak ada data pohon keluarga untuk diekspor.');
+                        return;
+                    }
+
+                    // Tampilkan loading
+                    const originalText = exportBtn.innerHTML;
+                    exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Memproses...';
+                    exportBtn.disabled = true;
+
+                    try {
+                        // Gunakan html2canvas untuk mengambil screenshot dari elemen pohon
+                        const canvas = await html2canvas(element, {
+                            scale: 2, // meningkatkan kualitas
+                            backgroundColor: '#ffffff',
+                            logging: false,
+                            useCORS: true // jika ada gambar dari URL eksternal
+                        });
+                        const imgData = canvas.toDataURL('image/png');
+
+                        // Buat PDF dengan orientasi landscape jika pohon lebar
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF({
+                            orientation: 'landscape',
+                            unit: 'mm',
+                            format: 'a4'
+                        });
+
+                        const pdfWidth = pdf.internal.pageSize.getWidth();
+                        const pdfHeight = pdf.internal.pageSize.getHeight();
+                        const imgWidth = pdfWidth;
+                        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                        let position = 0;
+                        // Jika gambar lebih tinggi dari halaman, bagi menjadi beberapa halaman
+                        let heightLeft = imgHeight;
+                        let page = 1;
+                        while (heightLeft > 0) {
+                            if (page > 1) pdf.addPage();
+                            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                            heightLeft -= pdfHeight;
+                            position -= pdfHeight;
+                            page++;
+                        }
+
+                        pdf.save(`pohon_keluarga_${user.nama || user.email}.pdf`);
+                    } catch (error) {
+                        console.error('Gagal mengekspor PDF:', error);
+                        alert('Gagal mengekspor PDF. Silakan coba lagi.');
+                    } finally {
+                        exportBtn.innerHTML = originalText;
+                        exportBtn.disabled = false;
+                    }
+                });
+            }
+        })();
+    </script>
+</body>
+
+</html>

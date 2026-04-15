@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Dashboard Ketua RT - SIP Demangan</title>
+  <link rel="icon" type="image/webp" href="2.webp">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #2ecc71;
+      --primary-dark: #27ae60;
+      --sidebar-bg: #ffffff;
+      --sidebar-width: 280px;
+      --sidebar-collapsed-width: 80px;
+      --header-height: 70px;
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      --shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      min-height: 100vh;
+    }
+
+    /* ========== SIDEBAR (DESKTOP) ========== */
+    .app-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--sidebar-bg);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.03);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      transition: width 0.3s ease;
+      z-index: 1000;
+    }
+
+    .sidebar-collapsed {
+      width: var(--sidebar-collapsed-width);
+    }
+
+    .sidebar-header {
+      padding: 1.5rem 1rem 0.5rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-brand {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.2s ease;
+    }
+
+    .logo-wrapper {
+      width: 48px;
+      height: 48px;
+      background: transparent;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 12px rgba(46, 204, 113, 0.25);
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .logo-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 16px;
+    }
+
+    .sidebar-brand h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .sidebar-header p {
+      color: #64748b;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      padding-left: calc(48px + 0.75rem);
+    }
+
+    .sidebar-collapsed .sidebar-brand h3,
+    .sidebar-collapsed .sidebar-header p,
+    .sidebar-collapsed .nav-link span {
+      display: none;
+    }
+
+    .sidebar-collapsed .nav-link i {
+      margin-right: 0;
+    }
+
+    .sidebar-collapsed .nav-link {
+      justify-content: center;
+      padding: 0.75rem 0;
+    }
+
+    .sidebar-collapsed .logo-wrapper {
+      width: 40px;
+      height: 40px;
+    }
+
+    .sidebar-collapsed .sidebar-brand {
+      gap: 0;
+    }
+
+    #sidebarCollapseBtn {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      cursor: pointer;
+    }
+
+    .nav-menu {
+      padding: 1rem 0.5rem;
+    }
+
+    .nav-item {
+      list-style: none;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      margin: 0.25rem 0;
+      color: #475569;
+      font-weight: 500;
+      border-radius: 30px;
+      transition: all 0.2s;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav-link i {
+      width: 24px;
+      font-size: 1.2rem;
+      margin-right: 0.75rem;
+      color: #94a3b8;
+    }
+
+    .nav-link:hover {
+      background: rgba(46, 204, 113, 0.1);
+      color: #2ecc71;
+    }
+
+    .nav-link:hover i {
+      color: #2ecc71;
+    }
+
+    .nav-link.active {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      box-shadow: 0 6px 12px rgba(46, 204, 113, 0.2);
+    }
+
+    .nav-link.active i {
+      color: white;
+    }
+
+    .badge-notif {
+      background-color: #e74c3c;
+      color: white;
+      border-radius: 20px;
+      padding: 0.2rem 0.6rem;
+      font-size: 0.75rem;
+      margin-left: auto;
+    }
+
+    /* ========== TOP NAVBAR ========== */
+    .top-navbar {
+      height: var(--header-height);
+      background: white;
+      box-shadow: var(--shadow);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    .user-dropdown {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .dropdown-menu {
+      border: none;
+      border-radius: 20px;
+      box-shadow: var(--shadow-hover);
+      padding: 0.5rem;
+    }
+
+    .dropdown-item {
+      border-radius: 30px;
+      padding: 0.5rem 1.2rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(46, 204, 113, 0.1);
+      color: #2ecc71;
+    }
+
+    /* ========== MAIN CONTENT ========== */
+    .main-content {
+      flex: 1;
+      background: #f8fafc;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+
+    .stat-card {
+      border: none;
+      border-radius: 24px;
+      background: white;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .stat-card .card-body {
+      padding: 1.5rem;
+    }
+
+    .stat-card i {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-card h6 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-card h3 {
+      font-weight: 700;
+      margin-bottom: 0;
+      font-size: 2rem;
+    }
+
+    .card {
+      border: none;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-header {
+      background: transparent;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      font-weight: 600;
+      padding: 1.2rem 1.5rem;
+    }
+
+    .badge {
+      font-weight: 500;
+      padding: 0.5em 1em;
+      border-radius: 30px;
+    }
+
+    /* ========== BOTTOM NAVIGATION (TELEGRAM STYLE) - ONLY MOBILE ========== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 8px 12px 12px;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      z-index: 1040;
+      transition: transform 0.2s ease;
+    }
+
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: #6c757d;
+      font-size: 12px;
+      font-weight: 500;
+      transition: 0.2s;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 30px;
+    }
+
+    .bottom-nav-item i {
+      font-size: 22px;
+      margin-bottom: 2px;
+    }
+
+    .bottom-nav-item.active {
+      color: #2ecc71;
+      background: rgba(46, 204, 113, 0.12);
+    }
+
+    .bottom-nav-item .label {
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      border: none;
+      box-shadow: 0 6px 16px rgba(46, 204, 113, 0.3);
+      z-index: 1050;
+      font-size: 1.3rem;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 991.98px) {
+      .sidebar {
+        position: fixed;
+        transform: translateX(-100%);
+        height: 100vh;
+        transition: transform 0.3s ease, width 0.3s ease;
+      }
+      .sidebar.show {
+        transform: translateX(0);
+      }
+      .main-content {
+        padding: 1rem;
+        padding-bottom: 80px;
+      }
+      .sidebar-toggle {
+        display: flex;
+      }
+      .logo-wrapper {
+        width: 40px;
+        height: 40px;
+      }
+      .sidebar-brand h3 {
+        font-size: 1.2rem;
+      }
+      .sidebar-header p {
+        padding-left: calc(40px + 0.75rem);
+      }
+      .sidebar-collapsed {
+        width: var(--sidebar-width);
+      }
+      .sidebar-collapsed .sidebar-brand h3,
+      .sidebar-collapsed .sidebar-header p,
+      .sidebar-collapsed .nav-link span {
+        display: block;
+      }
+      .sidebar-collapsed .nav-link i {
+        margin-right: 0.75rem;
+      }
+      .sidebar-collapsed .nav-link {
+        justify-content: flex-start;
+        padding: 0.75rem 1rem;
+      }
+      .bottom-nav {
+        display: flex;
+      }
+    }
+
+    @media (min-width: 992px) {
+      .bottom-nav {
+        display: none;
+      }
+      body {
+        padding-bottom: 0;
+      }
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+    .refresh-btn {
+      transition: all 0.2s;
+    }
+    .refresh-btn:disabled {
+      opacity: 0.6;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-wrapper">
+    <!-- SIDEBAR (DESKTOP) -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-brand">
+          <div class="logo-wrapper"><img src="1.webp" alt="Logo SIP Demangan"></div>
+          <h3>SIP Demangan</h3>
+        </a>
+        <button class="btn btn-link text-dark p-0" id="sidebarCollapseBtn"><i class="fas fa-chevron-left"></i></button>
+      </div>
+      <p>Padukuhan Demangan</p>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="dashboard_ketua_rt.html" class="nav-link active"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+        <li class="nav-item"><a href="warga_ketua.html" class="nav-link"><i class="fas fa-users"></i><span>Data Warga</span></a></li>
+        <li class="nav-item"><a href="surat_ketua.html" class="nav-link"><i class="fas fa-envelope"></i><span>Surat</span><span class="badge-notif" id="suratNotifBadge" style="display:none;">0</span></a></li>
+        <li class="nav-item"><a href="berita.html" class="nav-link"><i class="fas fa-newspaper"></i><span>Berita</span></a></li>
+        <li class="nav-item"><a href="peta_sebaran_ketua.html" class="nav-link"><i class="fas fa-map-marked-alt"></i><span>Peta Sebaran</span></a></li>
+        <li class="nav-item"><a href="pohon_keluarga_ketua_rt.html" class="nav-link"><i class="fas fa-tree"></i><span>Pohon Keluarga</span></a></li>
+        <li class="nav-item"><a href="verifikasi_pendaftar.html" class="nav-link"><i class="fas fa-user-check"></i><span>Verifikasi Pendaftar</span></a></li>
+      </ul>
+    </div>
+
+    <!-- BOTTOM NAVIGATION (MOBILE) -->
+    <div class="bottom-nav" id="bottomNav">
+      <button class="bottom-nav-item active" data-url="dashboard_ketua_rt.html">
+        <i class="fas fa-tachometer-alt"></i>
+        <span class="label">Dashboard</span>
+      </button>
+      <button class="bottom-nav-item" data-url="warga_ketua.html">
+        <i class="fas fa-users"></i>
+        <span class="label">Warga</span>
+      </button>
+      <button class="bottom-nav-item" data-url="surat_ketua.html">
+        <i class="fas fa-envelope"></i>
+        <span class="label">Surat</span>
+      </button>
+      <button class="bottom-nav-item" data-url="berita.html">
+        <i class="fas fa-newspaper"></i>
+        <span class="label">Berita</span>
+      </button>
+      <button class="bottom-nav-item" data-url="verifikasi_pendaftar.html">
+        <i class="fas fa-user-check"></i>
+        <span class="label">Verifikasi</span>
+      </button>
+    </div>
+
+    <div class="flex-grow-1">
+      <div class="top-navbar">
+        <div class="user-dropdown">
+          <span id="displayName" class="fw-semibold"></span>
+          <div class="dropdown">
+            <button class="btn p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <div class="user-avatar"><i class="fas fa-user"></i></div>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="profile.html"><i class="fas fa-id-card me-2"></i> Profil Saya</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div id="loadingSpinner" class="text-center my-5" style="display:none;">
+          <div class="spinner-border text-success" role="status"><span class="visually-hidden">Memuat...</span></div>
+        </div>
+
+        <!-- DASHBOARD SECTION -->
+        <div id="dashboardSection">
+          <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+            <div class="d-flex align-items-center gap-3">
+              <h2 class="fw-bold mb-0">Dashboard Ketua RT <span id="ketuaRtNumber"></span></h2>
+              <span class="badge bg-warning text-dark">Ketua RT</span>
+            </div>
+            <button class="btn btn-outline-success btn-sm refresh-btn" id="refreshBtn">
+              <i class="fas fa-sync-alt"></i> Refresh Data
+            </button>
+          </div>
+          <p class="text-muted">Selamat datang, <span class="fw-semibold" id="ketuaRtName"></span>!</p>
+
+          <!-- Kartu Statistik RT -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-4 col-6">
+              <div class="stat-card">
+                <div class="card-body"><i class="fas fa-users text-primary"></i>
+                  <h6 class="text-muted">Warga RT <span id="rtWargaCountRt"></span></h6>
+                  <h3 id="rtWargaCount">0</h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 col-6">
+              <div class="stat-card">
+                <div class="card-body"><i class="fas fa-envelope-open-text text-warning"></i>
+                  <h6 class="text-muted">Surat Masuk</h6>
+                  <h3 id="rtSuratMasuk">0</h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 col-6">
+              <div class="stat-card">
+                <div class="card-body"><i class="fas fa-check-circle text-info"></i>
+                  <h6 class="text-muted">Surat Selesai</h6>
+                  <h3 id="rtSuratSelesai">0</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rangkuman Proses Surat -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-3 col-6">
+              <div class="card border-start border-warning border-4">
+                <div class="card-body">
+                  <h6 class="text-muted"><i class="fas fa-clock text-warning me-1"></i> Diajukan</h6>
+                  <h4 id="rtSuratDiajukan" class="fw-bold">0</h4>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 col-6">
+              <div class="card border-start border-primary border-4">
+                <div class="card-body">
+                  <h6 class="text-muted"><i class="fas fa-check-circle text-primary me-1"></i> Disetujui</h6>
+                  <h4 id="rtSuratDisetujui" class="fw-bold">0</h4>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 col-6">
+              <div class="card border-start border-success border-4">
+                <div class="card-body">
+                  <h6 class="text-muted"><i class="fas fa-check-double text-success me-1"></i> Selesai</h6>
+                  <h4 id="rtSuratSelesaiDetail" class="fw-bold">0</h4>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 col-6">
+              <div class="card border-start border-danger border-4">
+                <div class="card-body">
+                  <h6 class="text-muted"><i class="fas fa-times-circle text-danger me-1"></i> Ditolak</h6>
+                  <h4 id="rtSuratDitolak" class="fw-bold">0</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Kependudukan, Ekonomi, Bantuan -->
+          <div class="row g-3 mt-2">
+            <div class="col-md-4">
+              <div class="card h-100">
+                <div class="card-header bg-info text-white"><i class="fas fa-id-card me-2"></i>Status Kependudukan</div>
+                <div class="card-body p-0">
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">Tetap <span class="badge bg-primary rounded-pill" id="rtStatusTetap">0</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">Pindah <span class="badge bg-warning rounded-pill" id="rtStatusPindah">0</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">Meninggal <span class="badge bg-dark rounded-pill" id="rtStatusMeninggal">0</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">Tidak Diketahui <span class="badge bg-secondary rounded-pill" id="rtStatusTdkDiketahui">0</span></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card h-100">
+                <div class="card-header bg-success text-white"><i class="fas fa-coins me-2"></i>Status Ekonomi</div>
+                <div class="card-body p-0">
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">Mampu <span class="badge bg-primary rounded-pill" id="rtEkonomiMampu">0</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">Tidak Mampu <span class="badge bg-danger rounded-pill" id="rtEkonomiTidakMampu">0</span></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card h-100">
+                <div class="card-header bg-warning text-dark"><i class="fas fa-gift me-2"></i>Status Bantuan</div>
+                <div class="card-body p-0">
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">Tidak/belum dapat <span class="badge bg-secondary rounded-pill" id="rtBantuanTdk">0</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">PKH <span class="badge bg-success rounded-pill" id="rtBantuanPKH">0</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">BPNT <span class="badge bg-info rounded-pill" id="rtBantuanBPNT">0</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">JSLU <span class="badge bg-primary rounded-pill" id="rtBantuanJSLU">0</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">Bantuan lainnya <span class="badge bg-warning rounded-pill" id="rtBantuanLain">0</span></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grafik Pekerjaan & Pendidikan -->
+          <div class="row g-3 mt-3">
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header"><i class="fas fa-briefcase me-2 text-success"></i>Pekerjaan Warga RT <span id="rtPekerjaanLabel"></span></div>
+                <div class="card-body"><canvas id="rtPekerjaanChart"></canvas></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header"><i class="fas fa-graduation-cap me-2 text-success"></i>Pendidikan Warga RT <span id="rtPendidikanLabel"></span></div>
+                <div class="card-body"><canvas id="rtPendidikanChart"></canvas></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daftar Warga -->
+          <div class="card mt-4">
+            <div class="card-header"><i class="fas fa-list me-2"></i> Daftar Warga di RT <span id="rtList"></span></div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-striped mb-0 align-middle">
+                  <thead>
+                    <tr><th>NIK</th><th>Nama</th><th>No HP</th><th>Pekerjaan</th><th>Aksi</th></tr>
+                  </thead>
+                  <tbody id="rtWargaList"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    (function () {
+      // ==================== SIDEBAR COLLAPSE & TOGGLE ====================
+      const sidebar = document.getElementById('sidebar');
+      const collapseBtn = document.getElementById('sidebarCollapseBtn');
+      const mobileToggle = document.getElementById('sidebarToggle');
+      if (sidebar && collapseBtn) {
+        const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        if (isCollapsed) {
+          sidebar.classList.add('sidebar-collapsed');
+          collapseBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        } else {
+          collapseBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        }
+        collapseBtn.addEventListener('click', () => {
+          sidebar.classList.toggle('sidebar-collapsed');
+          const nowCollapsed = sidebar.classList.contains('sidebar-collapsed');
+          localStorage.setItem('sidebarCollapsed', nowCollapsed);
+          collapseBtn.innerHTML = nowCollapsed ? '<i class="fas fa-chevron-right"></i>' : '<i class="fas fa-chevron-left"></i>';
+        });
+      }
+      if (mobileToggle) {
+        mobileToggle.addEventListener('click', () => sidebar.classList.toggle('show'));
+      }
+      document.addEventListener('click', (event) => {
+        if (window.innerWidth <= 991.98 && sidebar && !sidebar.contains(event.target) && mobileToggle && !mobileToggle.contains(event.target) && sidebar.classList.contains('show')) {
+          sidebar.classList.remove('show');
+        }
+      });
+
+      // ==================== BOTTOM NAVIGATION (MOBILE) ====================
+      const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+      bottomNavItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          const url = item.getAttribute('data-url');
+          if (url) window.location.href = url;
+        });
+        const currentPath = window.location.pathname.split('/').pop();
+        const itemUrl = item.getAttribute('data-url');
+        if (itemUrl === currentPath) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+
+      // ==================== AUTH & DASHBOARD LOGIC ====================
+      const user = checkAuth();
+      if (!user) return;
+      if (user.role !== 'ketua_rt') {
+        if (user.role === 'admin') window.location.href = 'dashboard_admin.html';
+        else if (user.role === 'member') window.location.href = 'dashboard_member.html';
+        return;
+      }
+      document.getElementById('displayName').innerText = user.nama || user.email;
+      document.getElementById('ketuaRtNumber').innerText = user.rt;
+      document.getElementById('ketuaRtName').innerText = user.nama || user.email;
+      document.getElementById('rtList').innerText = user.rt;
+      document.getElementById('rtPekerjaanLabel').innerText = user.rt;
+      document.getElementById('rtPendidikanLabel').innerText = user.rt;
+      document.getElementById('rtWargaCountRt').innerText = user.rt;
+
+      let wargaData = [], suratData = [];
+      let pekerjaanChart = null, pendidikanChart = null;
+
+      function animateValue(elementId, start, end, duration) {
+        const obj = document.getElementById(elementId);
+        if (!obj) return;
+        let startTimestamp = null;
+        const step = (timestamp) => {
+          if (!startTimestamp) startTimestamp = timestamp;
+          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+          obj.innerText = Math.floor(progress * (end - start) + start);
+          if (progress < 1) window.requestAnimationFrame(step);
+          else obj.innerText = end;
+        };
+        window.requestAnimationFrame(step);
+      }
+
+      function updateSuratBadge(count) {
+        const badge = document.getElementById('suratNotifBadge');
+        if (badge) {
+          if (count > 0) { badge.innerText = count; badge.style.display = 'inline-block'; }
+          else badge.style.display = 'none';
+        }
+      }
+
+      function renderDashboard(warga, surat) {
+        const totalWarga = warga.length;
+        const suratMasuk = surat.filter(s => s.status === 'diajukan').length;
+        const suratSelesai = surat.filter(s => s.status === 'selesai').length;
+        animateValue('rtWargaCount', 0, totalWarga, 800);
+        animateValue('rtSuratMasuk', 0, suratMasuk, 800);
+        animateValue('rtSuratSelesai', 0, suratSelesai, 800);
+        updateSuratBadge(suratMasuk);
+
+        const diajukan = surat.filter(s => s.status === 'diajukan').length;
+        const disetujui = surat.filter(s => s.status === 'disetujui').length;
+        const selesai = surat.filter(s => s.status === 'selesai').length;
+        const ditolak = surat.filter(s => s.status === 'ditolak').length;
+        animateValue('rtSuratDiajukan', 0, diajukan, 800);
+        animateValue('rtSuratDisetujui', 0, disetujui, 800);
+        animateValue('rtSuratSelesaiDetail', 0, selesai, 800);
+        animateValue('rtSuratDitolak', 0, ditolak, 800);
+
+        animateValue('rtStatusTetap', 0, warga.filter(w => w.status_kependudukan === 'tetap').length, 800);
+        animateValue('rtStatusPindah', 0, warga.filter(w => w.status_kependudukan === 'pindah').length, 800);
+        animateValue('rtStatusMeninggal', 0, warga.filter(w => w.status_kependudukan === 'meninggal').length, 800);
+        animateValue('rtStatusTdkDiketahui', 0, warga.filter(w => !w.status_kependudukan || w.status_kependudukan === 'tidak diketahui').length, 800);
+        animateValue('rtEkonomiMampu', 0, warga.filter(w => w.status_ekonomi === 'mampu').length, 800);
+        animateValue('rtEkonomiTidakMampu', 0, warga.filter(w => !w.status_ekonomi || w.status_ekonomi === 'tidak mampu').length, 800);
+        animateValue('rtBantuanTdk', 0, warga.filter(w => !w.status_bantuan || w.status_bantuan === 'Tidak/belum dapat').length, 800);
+        animateValue('rtBantuanPKH', 0, warga.filter(w => w.status_bantuan === 'PKH').length, 800);
+        animateValue('rtBantuanBPNT', 0, warga.filter(w => w.status_bantuan === 'BPNT').length, 800);
+        animateValue('rtBantuanJSLU', 0, warga.filter(w => w.status_bantuan === 'JSLU').length, 800);
+        animateValue('rtBantuanLain', 0, warga.filter(w => w.status_bantuan === 'Bantuan lainnya').length, 800);
+
+        const tbody = document.getElementById('rtWargaList');
+        tbody.innerHTML = '';
+        if (warga.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada warga di RT ini</td></tr>';
+        } else {
+          warga.forEach(w => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td style="white-space: nowrap;">${w.nik || '-'}</td>
+              <td>${w.nama || '-'}</td>
+              <td>${w.no_hp || '-'}</td>
+              <td>${w.pekerjaan || '-'}</td>
+              <td><button class="btn btn-sm btn-outline-warning" onclick="location.href='warga_ketua.html?edit=${w.id}'">Detail</button></td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+
+        const pekerjaanMap = {};
+        warga.forEach(w => { const p = w.pekerjaan || 'Tidak diketahui'; pekerjaanMap[p] = (pekerjaanMap[p] || 0) + 1; });
+        if (pekerjaanChart) pekerjaanChart.destroy();
+        const pc = document.getElementById('rtPekerjaanChart')?.getContext('2d');
+        if (pc && Object.keys(pekerjaanMap).length) {
+          pekerjaanChart = new Chart(pc, {
+            type: 'pie',
+            data: { labels: Object.keys(pekerjaanMap), datasets: [{ data: Object.values(pekerjaanMap), backgroundColor: ['#2ecc71', '#3498db', '#f1c40f', '#e74c3c', '#9b59b6', '#1abc9c', '#e67e22'] }] },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+          });
+        }
+
+        const pendidikanMap = {};
+        warga.forEach(w => { const p = w.pendidikan_terakhir || 'Tidak diketahui'; pendidikanMap[p] = (pendidikanMap[p] || 0) + 1; });
+        if (pendidikanChart) pendidikanChart.destroy();
+        const pendCtx = document.getElementById('rtPendidikanChart')?.getContext('2d');
+        if (pendCtx && Object.keys(pendidikanMap).length) {
+          pendidikanChart = new Chart(pendCtx, {
+            type: 'pie',
+            data: { labels: Object.keys(pendidikanMap), datasets: [{ data: Object.values(pendidikanMap), backgroundColor: ['#2ecc71', '#3498db', '#f1c40f', '#e74c3c', '#9b59b6', '#1abc9c', '#e67e22'] }] },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+          });
+        }
+      }
+
+      async function fetchFreshWarga(rt) {
+        const allWarga = await apiRequest('/warga', 'GET');
+        return allWarga.filter(w => String(w.alamat_rt) === String(rt));
+      }
+
+      async function fetchFreshSurat(rt) {
+        const allSurat = await apiRequest('/surat', 'GET');
+        const warga = await fetchFreshWarga(rt);
+        const nikList = warga.map(w => w.nik);
+        return allSurat.filter(s => nikList.includes(s.nik_pemohon));
+      }
+
+      async function loadDashboard(rt, showSpinner = false) {
+        const cachedWarga = sessionStorage.getItem(`ketua_warga_${rt}`);
+        const cachedSurat = sessionStorage.getItem(`ketua_surat_${rt}`);
+        if (cachedWarga && cachedSurat) {
+          wargaData = JSON.parse(cachedWarga);
+          suratData = JSON.parse(cachedSurat);
+          renderDashboard(wargaData, suratData);
+          refreshBackgroundAll(rt);
+        } else if (showSpinner) {
+          document.getElementById('loadingSpinner').style.display = 'block';
+          try {
+            wargaData = await fetchFreshWarga(rt);
+            suratData = await fetchFreshSurat(rt);
+            sessionStorage.setItem(`ketua_warga_${rt}`, JSON.stringify(wargaData));
+            sessionStorage.setItem(`ketua_surat_${rt}`, JSON.stringify(suratData));
+            renderDashboard(wargaData, suratData);
+          } catch (error) { alert('Gagal memuat data: ' + error.message); }
+          finally { document.getElementById('loadingSpinner').style.display = 'none'; }
+        } else {
+          await loadDashboard(rt, true);
+        }
+      }
+
+      async function refreshBackgroundAll(rt) {
+        try {
+          const freshWarga = await fetchFreshWarga(rt);
+          const freshSurat = await fetchFreshSurat(rt);
+          const cachedWarga = sessionStorage.getItem(`ketua_warga_${rt}`);
+          const cachedSurat = sessionStorage.getItem(`ketua_surat_${rt}`);
+          if (JSON.stringify(freshWarga) !== cachedWarga || JSON.stringify(freshSurat) !== cachedSurat) {
+            wargaData = freshWarga;
+            suratData = freshSurat;
+            sessionStorage.setItem(`ketua_warga_${rt}`, JSON.stringify(wargaData));
+            sessionStorage.setItem(`ketua_surat_${rt}`, JSON.stringify(suratData));
+            renderDashboard(wargaData, suratData);
+          }
+        } catch (error) { console.error('Refresh background gagal:', error); }
+      }
+
+      loadDashboard(user.rt);
+      let refreshInterval = setInterval(() => {
+        if (document.visibilityState === 'visible') refreshBackgroundAll(user.rt);
+      }, 30000);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') refreshBackgroundAll(user.rt);
+      });
+      window.addEventListener('beforeunload', () => clearInterval(refreshInterval));
+
+      document.getElementById('refreshBtn').addEventListener('click', async () => {
+        const btn = document.getElementById('refreshBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Loading...';
+        try {
+          await refreshBackgroundAll(user.rt);
+          const freshWarga = await fetchFreshWarga(user.rt);
+          const freshSurat = await fetchFreshSurat(user.rt);
+          wargaData = freshWarga;
+          suratData = freshSurat;
+          renderDashboard(wargaData, suratData);
+        } catch (error) { alert('Gagal refresh: ' + error.message); }
+        finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data'; }
+      });
+
+      document.getElementById('logoutBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+      });
+    })();
+  </script>
+</body>
+
+</html>

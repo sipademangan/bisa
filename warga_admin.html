@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Warga - SIP Demangan (Admin)</title>
+  <link rel="icon" type="image/webp" href="2.webp">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+  <style>
+    :root {
+      --primary: #2ecc71;
+      --primary-dark: #27ae60;
+      --header-height: 70px;
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      --shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      min-height: 100vh;
+    }
+
+    /* Offcanvas sidebar */
+    .offcanvas {
+      width: 280px;
+      background: #ffffff;
+      border-right: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .offcanvas-header {
+      padding: 1.5rem 1rem 0.5rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .sidebar-brand {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-wrapper {
+      width: 48px;
+      height: 48px;
+      background: transparent;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 12px rgba(46, 204, 113, 0.25);
+      overflow: hidden;
+    }
+
+    .logo-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .sidebar-brand h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .offcanvas-body p {
+      color: #64748b;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      padding-left: calc(48px + 0.75rem);
+    }
+
+    .nav-menu {
+      padding: 1rem 0.5rem;
+      list-style: none;
+    }
+
+    .nav-item {
+      list-style: none;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      margin: 0.25rem 0;
+      color: #475569;
+      font-weight: 500;
+      border-radius: 30px;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .nav-link i {
+      width: 24px;
+      font-size: 1.2rem;
+      margin-right: 0.75rem;
+      color: #94a3b8;
+    }
+
+    .nav-link:hover {
+      background: rgba(46, 204, 113, 0.1);
+      color: #2ecc71;
+    }
+
+    .nav-link:hover i {
+      color: #2ecc71;
+    }
+
+    .nav-link.active {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      box-shadow: 0 6px 12px rgba(46, 204, 113, 0.2);
+    }
+
+    .nav-link.active i {
+      color: white;
+    }
+
+    .badge-notif {
+      background-color: #e74c3c;
+      color: white;
+      border-radius: 20px;
+      padding: 0.2rem 0.6rem;
+      font-size: 0.75rem;
+      margin-left: auto;
+    }
+
+    .top-navbar {
+      height: var(--header-height);
+      background: white;
+      box-shadow: var(--shadow);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    .menu-toggle-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #2ecc71;
+      cursor: pointer;
+    }
+
+    .user-dropdown {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .dropdown-menu {
+      border: none;
+      border-radius: 20px;
+      box-shadow: var(--shadow-hover);
+      padding: 0.5rem;
+    }
+
+    .dropdown-item {
+      border-radius: 30px;
+      padding: 0.5rem 1.2rem;
+      font-weight: 500;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(46, 204, 113, 0.1);
+      color: #2ecc71;
+    }
+
+    .main-content {
+      background: #f8fafc;
+      padding: 2rem;
+      min-height: calc(100vh - var(--header-height));
+    }
+
+    /* Wrapper tabel dengan scroll horizontal dan vertikal + freeze header */
+    .table-wrapper {
+      max-height: 65vh;
+      overflow-x: scroll;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      width: 100%;
+      border-radius: 0 0 24px 24px;
+    }
+
+    .card-body {
+      overflow: visible;
+      padding: 0;
+    }
+
+    .table {
+      min-width: 1000px;
+      width: max-content;
+      --bs-table-striped-bg: rgba(0, 0, 0, 0.02);
+      margin-bottom: 0;
+    }
+
+    /* FREEZE HEADER */
+    .table thead th {
+      position: sticky;
+      top: 0;
+      background-color: #f1f5f9;
+      z-index: 10;
+      box-shadow: inset 0 -1px 0 #dee2e6;
+    }
+
+    .filter-box {
+      background: white;
+      border-radius: 24px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      border: none;
+      border-radius: 30px;
+      padding: 0.5rem 1.5rem;
+      font-weight: 500;
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(46, 204, 113, 0.3);
+    }
+
+    .card {
+      border: none;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-header {
+      background: transparent;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      font-weight: 600;
+      padding: 1.2rem 1.5rem;
+    }
+
+    .badge {
+      font-weight: 500;
+      padding: 0.5em 1em;
+      border-radius: 30px;
+    }
+
+    #map {
+      height: 250px;
+      width: 100%;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .preview-img {
+      max-height: 100px;
+      border-radius: 12px;
+      margin-top: 0.5rem;
+    }
+
+    /* Tooltip info */
+    .info-icon {
+      color: #2ecc71;
+      font-size: 0.8rem;
+      margin-left: 5px;
+      cursor: help;
+    }
+
+    .form-label {
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 1rem;
+      }
+      .top-navbar {
+        padding: 0 1rem;
+      }
+      .table-wrapper {
+        max-height: 55vh;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Offcanvas Sidebar (Popup) -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarLabel">
+    <div class="offcanvas-header">
+      <a href="index.html" class="sidebar-brand">
+        <div class="logo-wrapper">
+          <img src="1.webp" alt="Logo SIP Demangan">
+        </div>
+        <h3>SIP Demangan</h3>
+      </a>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <p>Padukuhan Demangan</p>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="dashboard_admin.html" class="nav-link" id="menuDashboard"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+        <li class="nav-item"><a href="warga_admin.html" class="nav-link active" id="menuWarga"><i class="fas fa-users"></i> <span>Data Warga</span></a></li>
+        <li class="nav-item">
+          <a href="surat_admin.html" class="nav-link" id="menuSurat">
+            <i class="fas fa-envelope"></i> <span>Surat</span>
+            <span class="badge-notif" id="suratNotifBadge" style="display:none;">0</span>
+          </a>
+        </li>
+        <li class="nav-item"><a href="berita.html" class="nav-link" id="menuBerita"><i class="fas fa-newspaper"></i> <span>Berita</span></a></li>
+        <li class="nav-item"><a href="galeri.html" class="nav-link" id="menuGaleri"><i class="fas fa-images"></i> <span>Galeri</span></a></li>
+        <li class="nav-item"><a href="peta_sebaran_admin.html" class="nav-link" id="menuPeta"><i class="fas fa-map-marked-alt"></i> <span>Peta Sebaran</span></a></li>
+        <li class="nav-item"><a href="pohon_keluarga.html" class="nav-link" id="menuKeluarga"><i class="fas fa-tree"></i> <span>Pohon Keluarga</span></a></li>
+        <li class="nav-item"><a href="users.html" class="nav-link" id="menuUsers"><i class="fas fa-user-cog"></i> <span>Kelola Pengguna</span></a></li>
+        <li class="nav-item"><a href="hash_tool.html" class="nav-link" id="menuHash"><i class="fas fa-hashtag"></i> <span>Hash/Unhash SHA256</span></a></li>
+        <li class="nav-item"><a href="verifikasi_pendaftar.html" class="nav-link" id="menuVerifikasi"><i class="fas fa-user-check"></i> <span>Verifikasi Pendaftar</span></a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Konten Utama -->
+  <div class="top-navbar">
+    <button class="menu-toggle-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="user-dropdown">
+      <span id="displayName" class="fw-semibold"></span>
+      <div class="dropdown">
+        <button class="btn p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <div class="user-avatar"><i class="fas fa-user"></i></div>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="profile.html"><i class="fas fa-id-card me-2"></i> Profil Saya</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div id="loadingSpinner" class="text-center my-5" style="display:none;">
+      <div class="spinner-border text-success"></div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <h2 class="fw-bold mb-0"><i class="fas fa-users me-2 text-success"></i>Data Warga (Admin)</h2>
+      <div class="d-flex gap-2">
+        <button class="btn btn-danger" id="deleteSelectedBtn"><i class="fas fa-trash-alt me-1"></i>Hapus Terpilih</button>
+        <button class="btn btn-success" id="tambahWargaBtn" data-bs-toggle="modal" data-bs-target="#wargaModal"><i class="fas fa-plus me-1"></i>Tambah Warga</button>
+      </div>
+    </div>
+
+    <div class="filter-box">
+      <div class="row g-3">
+        <div class="col-md-3"><input type="text" class="form-control" id="searchInput" placeholder="Cari NIK, Nama, No HP..."></div>
+        <div class="col-md-2"><select class="form-select" id="filterRt"><option value="">Semua RT</option><option value="1">RT 01</option><option value="2">RT 02</option><option value="3">RT 03</option><option value="4">RT 04</option><option value="5">RT 05</option><option value="6">RT 06</option><option value="7">RT 07</option></select></div>
+        <div class="col-md-2"><select class="form-select" id="filterStatus"><option value="">Semua Status</option><option value="tetap">Tetap</option><option value="pindah">Pindah</option><option value="meninggal">Meninggal</option><option value="tidak diketahui">Tidak Diketahui</option></select></div>
+        <div class="col-md-2"><select class="form-select" id="filterEkonomi"><option value="">Semua Ekonomi</option><option value="mampu">Mampu</option><option value="tidak mampu">Tidak Mampu</option></select></div>
+        <div class="col-md-2"><select class="form-select" id="filterBantuan"><option value="">Semua Bantuan</option><option value="Tidak/belum dapat">Tidak/belum dapat</option><option value="PKH">PKH</option><option value="BPNT">BPNT</option><option value="JSLU">JSLU</option><option value="Bantuan lainnya">Bantuan lainnya</option></select></div>
+        <div class="col-md-1 d-flex gap-2"><button class="btn btn-primary flex-grow-1" id="exportCsvBtn"><i class="fas fa-download"></i></button><button class="btn btn-secondary flex-grow-1" id="importCsvBtn"><i class="fas fa-upload"></i></button><input type="file" id="importFile" accept=".csv" style="display:none;"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><i class="fas fa-list me-2"></i>Daftar Warga</div>
+      <div class="card-body p-0">
+        <div class="table-wrapper">
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th style="width: 40px;"><input type="checkbox" id="selectAllCheckbox"></th>
+                <th>NIK</th>
+                <th>Nama</th>
+                <th>RT</th>
+                <th>JK</th>
+                <th>Tgl Lahir</th>
+                <th>Status Kawin</th>
+                <th>Status Kependudukan</th>
+                <th>Status Ekonomi</th>
+                <th>Status Bantuan</th>
+                <th>Pekerjaan</th>
+                <th>No HP</th>
+                <th style="width: 100px;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="wargaList"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Form Warga dengan Warning & Aturan -->
+  <div class="modal fade" id="wargaModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Tambah Data Warga</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="fas fa-info-circle me-2"></i> <strong>Aturan Pengisian:</strong> NIK dan NKK harus 16 digit angka. No HP minimal 10 digit, maksimal 13 digit. Isi data dengan benar.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          <form id="wargaForm" novalidate>
+            <input type="hidden" id="wargaId">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">NIK <i class="fas fa-info-circle info-icon" data-bs-toggle="tooltip" title="16 digit angka, unik, wajib diisi"></i></label>
+                <input type="text" class="form-control" id="nik" required pattern="\d{16}" maxlength="16" placeholder="16 digit angka">
+                <div class="invalid-feedback">NIK harus 16 digit angka</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">NKK <i class="fas fa-info-circle info-icon" data-bs-toggle="tooltip" title="16 digit angka, biasanya nomor kartu keluarga"></i></label>
+                <input type="text" class="form-control" id="nkk" required pattern="\d{16}" maxlength="16" placeholder="16 digit angka">
+                <div class="invalid-feedback">NKK harus 16 digit angka</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Nama Lengkap</label>
+                <input type="text" class="form-control" id="nama" required placeholder="Sesuai KTP">
+                <div class="invalid-feedback">Nama wajib diisi</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">No HP <i class="fas fa-info-circle info-icon" data-bs-toggle="tooltip" title="Minimal 10 digit, maksimal 13 digit, angka saja"></i></label>
+                <input type="tel" class="form-control" id="no_hp" pattern="\d{10,13}" maxlength="13" placeholder="08xxxxxxxxxx">
+                <div class="invalid-feedback">No HP harus 10-13 digit angka</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3"><label class="form-label">Email</label><input type="email" class="form-control" id="email_warga" placeholder="contoh@email.com"></div>
+              <div class="col-md-6 mb-3"><label class="form-label">Alamat RT</label><select class="form-select" id="alamat_rt" required><option value="">Pilih RT</option><option value="1">RT 01</option><option value="2">RT 02</option><option value="3">RT 03</option><option value="4">RT 04</option><option value="5">RT 05</option><option value="6">RT 06</option><option value="7">RT 07</option></select><div class="invalid-feedback">Pilih RT</div></div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3"><label class="form-label">Tempat Lahir</label><input type="text" class="form-control" id="tempat_lahir" placeholder="Contoh: Bantul"></div>
+              <div class="col-md-6 mb-3"><label class="form-label">Tanggal Lahir</label><input type="date" class="form-control" id="tanggal_lahir"></div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3"><label class="form-label">Jenis Kelamin</label><select class="form-select" id="jenis_kelamin"><option value="">Pilih</option><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option></select></div>
+              <div class="col-md-6 mb-3"><label class="form-label">Status Kawin</label><select class="form-select" id="status_kawin"><option value="">Pilih</option><option value="Belum Kawin">Belum Kawin</option><option value="Kawin">Kawin</option><option value="Cerai Hidup">Cerai Hidup</option><option value="Cerai Mati">Cerai Mati</option></select></div>
+            </div>
+            <div class="mb-3"><label class="form-label">Alamat Lengkap</label><textarea class="form-control" id="alamat_lengkap" rows="2" placeholder="Dusun, Jalan, RT/RW (jika berbeda)"></textarea></div>
+            <div class="row">
+              <div class="col-md-6 mb-3"><label class="form-label">Pekerjaan</label><input type="text" class="form-control" id="pekerjaan" placeholder="Contoh: Petani, Guru, Wiraswasta"></div>
+              <div class="col-md-6 mb-3"><label class="form-label">Pendidikan Terakhir</label><input type="text" class="form-control" id="pendidikan" placeholder="SD, SMP, SMA, D3, S1, dll"></div>
+            </div>
+            <div class="mb-3"><label class="form-label">Keterangan</label><textarea class="form-control" id="keterangan" rows="2" placeholder="Catatan tambahan jika diperlukan"></textarea></div>
+            <div class="mb-3"><label class="form-label">Status Kependudukan</label><select class="form-select" id="status_kependudukan" required><option value="">Pilih</option><option value="tetap">Tetap</option><option value="pindah">Pindah</option><option value="meninggal">Meninggal</option><option value="tidak diketahui">Tidak Diketahui</option></select><div class="invalid-feedback">Pilih status kependudukan</div></div>
+            <div class="mb-3"><label class="form-label">Status Ekonomi</label><select class="form-select" id="status_ekonomi" required><option value="">Pilih</option><option value="mampu">Mampu</option><option value="tidak mampu">Tidak Mampu</option></select><div class="invalid-feedback">Pilih status ekonomi</div></div>
+            <div class="mb-3"><label class="form-label">Status Bantuan</label><select class="form-select" id="status_bantuan" required><option value="">Pilih</option><option value="Tidak/belum dapat">Tidak/belum dapat</option><option value="PKH">PKH</option><option value="BPNT">BPNT</option><option value="JSLU">JSLU</option><option value="Bantuan lainnya">Bantuan lainnya</option></select></div>
+            <div class="mb-3" id="bantuanLainnyaGroup" style="display:none;"><label class="form-label">Jenis Bantuan Lainnya</label><input type="text" class="form-control" id="bantuan_lainnya_custom" placeholder="Contoh: Bansos"></div>
+            <div class="mb-3"><label class="form-label">Lokasi Rumah</label><div id="map"></div><button type="button" class="btn btn-sm btn-primary mt-2" id="getLocationBtn"><i class="fas fa-location-dot me-1"></i> Lokasi Saya</button><input type="hidden" id="latitude"><input type="hidden" id="longitude"></div>
+            <div class="row">
+              <div class="col-md-6 mb-3"><label class="form-label">Foto Diri</label><input type="file" class="form-control" id="foto_diri" accept="image/*"><img id="preview_foto_diri" class="preview-img" style="display:none;"></div>
+              <div class="col-md-6 mb-3"><label class="form-label">Foto Rumah</label><input type="file" class="form-control" id="foto_rumah" accept="image/*"><img id="preview_foto_rumah" class="preview-img" style="display:none;"></div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-success" id="saveWargaBtn"><span id="saveText">Simpan</span><span id="saveSpinner" style="display:none;"><span class="spinner-border spinner-border-sm"></span> Menyimpan...</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    (function () {
+      // ========== AUTHENTICATION ==========
+      const user = checkAuth();
+      if (!user) return;
+      if (user.role !== 'admin') {
+        if (user.role === 'ketua_rt') window.location.href = 'dashboard_ketua_rt.html';
+        else window.location.href = 'dashboard_member.html';
+        return;
+      }
+      document.getElementById('displayName').innerText = user.nama || user.email;
+
+      // ========== GLOBAL VARIABLES ==========
+      const CACHE_KEY = 'warga_admin_data';
+      let allWarga = [], filteredWarga = [];
+      let map, marker;
+
+      // ========== RENDER TABLE ==========
+      function renderWarga(data) {
+        const tbody = document.getElementById('wargaList');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        data.forEach(w => {
+          const tr = document.createElement('tr');
+          const tglLahir = w.tanggal_lahir ? new Date(w.tanggal_lahir).toLocaleDateString('id-ID') : '-';
+          tr.innerHTML = `
+            <td><input type="checkbox" class="warga-checkbox" value="${w.id}"></td>
+            <td>${w.nik || ''}</td>
+            <td>${w.nama || ''}</td>
+            <td>${w.alamat_rt || ''}</td>
+            <td>${w.jenis_kelamin || '-'}</td>
+            <td>${tglLahir}</td>
+            <td>${w.status_kawin || '-'}</td>
+            <td><span class="badge ${w.status_kependudukan === 'tetap' ? 'bg-success' : w.status_kependudukan === 'pindah' ? 'bg-warning' : w.status_kependudukan === 'meninggal' ? 'bg-dark' : 'bg-secondary'}">${w.status_kependudukan || 'tidak diketahui'}</span></td>
+            <td><span class="badge ${w.status_ekonomi === 'mampu' ? 'bg-primary' : 'bg-danger'}">${w.status_ekonomi || 'tidak diketahui'}</span></td>
+            <td>${w.status_bantuan || '-'}</td>
+            <td>${w.pekerjaan || '-'}</td>
+            <td>${w.no_hp || '-'}</td>
+            <td><button class="btn btn-sm btn-outline-warning edit-btn" data-id="${w.id}"><i class="fas fa-edit"></i></button> <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${w.id}"><i class="fas fa-trash"></i></button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+          btn.removeEventListener('click', editHandler);
+          btn.addEventListener('click', editHandler);
+        });
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.removeEventListener('click', deleteHandler);
+          btn.addEventListener('click', deleteHandler);
+        });
+        const selectAll = document.getElementById('selectAllCheckbox');
+        if (selectAll) selectAll.checked = false;
+      }
+
+      function editHandler(e) {
+        const id = e.currentTarget.getAttribute('data-id');
+        editWarga(id);
+      }
+      function deleteHandler(e) {
+        const id = e.currentTarget.getAttribute('data-id');
+        deleteWarga(id);
+      }
+
+      function applyFilter() {
+        let data = allWarga;
+        const rt = document.getElementById('filterRt')?.value; if (rt) data = data.filter(w => w.alamat_rt == rt);
+        const status = document.getElementById('filterStatus')?.value; if (status) data = data.filter(w => w.status_kependudukan === status);
+        const ekonomi = document.getElementById('filterEkonomi')?.value; if (ekonomi) data = data.filter(w => w.status_ekonomi === ekonomi);
+        const bantuan = document.getElementById('filterBantuan')?.value; if (bantuan) data = data.filter(w => w.status_bantuan === bantuan);
+        const search = document.getElementById('searchInput')?.value.toLowerCase(); if (search) data = data.filter(w => (w.nik && w.nik.toLowerCase().includes(search)) || (w.nama && w.nama.toLowerCase().includes(search)) || (w.no_hp && w.no_hp.toLowerCase().includes(search)));
+        filteredWarga = data;
+        renderWarga(filteredWarga);
+      }
+
+      async function fetchFreshData() { return await apiRequest('/warga', 'GET'); }
+      async function refreshBackground() {
+        try {
+          const fresh = await fetchFreshData();
+          const cached = sessionStorage.getItem(CACHE_KEY);
+          if (JSON.stringify(fresh) !== cached) {
+            allWarga = fresh;
+            sessionStorage.setItem(CACHE_KEY, JSON.stringify(allWarga));
+            applyFilter();
+          }
+        } catch (error) { console.error('Gagal refresh background:', error); }
+      }
+      async function loadWarga() {
+        const cached = sessionStorage.getItem(CACHE_KEY);
+        if (cached) {
+          allWarga = JSON.parse(cached);
+          applyFilter();
+        }
+        refreshBackground();
+      }
+
+      async function updateSuratBadge() {
+        try {
+          let suratData;
+          const cached = sessionStorage.getItem('surat_admin_data');
+          if (cached) { suratData = JSON.parse(cached).surat; }
+          else { suratData = await apiRequest('/surat', 'GET'); }
+          const count = suratData.filter(s => s.status === 'diajukan').length;
+          const badge = document.getElementById('suratNotifBadge');
+          if (badge) {
+            if (count > 0) { badge.innerText = count; badge.style.display = 'inline-block'; }
+            else badge.style.display = 'none';
+          }
+        } catch (error) { console.error('Gagal update badge:', error); }
+      }
+
+      // ========== DELETE MASSAL ==========
+      const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+      if (deleteSelectedBtn) {
+        deleteSelectedBtn.addEventListener('click', async () => {
+          const checkboxes = document.querySelectorAll('.warga-checkbox:checked');
+          const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+          if (selectedIds.length === 0) { alert('Tidak ada data yang dipilih.'); return; }
+          if (!confirm(`Yakin akan menghapus ${selectedIds.length} data warga?`)) return;
+          deleteSelectedBtn.disabled = true;
+          const originalText = deleteSelectedBtn.innerHTML;
+          deleteSelectedBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menghapus...';
+          try {
+            const deletePromises = selectedIds.map(id => apiRequest(`/warga/${id}`, 'DELETE'));
+            await Promise.all(deletePromises);
+            alert(`${selectedIds.length} data berhasil dihapus.`);
+            await loadWarga();
+            await updateSuratBadge();
+          } catch (error) {
+            console.error(error);
+            alert('Terjadi kesalahan saat menghapus data.');
+          } finally {
+            deleteSelectedBtn.disabled = false;
+            deleteSelectedBtn.innerHTML = originalText;
+          }
+        });
+      }
+
+      // ========== SELECT ALL ==========
+      const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+      if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', (e) => {
+          document.querySelectorAll('.warga-checkbox').forEach(cb => cb.checked = e.target.checked);
+        });
+        document.getElementById('wargaList')?.addEventListener('change', (e) => {
+          if (e.target.classList.contains('warga-checkbox')) {
+            const allCheckboxes = document.querySelectorAll('.warga-checkbox');
+            selectAllCheckbox.checked = Array.from(allCheckboxes).every(cb => cb.checked);
+          }
+        });
+      }
+
+      // ========== BANTUAN LAINNYA ==========
+      const statusBantuanSelect = document.getElementById('status_bantuan');
+      const bantuanLainnyaGroup = document.getElementById('bantuanLainnyaGroup');
+      const bantuanLainnyaInput = document.getElementById('bantuan_lainnya_custom');
+      function toggleBantuanLainnya() {
+        if (statusBantuanSelect && bantuanLainnyaGroup) {
+          if (statusBantuanSelect.value === 'Bantuan lainnya') {
+            bantuanLainnyaGroup.style.display = 'block';
+            if (bantuanLainnyaInput) bantuanLainnyaInput.required = true;
+          } else {
+            bantuanLainnyaGroup.style.display = 'none';
+            if (bantuanLainnyaInput) bantuanLainnyaInput.required = false;
+          }
+        }
+      }
+      if (statusBantuanSelect) statusBantuanSelect.addEventListener('change', toggleBantuanLainnya);
+
+      // ========== PETA ==========
+      const wargaModal = document.getElementById('wargaModal');
+      if (wargaModal) {
+        wargaModal.addEventListener('shown.bs.modal', function () {
+          if (!map) {
+            map = L.map('map').setView([-7.7956, 110.3695], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
+            map.on('click', function (e) { setMarker(e.latlng); });
+          } else { map.invalidateSize(); }
+        });
+      }
+      function setMarker(latlng) {
+        if (marker) marker.remove();
+        marker = L.marker(latlng).addTo(map);
+        document.getElementById('latitude').value = latlng.lat;
+        document.getElementById('longitude').value = latlng.lng;
+      }
+      const getLocationBtn = document.getElementById('getLocationBtn');
+      if (getLocationBtn) {
+        getLocationBtn.addEventListener('click', function () {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => { const latlng = { lat: position.coords.latitude, lng: position.coords.longitude }; if (map) map.setView(latlng, 16); setMarker(latlng); },
+              (error) => { alert('Tidak dapat mengambil lokasi: ' + error.message); }
+            );
+          } else { alert('Geolocation tidak didukung.'); }
+        });
+      }
+
+      async function uploadFile(file) {
+        if (!file) return null;
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = async function (e) {
+            const base64 = e.target.result.split(',')[1];
+            try { const result = await apiRequest('/upload', 'POST', { filename: file.name, data: base64 }); resolve(result.url); } catch (err) { reject(err); }
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      // ========== VALIDASI FORM SEBELUM SIMPAN ==========
+      function validateForm() {
+        let isValid = true;
+
+        // NIK: harus 16 digit angka
+        const nik = document.getElementById('nik').value.trim();
+        if (!/^\d{16}$/.test(nik)) {
+          document.getElementById('nik').classList.add('is-invalid');
+          isValid = false;
+        } else {
+          document.getElementById('nik').classList.remove('is-invalid');
+        }
+
+        // NKK: harus 16 digit angka
+        const nkk = document.getElementById('nkk').value.trim();
+        if (!/^\d{16}$/.test(nkk)) {
+          document.getElementById('nkk').classList.add('is-invalid');
+          isValid = false;
+        } else {
+          document.getElementById('nkk').classList.remove('is-invalid');
+        }
+
+        // Nama
+        const nama = document.getElementById('nama').value.trim();
+        if (!nama) {
+          document.getElementById('nama').classList.add('is-invalid');
+          isValid = false;
+        } else {
+          document.getElementById('nama').classList.remove('is-invalid');
+        }
+
+        // No HP (opsional tapi jika diisi harus valid)
+        const nohp = document.getElementById('no_hp').value.trim();
+        if (nohp && !/^\d{10,13}$/.test(nohp)) {
+          document.getElementById('no_hp').classList.add('is-invalid');
+          isValid = false;
+        } else {
+          document.getElementById('no_hp').classList.remove('is-invalid');
+        }
+
+        // RT
+        const rt = document.getElementById('alamat_rt').value;
+        if (!rt) {
+          document.getElementById('alamat_rt').classList.add('is-invalid');
+          isValid = false;
+        } else {
+          document.getElementById('alamat_rt').classList.remove('is-invalid');
+        }
+
+        // Status Kependudukan
+        const statusKependudukan = document.getElementById('status_kependudukan').value;
+        if (!statusKependudukan) {
+          document.getElementById('status_kependudukan').classList.add('is-invalid');
+          isValid = false;
+        } else {
+          document.getElementById('status_kependudukan').classList.remove('is-invalid');
+        }
+
+        // Status Ekonomi
+        const statusEkonomi = document.getElementById('status_ekonomi').value;
+        if (!statusEkonomi) {
+          document.getElementById('status_ekonomi').classList.add('is-invalid');
+          isValid = false;
+        } else {
+          document.getElementById('status_ekonomi').classList.remove('is-invalid');
+        }
+
+        return isValid;
+      }
+
+      // ========== SIMPAN (TAMBAH / EDIT) ==========
+      const saveWargaBtn = document.getElementById('saveWargaBtn');
+      if (saveWargaBtn) {
+        saveWargaBtn.addEventListener('click', async function () {
+          // Validasi form
+          if (!validateForm()) {
+            alert('Mohon periksa kembali data Anda. Pastikan NIK (16 digit), NKK (16 digit), No HP (10-13 digit), dan field wajib lainnya diisi dengan benar.');
+            return;
+          }
+
+          const id = document.getElementById('wargaId').value;
+          let status_bantuan = statusBantuanSelect ? statusBantuanSelect.value : '';
+          if (status_bantuan === 'Bantuan lainnya') {
+            const custom = bantuanLainnyaInput ? bantuanLainnyaInput.value.trim() : '';
+            if (custom === '') {
+              alert('Harap isi jenis bantuan lainnya.');
+              return;
+            }
+            status_bantuan = custom;
+          }
+          const data = {
+            nik: document.getElementById('nik')?.value.trim(),
+            nkk: document.getElementById('nkk')?.value.trim(),
+            nama: document.getElementById('nama')?.value.trim(),
+            no_hp: document.getElementById('no_hp')?.value.trim(),
+            email: document.getElementById('email_warga')?.value.trim(),
+            alamat_rt: document.getElementById('alamat_rt')?.value,
+            tempat_lahir: document.getElementById('tempat_lahir')?.value.trim(),
+            tanggal_lahir: document.getElementById('tanggal_lahir')?.value,
+            jenis_kelamin: document.getElementById('jenis_kelamin')?.value,
+            status_kawin: document.getElementById('status_kawin')?.value,
+            alamat_lengkap: document.getElementById('alamat_lengkap')?.value.trim(),
+            pekerjaan: document.getElementById('pekerjaan')?.value.trim(),
+            pendidikan_terakhir: document.getElementById('pendidikan')?.value.trim(),
+            keterangan: document.getElementById('keterangan')?.value.trim(),
+            status_kependudukan: document.getElementById('status_kependudukan')?.value,
+            status_ekonomi: document.getElementById('status_ekonomi')?.value,
+            status_bantuan: status_bantuan,
+            latitude: document.getElementById('latitude')?.value,
+            longitude: document.getElementById('longitude')?.value
+          };
+          if (!data.nik || !data.nama || !data.alamat_rt || !data.status_kependudukan || !data.status_ekonomi) {
+            alert('NIK, Nama, RT, Status Kependudukan, dan Status Ekonomi harus diisi');
+            return;
+          }
+
+          const fotoDiriFile = document.getElementById('foto_diri')?.files[0];
+          const fotoRumahFile = document.getElementById('foto_rumah')?.files[0];
+          let foto_diri_url = document.getElementById('preview_foto_diri')?.src || '';
+          if (foto_diri_url === '#' || foto_diri_url.includes('null')) foto_diri_url = '';
+          let foto_rumah_url = document.getElementById('preview_foto_rumah')?.src || '';
+          if (foto_rumah_url === '#' || foto_rumah_url.includes('null')) foto_rumah_url = '';
+          if (fotoDiriFile) { try { foto_diri_url = await uploadFile(fotoDiriFile); } catch (err) { alert('Gagal upload foto diri: ' + err.message); return; } }
+          if (fotoRumahFile) { try { foto_rumah_url = await uploadFile(fotoRumahFile); } catch (err) { alert('Gagal upload foto rumah: ' + err.message); return; } }
+          data.foto_diri = foto_diri_url; data.foto_rumah = foto_rumah_url;
+
+          const btn = this, text = document.getElementById('saveText'), spinner = document.getElementById('saveSpinner');
+          if (btn) btn.disabled = true;
+          if (text) text.style.display = 'none';
+          if (spinner) spinner.style.display = 'inline-block';
+          try {
+            if (id) await apiRequest('/warga/' + id, 'PUT', data);
+            else await apiRequest('/warga', 'POST', data);
+            const modal = bootstrap.Modal.getInstance(document.getElementById('wargaModal'));
+            if (modal) modal.hide();
+            clearForm();
+            await loadWarga();
+            await updateSuratBadge();
+            alert('Data berhasil disimpan!');
+          } catch (error) { alert('Gagal menyimpan data: ' + error.message); }
+          finally {
+            if (btn) btn.disabled = false;
+            if (text) text.style.display = 'inline-block';
+            if (spinner) spinner.style.display = 'none';
+          }
+        });
+      }
+
+      // ========== EDIT WARGA ==========
+      async function editWarga(id) {
+        let warga = allWarga.find(w => w.id == id);
+        if (!warga) {
+          try { warga = await apiRequest('/warga/' + id, 'GET'); } catch (error) { alert('Gagal mengambil data: ' + error.message); return; }
+        }
+        document.getElementById('wargaId').value = warga.id;
+        document.getElementById('nik').value = warga.nik || '';
+        document.getElementById('nkk').value = warga.nkk || '';
+        document.getElementById('nama').value = warga.nama || '';
+        document.getElementById('no_hp').value = warga.no_hp || '';
+        document.getElementById('email_warga').value = warga.email || '';
+        document.getElementById('alamat_rt').value = warga.alamat_rt || '';
+        document.getElementById('tempat_lahir').value = warga.tempat_lahir || '';
+        document.getElementById('tanggal_lahir').value = warga.tanggal_lahir || '';
+        document.getElementById('jenis_kelamin').value = warga.jenis_kelamin || '';
+        document.getElementById('status_kawin').value = warga.status_kawin || '';
+        document.getElementById('alamat_lengkap').value = warga.alamat_lengkap || '';
+        document.getElementById('pekerjaan').value = warga.pekerjaan || '';
+        document.getElementById('pendidikan').value = warga.pendidikan_terakhir || '';
+        document.getElementById('keterangan').value = warga.keterangan || '';
+        document.getElementById('status_kependudukan').value = warga.status_kependudukan || 'tetap';
+        document.getElementById('status_ekonomi').value = warga.status_ekonomi || 'mampu';
+        const presetBantuan = ['Tidak/belum dapat', 'PKH', 'BPNT', 'JSLU', 'Bantuan lainnya'];
+        if (statusBantuanSelect) {
+          if (!presetBantuan.includes(warga.status_bantuan)) {
+            statusBantuanSelect.value = 'Bantuan lainnya';
+            if (bantuanLainnyaInput) bantuanLainnyaInput.value = warga.status_bantuan;
+            toggleBantuanLainnya();
+          } else {
+            statusBantuanSelect.value = warga.status_bantuan;
+            toggleBantuanLainnya();
+          }
+        }
+        document.getElementById('latitude').value = warga.latitude || '';
+        document.getElementById('longitude').value = warga.longitude || '';
+        const previewFotoDiri = document.getElementById('preview_foto_diri');
+        const previewFotoRumah = document.getElementById('preview_foto_rumah');
+        if (warga.foto_diri && previewFotoDiri) { previewFotoDiri.src = warga.foto_diri; previewFotoDiri.style.display = 'block'; } else if (previewFotoDiri) previewFotoDiri.style.display = 'none';
+        if (warga.foto_rumah && previewFotoRumah) { previewFotoRumah.src = warga.foto_rumah; previewFotoRumah.style.display = 'block'; } else if (previewFotoRumah) previewFotoRumah.style.display = 'none';
+        if (map && warga.latitude && warga.longitude) { const latlng = { lat: parseFloat(warga.latitude), lng: parseFloat(warga.longitude) }; setMarker(latlng); map.setView(latlng, 16); } else if (map && marker) marker.remove();
+        document.getElementById('modalTitle').innerText = 'Edit Data Warga';
+        const modal = new bootstrap.Modal(document.getElementById('wargaModal'));
+        modal.show();
+      }
+
+      // ========== DELETE WARGA (TUNGGAL) ==========
+      async function deleteWarga(id) {
+        if (confirm('Yakin hapus data ini?')) {
+          try { await apiRequest('/warga/' + id, 'DELETE'); await loadWarga(); await updateSuratBadge(); } catch (error) { alert('Gagal menghapus: ' + error.message); }
+        }
+      }
+
+      // ========== CLEAR FORM ==========
+      function clearForm() {
+        const form = document.getElementById('wargaForm');
+        if (form) form.reset();
+        document.getElementById('wargaId').value = '';
+        document.getElementById('preview_foto_diri').style.display = 'none';
+        document.getElementById('preview_foto_rumah').style.display = 'none';
+        if (marker) marker.remove();
+        document.getElementById('modalTitle').innerText = 'Tambah Data Warga';
+        if (bantuanLainnyaGroup) bantuanLainnyaGroup.style.display = 'none';
+        if (bantuanLainnyaInput) bantuanLainnyaInput.value = '';
+        // Reset validasi
+        document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+      }
+      document.getElementById('tambahWargaBtn')?.addEventListener('click', clearForm);
+
+      // ========== EKSPOR CSV ==========
+      const exportBtn = document.getElementById('exportCsvBtn');
+      if (exportBtn) {
+        exportBtn.addEventListener('click', function () {
+          if (filteredWarga.length === 0) { alert('Tidak ada data untuk diekspor.'); return; }
+          const headers = ['NIK', 'NKK', 'Nama', 'No HP', 'Email', 'RT', 'Tempat Lahir', 'Tanggal Lahir', 'Jenis Kelamin', 'Status Kawin', 'Alamat Lengkap', 'Latitude', 'Longitude', 'Pekerjaan', 'Pendidikan', 'Keterangan', 'Status Kependudukan', 'Status Ekonomi', 'Status Bantuan', 'Foto Diri URL', 'Foto Rumah URL'];
+          const rows = filteredWarga.map(w => [
+            w.nik, w.nkk, w.nama, w.no_hp, w.email, w.alamat_rt,
+            w.tempat_lahir || '', w.tanggal_lahir || '', w.jenis_kelamin || '', w.status_kawin || '', w.alamat_lengkap || '',
+            w.latitude, w.longitude, w.pekerjaan, w.pendidikan_terakhir, w.keterangan,
+            w.status_kependudukan, w.status_ekonomi, w.status_bantuan, w.foto_diri, w.foto_rumah
+          ]);
+          const csvContent = [headers, ...rows].map(row => row.map(cell => `"${cell || ''}"`).join(',')).join('\n');
+          const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+          const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'data_warga.csv'; link.click();
+        });
+      }
+
+      // ========== IMPOR CSV ==========
+      const importCsvBtn = document.getElementById('importCsvBtn');
+      const importFile = document.getElementById('importFile');
+      if (importCsvBtn && importFile) {
+        importCsvBtn.addEventListener('click', () => importFile.click());
+        importFile.addEventListener('change', function (e) {
+          const file = e.target.files[0];
+          if (!file) return;
+          Papa.parse(file, {
+            header: true, skipEmptyLines: true, complete: async function (results) {
+              const data = results.data;
+              if (data.length === 0) { alert('File CSV kosong.'); return; }
+              if (!confirm(`Akan mengimpor ${data.length} data. Lanjutkan?`)) return;
+              try {
+                const result = await apiRequest('/import-warga', 'POST', { warga: data });
+                alert(result.message || 'Impor berhasil');
+                await loadWarga();
+                await updateSuratBadge();
+              } catch (error) { alert('Gagal impor: ' + error.message); }
+            }, error: function (err) { alert('Gagal membaca file CSV: ' + err); }
+          });
+        });
+      }
+
+      // ========== FILTER LISTENERS ==========
+      document.getElementById('searchInput')?.addEventListener('input', applyFilter);
+      document.getElementById('filterRt')?.addEventListener('change', applyFilter);
+      document.getElementById('filterStatus')?.addEventListener('change', applyFilter);
+      document.getElementById('filterEkonomi')?.addEventListener('change', applyFilter);
+      document.getElementById('filterBantuan')?.addEventListener('change', applyFilter);
+
+      // ========== AUTO REFRESH ==========
+      let refreshInterval = setInterval(() => { if (document.visibilityState === 'visible') refreshBackground(); }, 30000);
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshBackground(); });
+      window.addEventListener('beforeunload', () => clearInterval(refreshInterval));
+
+      // ========== INIT ==========
+      loadWarga().then(() => updateSuratBadge());
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const editId = urlParams.get('edit');
+      if (editId) setTimeout(() => editWarga(editId), 500);
+
+      document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+      });
+
+      // Inisialisasi tooltip Bootstrap
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+    })();
+  </script>
+</body>
+
+</html>

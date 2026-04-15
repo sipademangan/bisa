@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peta Sebaran Warga - SIP Demangan (Admin)</title>
+  <!-- Favicon (WebP) -->
+  <link rel="icon" type="image/webp" href="2.webp">
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts Inter -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+    rel="stylesheet">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Leaflet Marker Cluster CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+  <style>
+    /* style sama seperti sebelumnya (tidak diubah) */
+    :root {
+      --primary: #2ecc71;
+      --primary-dark: #27ae60;
+      --sidebar-bg: #ffffff;
+      --sidebar-width: 280px;
+      --sidebar-collapsed-width: 80px;
+      --header-height: 70px;
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      --shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      min-height: 100vh;
+    }
+
+    .app-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--sidebar-bg);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.03);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      transition: width 0.3s ease;
+      z-index: 1000;
+    }
+
+    .sidebar-collapsed {
+      width: var(--sidebar-collapsed-width);
+    }
+
+    .sidebar-header {
+      padding: 1.5rem 1rem 0.5rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-brand {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-brand:hover {
+      transform: translateY(-2px);
+    }
+
+    .logo-wrapper {
+      width: 48px;
+      height: 48px;
+      background: transparent;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 12px rgba(46, 204, 113, 0.25);
+      transition: all 0.2s;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .logo-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 16px;
+    }
+
+    .sidebar-brand:hover .logo-wrapper {
+      box-shadow: 0 8px 16px rgba(46, 204, 113, 0.4);
+      transform: scale(1.02);
+    }
+
+    .sidebar-brand h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .sidebar-header p {
+      color: #64748b;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      padding-left: calc(48px + 0.75rem);
+    }
+
+    .sidebar-collapsed .sidebar-brand h3,
+    .sidebar-collapsed .sidebar-header p,
+    .sidebar-collapsed .nav-link span {
+      display: none;
+    }
+
+    .sidebar-collapsed .nav-link i {
+      margin-right: 0;
+    }
+
+    .sidebar-collapsed .nav-link {
+      justify-content: center;
+      padding: 0.75rem 0;
+    }
+
+    .sidebar-collapsed .logo-wrapper {
+      width: 40px;
+      height: 40px;
+    }
+
+    .sidebar-collapsed .sidebar-brand {
+      gap: 0;
+    }
+
+    #sidebarCollapseBtn {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      transition: transform 0.2s;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .sidebar-collapsed #sidebarCollapseBtn i {
+      transform: rotate(180deg);
+    }
+
+    .nav-menu {
+      padding: 1rem 0.5rem;
+    }
+
+    .nav-item {
+      list-style: none;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      margin: 0.25rem 0;
+      color: #475569;
+      font-weight: 500;
+      border-radius: 30px;
+      transition: all 0.2s;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav-link i {
+      width: 24px;
+      font-size: 1.2rem;
+      margin-right: 0.75rem;
+      color: #94a3b8;
+    }
+
+    .nav-link:hover {
+      background: rgba(46, 204, 113, 0.1);
+      color: #2ecc71;
+    }
+
+    .nav-link:hover i {
+      color: #2ecc71;
+    }
+
+    .nav-link.active {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      box-shadow: 0 6px 12px rgba(46, 204, 113, 0.2);
+    }
+
+    .nav-link.active i {
+      color: white;
+    }
+
+    .badge-notif {
+      background-color: #e74c3c;
+      color: white;
+      border-radius: 20px;
+      padding: 0.2rem 0.6rem;
+      font-size: 0.75rem;
+      margin-left: auto;
+    }
+
+    .sidebar-collapsed .badge-notif {
+      display: none;
+    }
+
+    .top-navbar {
+      height: var(--header-height);
+      background: white;
+      box-shadow: var(--shadow);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    .user-dropdown {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .dropdown-menu {
+      border: none;
+      border-radius: 20px;
+      box-shadow: var(--shadow-hover);
+      padding: 0.5rem;
+    }
+
+    .dropdown-item {
+      border-radius: 30px;
+      padding: 0.5rem 1.2rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(46, 204, 113, 0.1);
+      color: #2ecc71;
+    }
+
+    .dropdown-item i {
+      width: 1.5rem;
+    }
+
+    .main-content {
+      flex: 1;
+      background: #f8fafc;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+
+    .info-box {
+      background: white;
+      border-radius: 24px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .info-box i {
+      font-size: 2.5rem;
+      color: var(--primary);
+    }
+
+    .info-box h5 {
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .info-box p {
+      margin-bottom: 0;
+      color: #64748b;
+    }
+
+    .map-container {
+      background: white;
+      border-radius: 24px;
+      padding: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    #map {
+      height: 550px;
+      width: 100%;
+      border-radius: 20px;
+      z-index: 1;
+    }
+
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      border: none;
+      box-shadow: 0 6px 16px rgba(46, 204, 113, 0.3);
+      z-index: 1050;
+      font-size: 1.3rem;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 991.98px) {
+      .sidebar {
+        position: fixed;
+        transform: translateX(-100%);
+        height: 100vh;
+        transition: transform 0.3s ease, width 0.3s ease;
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        padding: 1rem;
+      }
+
+      .sidebar-toggle {
+        display: flex;
+      }
+
+      .logo-wrapper {
+        width: 40px;
+        height: 40px;
+      }
+
+      .sidebar-brand h3 {
+        font-size: 1.2rem;
+      }
+
+      .sidebar-header p {
+        padding-left: calc(40px + 0.75rem);
+      }
+
+      .sidebar-collapsed {
+        width: var(--sidebar-width);
+      }
+
+      .sidebar-collapsed .sidebar-brand h3,
+      .sidebar-collapsed .sidebar-header p,
+      .sidebar-collapsed .nav-link span {
+        display: block;
+      }
+
+      .sidebar-collapsed .nav-link i {
+        margin-right: 0.75rem;
+      }
+
+      .sidebar-collapsed .nav-link {
+        justify-content: flex-start;
+        padding: 0.75rem 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-wrapper">
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-brand">
+          <div class="logo-wrapper">
+            <img src="1.webp" alt="Logo SIP Demangan">
+          </div>
+          <h3>SIP Demangan</h3>
+        </a>
+        <button class="btn btn-link text-dark p-0" id="sidebarCollapseBtn" aria-label="Toggle sidebar">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      </div>
+      <p>Padukuhan Demangan</p>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="dashboard_admin.html" class="nav-link"><i class="fas fa-tachometer-alt"></i>
+            <span>Dashboard</span></a></li>
+        <li class="nav-item"><a href="warga_admin.html" class="nav-link"><i class="fas fa-users"></i> <span>Data
+              Warga</span></a></li>
+        <li class="nav-item">
+          <a href="surat_admin.html" class="nav-link" id="menuSurat">
+            <i class="fas fa-envelope"></i> <span>Surat</span>
+            <span class="badge-notif" id="suratNotifBadge" style="display:none;">0</span>
+          </a>
+        </li>
+        <li class="nav-item"><a href="berita.html" class="nav-link" id="menuBerita"><i class="fas fa-newspaper"></i>
+            <span>Berita</span></a></li>
+        <li class="nav-item"><a href="galeri.html" class="nav-link" id="menuGaleri"><i class="fas fa-images"></i>
+            <span>Galeri</span></a></li>
+        <li class="nav-item"><a href="peta_sebaran_admin.html" class="nav-link active"><i
+              class="fas fa-map-marked-alt"></i> <span>Peta Sebaran</span></a></li>
+        <li class="nav-item" id="menuKeluargaItem"><a href="pohon_keluarga.html" class="nav-link" id="menuKeluarga"><i
+              class="fas fa-tree"></i> <span>Pohon Keluarga</span></a></li>
+        <li class="nav-item"><a href="users.html" class="nav-link"><i class="fas fa-user-cog"></i> <span>Kelola
+              Pengguna</span></a></li>
+        <li class="nav-item"><a href="hash_tool.html" class="nav-link"><i class="fas fa-hashtag"></i>
+            <span>Hash/Unhash</span></a></li>
+        <li class="nav-item"><a href="verifikasi_pendaftar.html" class="nav-link" id="menuVerifikasi"><i
+              class="fas fa-user-check"></i>
+            <span>Verifikasi Pendaftar</span></a></li>
+      </ul>
+    </div>
+
+    <div class="flex-grow-1">
+      <div class="top-navbar">
+        <div class="user-dropdown">
+          <span id="displayName" class="fw-semibold"></span>
+          <div class="dropdown">
+            <button class="btn p-0" data-bs-toggle="dropdown">
+              <div class="user-avatar"><i class="fas fa-user"></i></div>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="profile.html"><i class="fas fa-id-card me-2"></i> Profil Saya</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div id="loadingSpinner" class="text-center my-5" style="display:none;">
+          <div class="spinner-border text-success"><span class="visually-hidden">Memuat...</span></div>
+        </div>
+
+        <div class="info-box">
+          <i class="fas fa-map-marked-alt"></i>
+          <div>
+            <h5>Peta Sebaran Warga (Admin)</h5>
+            <p>Klik marker untuk melihat detail warga. Jika beberapa warga berada di koordinat yang sama, marker akan
+              mengelompok secara otomatis.</p>
+          </div>
+        </div>
+
+        <div class="map-container">
+          <div id="map"></div>
+        </div>
+
+        <div class="mt-3 d-flex justify-content-between align-items-center text-muted small">
+          <span><i class="fas fa-info-circle me-1"></i> Data diperbarui secara real-time.</span>
+          <span><i class="fas fa-mouse-pointer me-1"></i> Klik marker untuk detail.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    (function () {
+      // Sidebar collapse
+      const sidebar = document.getElementById('sidebar');
+      const collapseBtn = document.getElementById('sidebarCollapseBtn');
+      const mobileToggle = document.getElementById('sidebarToggle');
+      if (sidebar && collapseBtn) {
+        const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        if (isCollapsed) {
+          sidebar.classList.add('sidebar-collapsed');
+          collapseBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        } else {
+          collapseBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        }
+        collapseBtn.addEventListener('click', () => {
+          sidebar.classList.toggle('sidebar-collapsed');
+          localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('sidebar-collapsed'));
+          collapseBtn.innerHTML = sidebar.classList.contains('sidebar-collapsed') ? '<i class="fas fa-chevron-right"></i>' : '<i class="fas fa-chevron-left"></i>';
+        });
+      }
+      if (mobileToggle) mobileToggle.addEventListener('click', () => sidebar.classList.toggle('show'));
+      document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 991.98 && sidebar && !sidebar.contains(e.target) && mobileToggle && !mobileToggle.contains(e.target) && sidebar.classList.contains('show')) {
+          sidebar.classList.remove('show');
+        }
+      });
+
+      const currentPage = window.location.pathname.split('/').pop();
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === currentPage) link.classList.add('active');
+      });
+
+      // Auth
+      const user = checkAuth();
+      if (!user) return;
+      if (user.role !== 'admin') {
+        if (user.role === 'ketua_rt') window.location.href = 'dashboard_ketua_rt.html';
+        else window.location.href = 'dashboard_member.html';
+        return;
+      }
+      document.getElementById('displayName').innerText = user.nama || user.email;
+
+      const CACHE_KEY = 'peta_admin_data';
+      let map, markersCluster;
+      let wargaData = [];
+
+      function updateMap(warga) {
+        if (!map) return;
+        if (markersCluster) map.removeLayer(markersCluster);
+        markersCluster = L.markerClusterGroup({ showCoverageOnHover: false, zoomToBoundsOnClick: true, spiderfyOnMaxZoom: true });
+        const wargaWithCoords = warga.filter(w => w.latitude && w.longitude);
+        wargaWithCoords.forEach(w => {
+          const lat = parseFloat(w.latitude);
+          const lng = parseFloat(w.longitude);
+          if (isNaN(lat) || isNaN(lng)) return;
+
+          // Format tanggal lahir Indonesia
+          let tglLahir = '';
+          if (w.tanggal_lahir) {
+            const date = new Date(w.tanggal_lahir);
+            if (!isNaN(date.getTime())) {
+              tglLahir = `<br>Tanggal Lahir: ${date.toLocaleDateString('id-ID')}`;
+            }
+          }
+
+          // Bangun konten popup dengan field baru (hanya tampil jika ada isinya)
+          const tempatLahir = w.tempat_lahir ? `<br>Tempat Lahir: ${w.tempat_lahir}` : '';
+          const jenisKelamin = w.jenis_kelamin ? `<br>Jenis Kelamin: ${w.jenis_kelamin}` : '';
+          const statusKawin = w.status_kawin ? `<br>Status Kawin: ${w.status_kawin}` : '';
+          const alamatLengkap = w.alamat_lengkap ? `<br>Alamat: ${w.alamat_lengkap}` : '';
+
+          const popup = `<b>${w.nama}</b><br>NIK: ${w.nik}<br>RT: ${w.alamat_rt}${jenisKelamin}${tempatLahir}${tglLahir}${statusKawin}${alamatLengkap}<br>Status: ${w.status_kependudukan}<br>Ekonomi: ${w.status_ekonomi}<br><a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" class="btn btn-sm btn-outline-primary mt-2"><i class="fas fa-map-pin"></i> Google Maps</a>`;
+          markersCluster.addLayer(L.marker([lat, lng]).bindPopup(popup));
+        });
+        map.addLayer(markersCluster);
+        if (wargaWithCoords.length > 0) {
+          const bounds = L.latLngBounds(wargaWithCoords.map(w => [parseFloat(w.latitude), parseFloat(w.longitude)]));
+          map.fitBounds(bounds, { padding: [50, 50] });
+        } else {
+          map.setView([-7.7956, 110.3695], 13);
+        }
+      }
+
+      async function fetchFreshData() { return await apiRequest('/warga', 'GET'); }
+      async function refreshBackground() {
+        try {
+          const fresh = await fetchFreshData();
+          const cached = sessionStorage.getItem(CACHE_KEY);
+          if (JSON.stringify(fresh) !== cached) {
+            wargaData = fresh;
+            sessionStorage.setItem(CACHE_KEY, JSON.stringify(wargaData));
+            updateMap(wargaData);
+            console.log('Peta admin diperbarui otomatis');
+          }
+        } catch (error) { console.error('Gagal refresh peta background:', error); }
+      }
+      async function loadMap() {
+        const cached = sessionStorage.getItem(CACHE_KEY);
+        if (cached) {
+          wargaData = JSON.parse(cached);
+          updateMap(wargaData);
+        }
+        refreshBackground();
+      }
+
+      // Badge notifikasi surat
+      async function updateSuratBadge() {
+        try {
+          let suratData;
+          const cached = sessionStorage.getItem('surat_admin_data');
+          if (cached) { suratData = JSON.parse(cached).surat; }
+          else { suratData = await apiRequest('/surat', 'GET'); }
+          const count = suratData.filter(s => s.status === 'diajukan').length;
+          const badge = document.getElementById('suratNotifBadge');
+          if (badge) {
+            if (count > 0) { badge.innerText = count; badge.style.display = 'inline-block'; }
+            else badge.style.display = 'none';
+          }
+        } catch (error) { console.error('Gagal update badge:', error); }
+      }
+
+      map = L.map('map').setView([-7.7956, 110.3695], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
+
+      loadMap().then(() => updateSuratBadge());
+
+      let refreshInterval = setInterval(() => { if (document.visibilityState === 'visible') refreshBackground(); }, 30000);
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshBackground(); });
+      window.addEventListener('beforeunload', () => clearInterval(refreshInterval));
+
+      document.getElementById('logoutBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+      });
+    })();
+  </script>
+</body>
+
+</html>

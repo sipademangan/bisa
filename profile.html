@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil Saya - SIP Demangan</title>
+  <!-- Favicon (WebP) -->
+  <link rel="icon" type="image/webp" href="2.webp">
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts Inter -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2ecc71;
+      --primary-dark: #27ae60;
+      --sidebar-bg: #ffffff;
+      --sidebar-width: 280px;
+      --sidebar-collapsed-width: 80px;
+      --header-height: 70px;
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      --shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      min-height: 100vh;
+    }
+
+    .app-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--sidebar-bg);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.03);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      transition: width 0.3s ease;
+      z-index: 1000;
+    }
+
+    .sidebar-collapsed {
+      width: var(--sidebar-collapsed-width);
+    }
+
+    .sidebar-header {
+      padding: 1.5rem 1rem 0.5rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-brand {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-brand:hover {
+      transform: translateY(-2px);
+    }
+
+    .logo-wrapper {
+      width: 48px;
+      height: 48px;
+      background: transparent;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 12px rgba(46, 204, 113, 0.25);
+      transition: all 0.2s;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .logo-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 16px;
+    }
+
+    .sidebar-brand:hover .logo-wrapper {
+      box-shadow: 0 8px 16px rgba(46, 204, 113, 0.4);
+      transform: scale(1.02);
+    }
+
+    .sidebar-brand h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .sidebar-header p {
+      color: #64748b;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      padding-left: calc(48px + 0.75rem);
+    }
+
+    .sidebar-collapsed .sidebar-brand h3,
+    .sidebar-collapsed .sidebar-header p,
+    .sidebar-collapsed .nav-link span {
+      display: none;
+    }
+
+    .sidebar-collapsed .nav-link i {
+      margin-right: 0;
+    }
+
+    .sidebar-collapsed .nav-link {
+      justify-content: center;
+      padding: 0.75rem 0;
+    }
+
+    .sidebar-collapsed .logo-wrapper {
+      width: 40px;
+      height: 40px;
+    }
+
+    .sidebar-collapsed .sidebar-brand {
+      gap: 0;
+    }
+
+    #sidebarCollapseBtn {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      transition: transform 0.2s;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .sidebar-collapsed #sidebarCollapseBtn i {
+      transform: rotate(180deg);
+    }
+
+    .nav-menu {
+      padding: 1rem 0.5rem;
+    }
+
+    .nav-item {
+      list-style: none;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      margin: 0.25rem 0;
+      color: #475569;
+      font-weight: 500;
+      border-radius: 30px;
+      transition: all 0.2s;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav-link i {
+      width: 24px;
+      font-size: 1.2rem;
+      margin-right: 0.75rem;
+      color: #94a3b8;
+    }
+
+    .nav-link:hover {
+      background: rgba(46, 204, 113, 0.1);
+      color: #2ecc71;
+    }
+
+    .nav-link:hover i {
+      color: #2ecc71;
+    }
+
+    .nav-link.active {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      box-shadow: 0 6px 12px rgba(46, 204, 113, 0.2);
+    }
+
+    .nav-link.active i {
+      color: white;
+    }
+
+    .badge-notif {
+      background-color: #e74c3c;
+      color: white;
+      border-radius: 20px;
+      padding: 0.2rem 0.6rem;
+      font-size: 0.75rem;
+      margin-left: auto;
+    }
+
+    .sidebar-collapsed .badge-notif {
+      display: none;
+    }
+
+    .top-navbar {
+      height: var(--header-height);
+      background: white;
+      box-shadow: var(--shadow);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    .user-dropdown {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .dropdown-menu {
+      border: none;
+      border-radius: 20px;
+      box-shadow: var(--shadow-hover);
+      padding: 0.5rem;
+    }
+
+    .dropdown-item {
+      border-radius: 30px;
+      padding: 0.5rem 1.2rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(46, 204, 113, 0.1);
+      color: #2ecc71;
+    }
+
+    .dropdown-item i {
+      width: 1.5rem;
+    }
+
+    .main-content {
+      flex: 1;
+      background: #f8fafc;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+
+    .card {
+      border: none;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+      background: transparent;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      font-weight: 600;
+      padding: 1.2rem 1.5rem;
+    }
+
+    .card-header i {
+      margin-right: 0.5rem;
+    }
+
+    .table {
+      margin-bottom: 0;
+    }
+
+    .table th {
+      width: 120px;
+      font-weight: 500;
+      color: #64748b;
+    }
+
+    .table td {
+      font-weight: 500;
+    }
+
+    .table-borderless th,
+    .table-borderless td {
+      border: none;
+      padding: 0.5rem 0;
+    }
+
+    .img-thumbnail {
+      border: none;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      border: none;
+      box-shadow: 0 6px 16px rgba(46, 204, 113, 0.3);
+      z-index: 1050;
+      font-size: 1.3rem;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 991.98px) {
+      .sidebar {
+        position: fixed;
+        transform: translateX(-100%);
+        height: 100vh;
+        transition: transform 0.3s ease, width 0.3s ease;
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        padding: 1rem;
+      }
+
+      .sidebar-toggle {
+        display: flex;
+      }
+
+      .logo-wrapper {
+        width: 40px;
+        height: 40px;
+      }
+
+      .sidebar-brand h3 {
+        font-size: 1.2rem;
+      }
+
+      .sidebar-header p {
+        padding-left: calc(40px + 0.75rem);
+      }
+
+      .sidebar-collapsed {
+        width: var(--sidebar-width);
+      }
+
+      .sidebar-collapsed .sidebar-brand h3,
+      .sidebar-collapsed .sidebar-header p,
+      .sidebar-collapsed .nav-link span {
+        display: block;
+      }
+
+      .sidebar-collapsed .nav-link i {
+        margin-right: 0.75rem;
+      }
+
+      .sidebar-collapsed .nav-link {
+        justify-content: flex-start;
+        padding: 0.75rem 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-wrapper">
+    <!-- SIDEBAR (dinamis: menu disesuaikan dengan role) -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-brand">
+          <div class="logo-wrapper">
+            <img src="1.webp" alt="Logo SIP Demangan">
+          </div>
+          <h3>SIP Demangan</h3>
+        </a>
+        <button class="btn btn-link text-dark p-0" id="sidebarCollapseBtn" aria-label="Toggle sidebar">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      </div>
+      <p>Padukuhan Demangan</p>
+      <ul class="nav-menu">
+        <!-- Dashboard (akan diatur href sesuai role) -->
+        <li class="nav-item"><a href="#" class="nav-link" id="menuDashboard"><i class="fas fa-tachometer-alt"></i>
+            <span>Dashboard</span></a></li>
+        <li class="nav-item" id="navWarga"><a href="#" class="nav-link" id="menuWarga"><i class="fas fa-users"></i>
+            <span>Data Warga</span></a></li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" id="menuSurat">
+            <i class="fas fa-envelope"></i> <span>Surat</span>
+            <span class="badge-notif" id="suratNotifBadge" style="display:none;">0</span>
+          </a>
+        </li>
+        <li class="nav-item" id="navPeta"><a href="#" class="nav-link" id="menuPeta"><i
+              class="fas fa-map-marked-alt"></i> <span>Peta Sebaran</span></a></li>
+        <li class="nav-item" id="navUsers" style="display:none;"><a href="users.html" class="nav-link" id="menuUsers"><i
+              class="fas fa-user-cog"></i> <span>Kelola Pengguna</span></a></li>
+        <li class="nav-item"><a href="verifikasi_pendaftar.html" class="nav-link" id="menuVerifikasi"><i
+              class="fas fa-user-check"></i>
+            <span>Verifikasi Pendaftar</span></a></li>
+      </ul>
+    </div>
+
+    <div class="flex-grow-1">
+      <div class="top-navbar">
+        <div class="user-dropdown">
+          <span id="displayName" class="fw-semibold"></span>
+          <div class="dropdown">
+            <button class="btn p-0" data-bs-toggle="dropdown">
+              <div class="user-avatar"><i class="fas fa-user"></i></div>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="profile.html"><i class="fas fa-id-card me-2"></i> Profil Saya</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div id="loadingSpinner" class="text-center my-5" style="display:none;">
+          <div class="spinner-border text-success"><span class="visually-hidden">Memuat...</span></div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-header"><i class="fas fa-id-card text-success"></i> Informasi Akun</div>
+              <div class="card-body">
+                <div class="text-center mb-3">
+                  <img id="profileFoto" src="" alt="Foto Profil" class="rounded-circle mb-2" style="width:100px; height:100px; object-fit:cover; border:2px solid #2ecc71;">
+                  <div>
+                    <input type="file" id="uploadFotoInput" accept="image/jpeg,image/png" class="d-none">
+                    <button class="btn btn-sm btn-outline-success mt-2" id="ubahFotoBtn"><i class="fas fa-camera"></i> Ubah Foto</button>
+                  </div>
+                </div>
+                <table class="table table-borderless">
+                  <tr>
+                    <th>Email</th>
+                    <td id="profileEmail">-</td>
+                  </tr>
+                  <tr>
+                    <th>Nama</th>
+                    <td id="profileNama">-</td>
+                  </tr>
+                  <tr>
+                    <th>Role</th>
+                    <td id="profileRole">-</td>
+                  </tr>
+                  <tr>
+                    <th>RT</th>
+                    <td id="profileRt">-</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-8">
+            <div class="card" id="wargaDataCard" style="display:none;">
+              <div class="card-header"><i class="fas fa-address-card text-success"></i> Data Warga Terkait</div>
+              <div class="card-body">
+                <div id="wargaDataContent"></div>
+                <a href="#" class="btn btn-outline-success btn-sm mt-3" id="editWargaLink"><i
+                    class="fas fa-edit me-1"></i>Edit Data Warga</a>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><i class="fas fa-history text-success"></i> Aktivitas Terakhir</div>
+              <div class="card-body">
+                <div id="aktivitasContent">Memuat...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    (function () {
+      // ==================== SIDEBAR COLLAPSE ====================
+      const sidebar = document.getElementById('sidebar');
+      const collapseBtn = document.getElementById('sidebarCollapseBtn');
+      const mobileToggle = document.getElementById('sidebarToggle');
+      if (sidebar && collapseBtn) {
+        const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        if (isCollapsed) {
+          sidebar.classList.add('sidebar-collapsed');
+          collapseBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        } else {
+          collapseBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        }
+        collapseBtn.addEventListener('click', () => {
+          sidebar.classList.toggle('sidebar-collapsed');
+          localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('sidebar-collapsed'));
+          collapseBtn.innerHTML = sidebar.classList.contains('sidebar-collapsed') ? '<i class="fas fa-chevron-right"></i>' : '<i class="fas fa-chevron-left"></i>';
+        });
+      }
+      if (mobileToggle) mobileToggle.addEventListener('click', () => sidebar.classList.toggle('show'));
+      document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 991.98 && sidebar && !sidebar.contains(e.target) && mobileToggle && !mobileToggle.contains(e.target) && sidebar.classList.contains('show')) {
+          sidebar.classList.remove('show');
+        }
+      });
+
+      const currentPage = window.location.pathname.split('/').pop();
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === currentPage) link.classList.add('active');
+      });
+
+      // ==================== AUTENTIKASI & SETUP MENU ====================
+      const user = checkAuth();
+      if (!user) return;
+
+      // Set foto profil dari user yang login
+      const profileFotoImg = document.getElementById('profileFoto');
+      if (user.foto_profil && profileFotoImg) {
+        profileFotoImg.src = user.foto_profil;
+      } else if (profileFotoImg) {
+        profileFotoImg.src = '';
+      }
+
+      // Atur menu berdasarkan role
+      const dashboardLink = document.getElementById('menuDashboard');
+      const wargaLink = document.getElementById('menuWarga');
+      const suratLink = document.getElementById('menuSurat');
+      const petaLink = document.getElementById('menuPeta');
+      const navUsers = document.getElementById('navUsers');
+
+      if (user.role === 'admin') {
+        dashboardLink.href = 'dashboard_admin.html';
+        wargaLink.href = 'warga_admin.html';
+        suratLink.href = 'surat_admin.html';
+        petaLink.href = 'peta_sebaran_admin.html';
+        navUsers.style.display = 'list-item';
+      } else if (user.role === 'ketua_rt') {
+        dashboardLink.href = 'dashboard_ketua_rt.html';
+        wargaLink.href = 'warga_ketua.html';
+        suratLink.href = 'surat_ketua.html';
+        petaLink.href = 'peta_sebaran_ketua.html';
+        navUsers.style.display = 'none';
+      } else {
+        dashboardLink.href = 'dashboard_member.html';
+        wargaLink.href = 'warga_member.html';
+        suratLink.href = 'surat_member.html';
+        petaLink.href = 'peta_sebaran_member.html';
+        navUsers.style.display = 'none';
+      }
+
+      document.getElementById('displayName').innerText = user.nama || user.email;
+
+      // ==================== CACHE KEYS ====================
+      const WARGA_CACHE_KEY = `profile_warga_${user.email}`;
+      const SURAT_CACHE_KEY = `profile_surat_${user.email}`;
+      let wargaData = null, suratData = [];
+
+      // ==================== RENDER PROFILE ====================
+      function renderProfile(warga, surat) {
+        document.getElementById('profileEmail').innerText = user.email;
+        document.getElementById('profileNama').innerText = user.nama || '-';
+        document.getElementById('profileRole').innerText = user.role === 'admin' ? 'Administrator' : (user.role === 'ketua_rt' ? `Ketua RT ${user.rt}` : 'Warga');
+        document.getElementById('profileRt').innerText = user.rt || '-';
+
+        if (warga && (user.role === 'member' || user.role === 'ketua_rt')) {
+          document.getElementById('wargaDataCard').style.display = 'block';
+          let html = '<table class="table table-sm">';
+          html += `<tr><th>NIK</th><td>${warga.nik || '-'}</td></tr>`;
+          html += `<tr><th>NKK</th><td>${warga.nkk || '-'}</td></tr>`;
+          html += `<tr><th>No HP</th><td>${warga.no_hp || '-'}</td></tr>`;
+          html += `<tr><th>Pekerjaan</th><td>${warga.pekerjaan || '-'}</td></tr>`;
+          html += `<tr><th>Pendidikan</th><td>${warga.pendidikan_terakhir || '-'}</td></tr>`;
+          if (warga.foto_diri) html += `<tr><th>Foto Diri</th><td><img src="${warga.foto_diri}" width="100" class="img-thumbnail"></td></tr>`;
+          if (warga.foto_rumah) html += `<tr><th>Foto Rumah</th><td><img src="${warga.foto_rumah}" width="100" class="img-thumbnail"></td></tr>`;
+          html += '</table>';
+          document.getElementById('wargaDataContent').innerHTML = html;
+          document.getElementById('editWargaLink').href = wargaLink.href + `?edit=${warga.id}`;
+        } else {
+          document.getElementById('wargaDataCard').style.display = 'none';
+        }
+
+        let aktivitasHtml = '';
+        if (surat.length === 0) {
+          aktivitasHtml = '<p class="text-muted">Belum ada aktivitas.</p>';
+        } else {
+          aktivitasHtml = '<table class="table table-sm"><thead><tr><th>Jenis</th><th>Status</th><th>Tanggal</th></tr></thead><tbody>';
+          surat.forEach(s => {
+            aktivitasHtml += `<tr>
+              <td>${s.jenis_surat}</td>
+              <td><span class="badge ${s.status === 'selesai' ? 'bg-success' : s.status === 'diajukan' ? 'bg-warning' : s.status === 'disetujui' ? 'bg-primary' : 'bg-danger'}">${s.status}</span></td>
+              <td>${new Date(s.tgl_pengajuan).toLocaleDateString('id-ID')}</td>
+            </tr>`;
+          });
+          aktivitasHtml += '</tbody></table>';
+        }
+        document.getElementById('aktivitasContent').innerHTML = aktivitasHtml;
+      }
+
+      // ==================== FETCH DATA DARI SERVER ====================
+      async function fetchFreshData() {
+        try {
+          const wargaList = await apiRequest('/warga', 'GET');
+          let myWarga = null;
+          if (user.role === 'member' || user.role === 'ketua_rt') {
+            myWarga = wargaList.find(w => w.email === user.email || w.created_by === user.email);
+          }
+          const suratList = await apiRequest('/surat', 'GET');
+          let filteredSurat = [];
+          if (user.role === 'admin') {
+            filteredSurat = suratList;
+          } else if (user.role === 'ketua_rt') {
+            const wargaRt = wargaList.filter(w => w.alamat_rt == user.rt);
+            const nikList = wargaRt.map(w => w.nik);
+            filteredSurat = suratList.filter(s => nikList.includes(s.nik_pemohon));
+          } else {
+            filteredSurat = suratList.filter(s => s.created_by === user.email);
+          }
+          filteredSurat.sort((a, b) => new Date(b.tgl_pengajuan) - new Date(a.tgl_pengajuan));
+          filteredSurat = filteredSurat.slice(0, 5);
+          return { warga: myWarga, surat: filteredSurat };
+        } catch (error) {
+          console.error('Gagal fetch profile data:', error);
+          throw error;
+        }
+      }
+
+      async function refreshBackground() {
+        try {
+          const fresh = await fetchFreshData();
+          const cachedWarga = sessionStorage.getItem(WARGA_CACHE_KEY);
+          const cachedSurat = sessionStorage.getItem(SURAT_CACHE_KEY);
+          if (JSON.stringify(fresh.warga) !== cachedWarga || JSON.stringify(fresh.surat) !== cachedSurat) {
+            wargaData = fresh.warga;
+            suratData = fresh.surat;
+            sessionStorage.setItem(WARGA_CACHE_KEY, JSON.stringify(wargaData));
+            sessionStorage.setItem(SURAT_CACHE_KEY, JSON.stringify(suratData));
+            renderProfile(wargaData, suratData);
+            console.log('Profile diperbarui otomatis');
+          }
+        } catch (error) {
+          console.error('Gagal refresh profile background:', error);
+        }
+      }
+
+      async function loadProfile() {
+        const cachedWarga = sessionStorage.getItem(WARGA_CACHE_KEY);
+        const cachedSurat = sessionStorage.getItem(SURAT_CACHE_KEY);
+        if (cachedWarga && cachedSurat) {
+          wargaData = JSON.parse(cachedWarga);
+          suratData = JSON.parse(cachedSurat);
+          renderProfile(wargaData, suratData);
+          refreshBackground();
+        } else {
+          const spinner = document.getElementById('loadingSpinner');
+          if (spinner) spinner.style.display = 'block';
+          try {
+            const fresh = await fetchFreshData();
+            wargaData = fresh.warga;
+            suratData = fresh.surat;
+            sessionStorage.setItem(WARGA_CACHE_KEY, JSON.stringify(wargaData));
+            sessionStorage.setItem(SURAT_CACHE_KEY, JSON.stringify(suratData));
+            renderProfile(wargaData, suratData);
+          } catch (error) {
+            alert('Gagal memuat profil: ' + error.message);
+          } finally {
+            if (spinner) spinner.style.display = 'none';
+          }
+        }
+      }
+
+      // ==================== BADGE NOTIFIKASI SURAT ====================
+      async function updateSuratBadge() {
+        try {
+          let count = 0;
+          if (user.role === 'admin') {
+            let suratData;
+            const cached = sessionStorage.getItem('surat_admin_data');
+            if (cached) { suratData = JSON.parse(cached).surat; }
+            else { suratData = await apiRequest('/surat', 'GET'); }
+            count = suratData.filter(s => s.status === 'diajukan').length;
+          } else if (user.role === 'ketua_rt') {
+            const cached = sessionStorage.getItem(`surat_ketua_${user.rt}`);
+            if (cached) { count = JSON.parse(cached).filter(s => s.status === 'diajukan').length; }
+            else {
+              const allSurat = await apiRequest('/surat', 'GET');
+              const allWarga = await apiRequest('/warga', 'GET');
+              const wargaRt = allWarga.filter(w => w.alamat_rt == user.rt);
+              const nikList = wargaRt.map(w => w.nik);
+              const filtered = allSurat.filter(s => nikList.includes(s.nik_pemohon));
+              count = filtered.filter(s => s.status === 'diajukan').length;
+              sessionStorage.setItem(`surat_ketua_${user.rt}`, JSON.stringify(filtered));
+            }
+          } else { // member
+            const cached = sessionStorage.getItem(`surat_member_${user.email}`);
+            if (cached) { count = JSON.parse(cached).filter(s => s.status === 'diajukan').length; }
+            else {
+              const allSurat = await apiRequest('/surat', 'GET');
+              const mySurat = allSurat.filter(s => s.created_by === user.email);
+              count = mySurat.filter(s => s.status === 'diajukan').length;
+              sessionStorage.setItem(`surat_member_${user.email}`, JSON.stringify(mySurat));
+            }
+          }
+          const badge = document.getElementById('suratNotifBadge');
+          if (badge) {
+            if (count > 0) { badge.innerText = count; badge.style.display = 'inline-block'; }
+            else badge.style.display = 'none';
+          }
+        } catch (error) { console.error('Gagal update badge:', error); }
+      }
+
+      // ==================== UPLOAD FOTO PROFIL ====================
+      const ubahFotoBtn = document.getElementById('ubahFotoBtn');
+      const uploadInput = document.getElementById('uploadFotoInput');
+
+      if (ubahFotoBtn && uploadInput) {
+        ubahFotoBtn.addEventListener('click', () => uploadInput.click());
+        uploadInput.addEventListener('change', async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          if (!file.type.startsWith('image/')) {
+            alert('Hanya file gambar yang diperbolehkan (JPG/PNG)');
+            return;
+          }
+          // Preview lokal
+          const reader = new FileReader();
+          reader.onload = function(ev) {
+            if (profileFotoImg) profileFotoImg.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+          
+          // Konversi ke base64 (tanpa prefix)
+          const base64 = await new Promise((resolve) => {
+            const fr = new FileReader();
+            fr.onload = (e) => resolve(e.target.result.split(',')[1]);
+            fr.readAsDataURL(file);
+          });
+          
+          try {
+            const result = await updateProfilePhoto(base64, file.name);
+            if (result && result.foto_url) {
+              if (profileFotoImg) profileFotoImg.src = result.foto_url;
+              // Update user di localStorage sudah dilakukan di api.js
+              alert('Foto profil berhasil diupdate');
+            } else {
+              throw new Error('Gagal upload');
+            }
+          } catch (err) {
+            console.error(err);
+            alert('Gagal mengupload foto: ' + err.message);
+            // Kembalikan gambar sebelumnya
+            if (user.foto_profil && profileFotoImg) profileFotoImg.src = user.foto_profil;
+            else if (profileFotoImg) profileFotoImg.src = '';
+          }
+        });
+      }
+
+      // ==================== AUTO REFRESH & START ====================
+      let refreshInterval = setInterval(() => { if (document.visibilityState === 'visible') refreshBackground(); }, 30000);
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshBackground(); });
+      window.addEventListener('beforeunload', () => clearInterval(refreshInterval));
+
+      loadProfile().then(() => updateSuratBadge());
+
+      document.getElementById('logoutBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+      });
+    })();
+  </script>
+</body>
+
+</html>

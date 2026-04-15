@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kelola Pengguna - SIP Demangan</title>
+  <link rel="icon" type="image/webp" href="2.webp">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2ecc71;
+      --primary-dark: #27ae60;
+      --sidebar-bg: #ffffff;
+      --sidebar-width: 280px;
+      --sidebar-collapsed-width: 80px;
+      --header-height: 70px;
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      --shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e293b; min-height: 100vh; }
+    .app-wrapper { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--sidebar-bg);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.03);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      transition: width 0.3s ease;
+      z-index: 1000;
+    }
+    .sidebar-collapsed { width: var(--sidebar-collapsed-width); }
+    .sidebar-header { padding: 1.5rem 1rem 0.5rem; border-bottom: 1px solid rgba(0, 0, 0, 0.05); display: flex; align-items: center; justify-content: space-between; }
+    .sidebar-brand { text-decoration: none; color: inherit; display: flex; align-items: center; gap: 0.75rem; transition: all 0.2s ease; }
+    .sidebar-brand:hover { transform: translateY(-2px); }
+    .logo-wrapper { width: 48px; height: 48px; background: transparent; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 12px rgba(46, 204, 113, 0.25); transition: all 0.2s; flex-shrink: 0; overflow: hidden; }
+    .logo-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
+    .sidebar-brand h3 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0; background: linear-gradient(135deg, #2ecc71, #27ae60); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
+    .sidebar-header p { color: #64748b; font-size: 0.8rem; margin-top: 0.5rem; padding-left: calc(48px + 0.75rem); }
+    .sidebar-collapsed .sidebar-brand h3, .sidebar-collapsed .sidebar-header p, .sidebar-collapsed .nav-link span { display: none; }
+    .sidebar-collapsed .nav-link i { margin-right: 0; }
+    .sidebar-collapsed .nav-link { justify-content: center; padding: 0.75rem 0; }
+    .sidebar-collapsed .logo-wrapper { width: 40px; height: 40px; }
+    .sidebar-collapsed .sidebar-brand { gap: 0; }
+    #sidebarCollapseBtn { background: transparent; border: none; color: #64748b; transition: transform 0.2s; font-size: 1rem; cursor: pointer; }
+    .sidebar-collapsed #sidebarCollapseBtn i { transform: rotate(180deg); }
+    .nav-menu { padding: 1rem 0.5rem; }
+    .nav-item { list-style: none; }
+    .nav-link { display: flex; align-items: center; padding: 0.75rem 1rem; margin: 0.25rem 0; color: #475569; font-weight: 500; border-radius: 30px; transition: all 0.2s; text-decoration: none; white-space: nowrap; }
+    .nav-link i { width: 24px; font-size: 1.2rem; margin-right: 0.75rem; color: #94a3b8; }
+    .nav-link:hover { background: rgba(46, 204, 113, 0.1); color: #2ecc71; }
+    .nav-link:hover i { color: #2ecc71; }
+    .nav-link.active { background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; box-shadow: 0 6px 12px rgba(46, 204, 113, 0.2); }
+    .nav-link.active i { color: white; }
+    .badge-notif { background-color: #e74c3c; color: white; border-radius: 20px; padding: 0.2rem 0.6rem; font-size: 0.75rem; margin-left: auto; }
+    .sidebar-collapsed .badge-notif { display: none; }
+    .top-navbar { height: var(--header-height); background: white; box-shadow: var(--shadow); padding: 0 2rem; display: flex; align-items: center; justify-content: flex-end; position: sticky; top: 0; z-index: 999; }
+    .user-dropdown { display: flex; align-items: center; gap: 1rem; }
+    .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, #2ecc71, #27ae60); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; cursor: pointer; }
+    .dropdown-menu { border: none; border-radius: 20px; box-shadow: var(--shadow-hover); padding: 0.5rem; }
+    .dropdown-item { border-radius: 30px; padding: 0.5rem 1.2rem; font-weight: 500; transition: all 0.2s; }
+    .dropdown-item:hover { background: rgba(46, 204, 113, 0.1); color: #2ecc71; }
+    .dropdown-item i { width: 1.5rem; }
+    .main-content { flex: 1; background: #f8fafc; padding: 2rem; overflow-x: hidden; }
+    .btn-success { background: linear-gradient(135deg, #2ecc71, #27ae60); border: none; border-radius: 30px; padding: 0.5rem 1.5rem; font-weight: 500; transition: all 0.2s; }
+    .btn-success:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(46, 204, 113, 0.3); }
+    .btn-outline-warning { border: 2px solid #f39c12; color: #f39c12; border-radius: 30px; padding: 0.4rem 1rem; transition: all 0.2s; }
+    .btn-outline-warning:hover { background: #f39c12; color: white; }
+    .btn-outline-danger { border: 2px solid #e74c3c; color: #e74c3c; border-radius: 30px; padding: 0.4rem 1rem; transition: all 0.2s; }
+    .btn-outline-danger:hover { background: #e74c3c; color: white; }
+    .search-box { position: relative; }
+    .search-box i { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); color: #94a3b8; z-index: 10; }
+    .search-box input { padding-left: 40px; width: 260px; border-radius: 30px; border: 1px solid #e2e8f0; transition: all 0.2s; }
+    .search-box input:focus { width: 300px; box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25); border-color: #2ecc71; }
+    @media (max-width: 576px) {
+      .search-box input { width: 100%; }
+      .search-box input:focus { width: 100%; }
+    }
+    .card { border: none; border-radius: 24px; box-shadow: var(--shadow); overflow: hidden; }
+    .card-header { background: transparent; border-bottom: 1px solid rgba(0, 0, 0, 0.05); font-weight: 600; padding: 1.2rem 1.5rem; }
+    .table { --bs-table-striped-bg: rgba(0, 0, 0, 0.02); margin-bottom: 0; }
+    .table thead th { background: #f8f9fa; font-weight: 600; border-bottom: none; padding: 1rem 1rem; color: #334155; }
+    .table tbody td { vertical-align: middle; padding: 1rem; }
+    .table .btn-sm { padding: 0.3rem 0.7rem; margin: 0 2px; }
+    .role-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600; text-align: center; }
+    .role-admin { background: #8b5cf6; color: white; }
+    .role-ketua_rt { background: #f59e0b; color: white; }
+    .role-member { background: #3b82f6; color: white; }
+    .status-badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 600; }
+    .status-active { background: #d1fae5; color: #065f46; }
+    .status-inactive { background: #fee2e2; color: #991b1b; }
+    .access-toggle-card { background: linear-gradient(135deg, #f8f9fa, #ffffff); border: 1px solid #e9ecef; }
+    .toggle-switch { width: 60px; height: 30px; }
+    .toggle-switch .form-check-input { width: 60px; height: 30px; cursor: pointer; }
+    .toggle-switch .form-check-input:checked { background-color: #2ecc71; border-color: #2ecc71; }
+    .modal-content { border: none; border-radius: 24px; box-shadow: var(--shadow-hover); }
+    .modal-header { background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; border-radius: 24px 24px 0 0; padding: 1.2rem 1.5rem; }
+    .modal-header .btn-close { filter: brightness(0) invert(1); }
+    .modal-footer { border-top: none; padding: 1.2rem 1.5rem; }
+    .form-control, .form-select { border-radius: 16px; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; }
+    .form-control:focus, .form-select:focus { border-color: #2ecc71; box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25); }
+    .empty-state { text-align: center; padding: 3rem; color: #94a3b8; }
+    .empty-state i { font-size: 3rem; margin-bottom: 1rem; }
+    .sidebar-toggle { display: none; position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; border: none; box-shadow: 0 6px 16px rgba(46, 204, 113, 0.3); z-index: 1050; font-size: 1.3rem; cursor: pointer; align-items: center; justify-content: center; }
+    @media (max-width: 991.98px) {
+      .sidebar { position: fixed; transform: translateX(-100%); height: 100vh; transition: transform 0.3s ease, width 0.3s ease; }
+      .sidebar.show { transform: translateX(0); }
+      .main-content { padding: 1rem; }
+      .sidebar-toggle { display: flex; }
+      .logo-wrapper { width: 40px; height: 40px; }
+      .sidebar-brand h3 { font-size: 1.2rem; }
+      .sidebar-header p { padding-left: calc(40px + 0.75rem); }
+      .sidebar-collapsed { width: var(--sidebar-width); }
+      .sidebar-collapsed .sidebar-brand h3, .sidebar-collapsed .sidebar-header p, .sidebar-collapsed .nav-link span { display: block; }
+      .sidebar-collapsed .nav-link i { margin-right: 0.75rem; }
+      .sidebar-collapsed .nav-link { justify-content: flex-start; padding: 0.75rem 1rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-wrapper">
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-brand">
+          <div class="logo-wrapper"><img src="1.webp" alt="Logo SIP Demangan"></div>
+          <h3>SIP Demangan</h3>
+        </a>
+        <button class="btn btn-link text-dark p-0" id="sidebarCollapseBtn" aria-label="Toggle sidebar"><i class="fas fa-chevron-left"></i></button>
+      </div>
+      <p>Padukuhan Demangan</p>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="dashboard_admin.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+        <li class="nav-item"><a href="warga_admin.html" class="nav-link"><i class="fas fa-users"></i> <span>Data Warga</span></a></li>
+        <li class="nav-item"><a href="surat_admin.html" class="nav-link" id="menuSurat"><i class="fas fa-envelope"></i> <span>Surat</span><span class="badge-notif" id="suratNotifBadge" style="display:none;">0</span></a></li>
+        <li class="nav-item"><a href="berita.html" class="nav-link" id="menuBerita"><i class="fas fa-newspaper"></i> <span>Berita</span></a></li>
+        <li class="nav-item"><a href="peta_sebaran_admin.html" class="nav-link"><i class="fas fa-map-marked-alt"></i> <span>Peta Sebaran</span></a></li>
+        <li class="nav-item"><a href="pohon_keluarga.html" class="nav-link"><i class="fas fa-tree"></i> <span>Pohon Keluarga</span></a></li>
+        <li class="nav-item"><a href="users.html" class="nav-link active"><i class="fas fa-user-cog"></i> <span>Kelola Pengguna</span></a></li>
+        <li class="nav-item"><a href="hash_tool.html" class="nav-link"><i class="fas fa-hashtag"></i> <span>Hash/Unhash</span></a></li>
+        <li class="nav-item"><a href="verifikasi_pendaftar.html" class="nav-link"><i class="fas fa-user-check"></i> <span>Verifikasi Pendaftar</span></a></li>
+      </ul>
+    </div>
+
+    <div class="flex-grow-1">
+      <div class="top-navbar">
+        <div class="user-dropdown">
+          <span id="displayName" class="fw-semibold"></span>
+          <div class="dropdown">
+            <button class="btn p-0" data-bs-toggle="dropdown"><div class="user-avatar"><i class="fas fa-user"></i></div></button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="profile.html"><i class="fas fa-id-card me-2"></i> Profil Saya</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <!-- Global Access Settings Card -->
+        <div class="card mb-4 access-toggle-card">
+          <div class="card-header bg-white"><i class="fas fa-lock me-2 text-success"></i> Pengaturan Akses Role</div>
+          <div class="card-body">
+            <div class="row g-4">
+              <div class="col-md-6">
+                <div class="d-flex justify-content-between align-items-center p-3 border rounded-3">
+                  <div><h5 class="mb-1"><i class="fas fa-user-tie me-2 text-warning"></i> Ketua RT</h5><small class="text-muted">Aktifkan/nonaktifkan akses seluruh menu untuk Ketua RT</small></div>
+                  <div class="toggle-switch"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="toggleKetuaRt" style="width: 50px; height: 25px;"></div></div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex justify-content-between align-items-center p-3 border rounded-3">
+                  <div><h5 class="mb-1"><i class="fas fa-users me-2 text-primary"></i> Member (Warga)</h5><small class="text-muted">Aktifkan/nonaktifkan akses seluruh menu untuk Warga</small></div>
+                  <div class="toggle-switch"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="toggleMember" style="width: 50px; height: 25px;"></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-3 text-end"><button class="btn btn-sm btn-success" id="saveAccessBtn"><i class="fas fa-save me-1"></i> Simpan Pengaturan</button><div id="accessMessage" class="mt-2 small"></div></div>
+          </div>
+        </div>
+
+        <!-- User Management Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+          <h2 class="fw-bold mb-0"><i class="fas fa-user-cog me-2 text-success"></i>Manajemen Pengguna</h2>
+          <div class="d-flex gap-2">
+            <div class="search-box"><i class="fas fa-search"></i><input type="text" class="form-control" id="searchUser" placeholder="Cari pengguna..."></div>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#userModal" onclick="clearUserForm()"><i class="fas fa-plus me-1"></i>Tambah</button>
+          </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="card">
+          <div class="card-header"><i class="fas fa-list me-2"></i>Daftar Pengguna</div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-striped mb-0">
+                <thead>
+                  <tr><th>Email</th><th>Nama Lengkap</th><th>Role</th><th>RT</th><th>Status</th><th>Aksi</th></tr>
+                </thead>
+                <tbody id="userList"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+
+  <!-- Modal Form User -->
+  <div class="modal fade" id="userModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title" id="userModalTitle">Tambah Pengguna</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <form id="userForm">
+            <input type="hidden" id="userId">
+            <div class="mb-3"><label class="form-label">Email <span class="text-danger">*</span></label><input type="email" class="form-control" id="email" required></div>
+            <div class="mb-3"><label class="form-label">Password <small class="text-muted">(kosongkan jika tidak diubah)</small></label><input type="password" class="form-control" id="password"></div>
+            <div class="mb-3"><label class="form-label">Nama Lengkap <span class="text-danger">*</span></label><input type="text" class="form-control" id="nama_lengkap" required></div>
+            <div class="mb-3"><label class="form-label">Role <span class="text-danger">*</span></label><select class="form-select" id="role" required><option value="admin">Admin</option><option value="ketua_rt">Ketua RT</option><option value="member">Member (Warga)</option></select></div>
+            <div class="mb-3" id="rtField" style="display:none;"><label class="form-label">RT (untuk Ketua RT) <span class="text-danger">*</span></label><select class="form-select" id="rt"><option value="">Pilih RT</option><option value="1">RT 01</option><option value="2">RT 02</option><option value="3">RT 03</option><option value="4">RT 04</option><option value="5">RT 05</option><option value="6">RT 06</option><option value="7">RT 07</option></select></div>
+          </form>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button><button type="button" class="btn btn-success" id="saveUserBtn"><span id="saveUserText">Simpan</span><span id="saveUserSpinner" style="display:none;"><span class="spinner-border spinner-border-sm"></span> Menyimpan...</span></button></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    (function () {
+      // ==================== SIDEBAR ====================
+      const sidebar = document.getElementById('sidebar');
+      const collapseBtn = document.getElementById('sidebarCollapseBtn');
+      const mobileToggle = document.getElementById('sidebarToggle');
+      if (sidebar && collapseBtn) {
+        const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        if (isCollapsed) { sidebar.classList.add('sidebar-collapsed'); collapseBtn.innerHTML = '<i class="fas fa-chevron-right"></i>'; }
+        else { collapseBtn.innerHTML = '<i class="fas fa-chevron-left"></i>'; }
+        collapseBtn.addEventListener('click', () => {
+          sidebar.classList.toggle('sidebar-collapsed');
+          localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('sidebar-collapsed'));
+          collapseBtn.innerHTML = sidebar.classList.contains('sidebar-collapsed') ? '<i class="fas fa-chevron-right"></i>' : '<i class="fas fa-chevron-left"></i>';
+        });
+      }
+      if (mobileToggle) mobileToggle.addEventListener('click', () => sidebar.classList.toggle('show'));
+      document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 991.98 && sidebar && !sidebar.contains(e.target) && mobileToggle && !mobileToggle.contains(e.target) && sidebar.classList.contains('show')) sidebar.classList.remove('show');
+      });
+      const currentPage = window.location.pathname.split('/').pop();
+      document.querySelectorAll('.nav-link').forEach(link => { link.classList.remove('active'); if (link.getAttribute('href') === currentPage) link.classList.add('active'); });
+
+      // ==================== AUTH ====================
+      const user = checkAuth();
+      if (!user) return;
+      if (user.role !== 'admin') {
+        if (user.role === 'ketua_rt') window.location.href = 'dashboard_ketua_rt.html';
+        else window.location.href = 'dashboard_member.html';
+        return;
+      }
+      document.getElementById('displayName').innerText = user.nama || user.email;
+
+      // ==================== GLOBAL ACCESS SETTINGS ====================
+      const toggleKetuaRt = document.getElementById('toggleKetuaRt');
+      const toggleMember = document.getElementById('toggleMember');
+      const saveAccessBtn = document.getElementById('saveAccessBtn');
+      const accessMessageDiv = document.getElementById('accessMessage');
+
+      async function loadAccessSettings() {
+        try {
+          const settings = await getAccessSettings();
+          toggleKetuaRt.checked = (settings.ketua_rt === 'active');
+          toggleMember.checked = (settings.member === 'active');
+        } catch (err) { console.error(err); if (accessMessageDiv) accessMessageDiv.innerHTML = '<div class="text-danger">Gagal memuat pengaturan akses</div>'; }
+      }
+      function showAccessMessage(msg, isError = false) { if (accessMessageDiv) { accessMessageDiv.innerHTML = `<span class="${isError ? 'text-danger' : 'text-success'}">${msg}</span>`; setTimeout(() => { if (accessMessageDiv) accessMessageDiv.innerHTML = ''; }, 3000); } }
+      if (saveAccessBtn) {
+        saveAccessBtn.addEventListener('click', async () => {
+          const ketuaStatus = toggleKetuaRt.checked ? 'active' : 'inactive';
+          const memberStatus = toggleMember.checked ? 'active' : 'inactive';
+          saveAccessBtn.disabled = true; const originalText = saveAccessBtn.innerHTML;
+          saveAccessBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...';
+          try { await updateAccessSetting('ketua_rt', ketuaStatus); await updateAccessSetting('member', memberStatus); showAccessMessage('Pengaturan akses berhasil disimpan', false); }
+          catch (err) { showAccessMessage('Gagal menyimpan: ' + err.message, true); }
+          finally { saveAccessBtn.disabled = false; saveAccessBtn.innerHTML = originalText; }
+        });
+      }
+
+      // ==================== USER MANAGEMENT ====================
+      const CACHE_KEY = 'users_admin_data';
+      let allUsers = [];
+
+      function getRoleBadge(role) {
+        if (role === 'admin') return '<span class="role-badge role-admin">Admin</span>';
+        if (role === 'ketua_rt') return '<span class="role-badge role-ketua_rt">Ketua RT</span>';
+        return '<span class="role-badge role-member">Member</span>';
+      }
+      function getStatusBadge(isActive) {
+        return isActive ? '<span class="status-badge status-active"><i class="fas fa-check-circle me-1"></i>Aktif</span>' : '<span class="status-badge status-inactive"><i class="fas fa-ban me-1"></i>Nonaktif</span>';
+      }
+      function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+
+      async function toggleUserStatus(email) {
+        try {
+          const result = await apiRequest('/users/' + encodeURIComponent(email) + '/toggle-status', 'POST');
+          await loadUsers(); // refresh after toggle
+          return result;
+        } catch (err) { throw new Error(err.message); }
+      }
+
+      async function renderUsers(users) {
+        const tbody = document.getElementById('userList');
+        if (!tbody) return;
+        if (!users || users.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fas fa-users-slash"></i><br>Tidak ada data pengguna</td></tr>`; return; }
+        tbody.innerHTML = '';
+        for (const u of users) {
+          const tr = document.createElement('tr');
+          const isActive = u.is_active === 'true' || u.is_active === true;
+          tr.innerHTML = `
+            <td class="fw-medium">${escapeHtml(u.email)}</td>
+            <td>${escapeHtml(u.nama_lengkap)}</td>
+            <td>${getRoleBadge(u.role)}</td>
+            <td>${u.rt ? `RT ${u.rt}` : '-'}</td>
+            <td>${getStatusBadge(isActive)}</td>
+            <td>
+              <button class="btn btn-sm btn-outline-warning" onclick="editUser('${escapeHtml(u.email)}')" title="Edit"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="deleteUser('${escapeHtml(u.email)}')" title="Hapus"><i class="fas fa-trash"></i></button>
+              <button class="btn btn-sm ${isActive ? 'btn-outline-secondary' : 'btn-outline-success'}" onclick="toggleUserStatusHandler('${escapeHtml(u.email)}')" title="${isActive ? 'Nonaktifkan' : 'Aktifkan'} Akun"><i class="fas ${isActive ? 'fa-toggle-off' : 'fa-toggle-on'}"></i></button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        }
+      }
+
+      window.toggleUserStatusHandler = async function(email) {
+        if (!confirm(`Apakah Anda yakin ingin mengubah status akun ${email}?`)) return;
+        try {
+          await toggleUserStatus(email);
+          await loadUsers();
+        } catch (err) { alert('Gagal mengubah status: ' + err.message); }
+      };
+
+      function filterUsers() {
+        const keyword = document.getElementById('searchUser').value.toLowerCase().trim();
+        if (!keyword) { renderUsers(allUsers); return; }
+        const filtered = allUsers.filter(u => u.email.toLowerCase().includes(keyword) || (u.nama_lengkap && u.nama_lengkap.toLowerCase().includes(keyword)) || u.role.toLowerCase().includes(keyword));
+        renderUsers(filtered);
+      }
+      let searchTimeout; const searchInput = document.getElementById('searchUser');
+      if (searchInput) searchInput.addEventListener('input', () => { clearTimeout(searchTimeout); searchTimeout = setTimeout(filterUsers, 300); });
+
+      async function fetchFreshData() { return await apiRequest('/users', 'GET'); }
+      async function refreshBackground() {
+        try { const fresh = await fetchFreshData(); const cached = sessionStorage.getItem(CACHE_KEY); if (JSON.stringify(fresh) !== cached) { allUsers = fresh; sessionStorage.setItem(CACHE_KEY, JSON.stringify(allUsers)); filterUsers(); console.log('Data users diperbarui otomatis'); } }
+        catch (error) { console.error('Gagal refresh background:', error); }
+      }
+      async function loadUsers() {
+        const cached = sessionStorage.getItem(CACHE_KEY);
+        if (cached) { allUsers = JSON.parse(cached); renderUsers(allUsers); }
+        refreshBackground();
+      }
+
+      // ==================== SURAT BADGE ====================
+      async function updateSuratBadge() {
+        try {
+          let suratData; const cached = sessionStorage.getItem('surat_admin_data');
+          if (cached) suratData = JSON.parse(cached).surat;
+          else suratData = await apiRequest('/surat', 'GET');
+          const count = suratData.filter(s => s.status === 'diajukan').length;
+          const badge = document.getElementById('suratNotifBadge');
+          if (badge) { if (count > 0) { badge.innerText = count; badge.style.display = 'inline-block'; } else badge.style.display = 'none'; }
+        } catch (error) { console.error('Gagal update badge:', error); }
+      }
+
+      // ==================== CRUD MODAL ====================
+      const roleSelect = document.getElementById('role'); const rtField = document.getElementById('rtField');
+      if (roleSelect) roleSelect.addEventListener('change', function () { rtField.style.display = this.value === 'ketua_rt' ? 'block' : 'none'; if (this.value !== 'ketua_rt') document.getElementById('rt').value = ''; });
+      const saveUserBtn = document.getElementById('saveUserBtn');
+      if (saveUserBtn) {
+        saveUserBtn.addEventListener('click', async function () {
+          const id = document.getElementById('userId').value;
+          const email = document.getElementById('email').value.trim();
+          const password = document.getElementById('password').value;
+          const nama = document.getElementById('nama_lengkap').value.trim();
+          const role = document.getElementById('role').value;
+          const rt = document.getElementById('rt').value;
+          if (!email || !nama || !role) { alert('Email, Nama, dan Role harus diisi'); return; }
+          if (role === 'ketua_rt' && !rt) { alert('Silakan pilih RT untuk Ketua RT'); return; }
+          const data = { email, nama_lengkap: nama, role, rt: rt || null };
+          if (password) data.password = password;
+          const btn = this; const textSpan = document.getElementById('saveUserText'); const spinnerSpan = document.getElementById('saveUserSpinner');
+          btn.disabled = true; if (textSpan) textSpan.style.display = 'none'; if (spinnerSpan) spinnerSpan.style.display = 'inline-block';
+          try {
+            if (id) await apiRequest('/users/' + encodeURIComponent(id), 'PUT', data);
+            else await apiRequest('/users', 'POST', data);
+            const modalEl = document.getElementById('userModal'); const modal = bootstrap.Modal.getInstance(modalEl); if (modal) modal.hide();
+            await loadUsers(); await updateSuratBadge();
+          } catch (error) { alert('Gagal menyimpan: ' + error.message); }
+          finally { btn.disabled = false; if (textSpan) textSpan.style.display = 'inline-block'; if (spinnerSpan) spinnerSpan.style.display = 'none'; }
+        });
+      }
+
+      window.editUser = async function (email) {
+        let u = allUsers.find(u => u.email === email);
+        if (!u) { try { const users = await apiRequest('/users', 'GET'); u = users.find(u => u.email === email); if (!u) throw new Error('User tidak ditemukan'); } catch (error) { alert('Gagal mengambil data: ' + error.message); return; } }
+        document.getElementById('userId').value = u.email;
+        document.getElementById('email').value = u.email;
+        document.getElementById('nama_lengkap').value = u.nama_lengkap;
+        document.getElementById('role').value = u.role;
+        document.getElementById('rt').value = u.rt || '';
+        rtField.style.display = u.role === 'ketua_rt' ? 'block' : 'none';
+        document.getElementById('userModalTitle').innerText = 'Edit Pengguna';
+        const modal = new bootstrap.Modal(document.getElementById('userModal')); modal.show();
+      };
+      window.deleteUser = async function (email) { if (confirm(`Yakin hapus pengguna dengan email ${email}?`)) { try { await apiRequest('/users/' + encodeURIComponent(email), 'DELETE'); await loadUsers(); await updateSuratBadge(); } catch (error) { alert('Gagal menghapus: ' + error.message); } } };
+      window.clearUserForm = function () { document.getElementById('userForm').reset(); document.getElementById('userId').value = ''; document.getElementById('userModalTitle').innerText = 'Tambah Pengguna'; rtField.style.display = 'none'; document.getElementById('rt').value = ''; };
+
+      // ==================== AUTO REFRESH ====================
+      let refreshInterval = setInterval(() => { if (document.visibilityState === 'visible') refreshBackground(); }, 30000);
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshBackground(); });
+      window.addEventListener('beforeunload', () => clearInterval(refreshInterval));
+
+      // Start
+      loadUsers().then(() => { updateSuratBadge(); loadAccessSettings(); });
+      document.getElementById('logoutBtn').addEventListener('click', (e) => { e.preventDefault(); localStorage.removeItem('user'); window.location.href = 'login.html'; });
+    })();
+  </script>
+</body>
+
+</html>

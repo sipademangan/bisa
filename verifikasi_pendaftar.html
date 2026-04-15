@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Verifikasi Pendaftar Baru - SIP Demangan</title>
+  <link rel="icon" type="image/webp" href="2.webp">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2ecc71;
+      --primary-dark: #27ae60;
+      --sidebar-bg: #ffffff;
+      --sidebar-width: 280px;
+      --sidebar-collapsed-width: 80px;
+      --header-height: 70px;
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      --shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      min-height: 100vh;
+    }
+
+    .app-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--sidebar-bg);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.03);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      transition: width 0.3s ease;
+      z-index: 1000;
+    }
+
+    .sidebar-collapsed {
+      width: var(--sidebar-collapsed-width);
+    }
+
+    .sidebar-header {
+      padding: 1.5rem 1rem 0.5rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-brand {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-brand:hover {
+      transform: translateY(-2px);
+    }
+
+    .logo-wrapper {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 12px rgba(46, 204, 113, 0.25);
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .logo-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 16px;
+    }
+
+    .sidebar-brand h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .sidebar-header p {
+      color: #64748b;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      padding-left: calc(48px + 0.75rem);
+    }
+
+    .sidebar-collapsed .sidebar-brand h3,
+    .sidebar-collapsed .sidebar-header p,
+    .sidebar-collapsed .nav-link span {
+      display: none;
+    }
+
+    .sidebar-collapsed .nav-link i {
+      margin-right: 0;
+    }
+
+    .sidebar-collapsed .nav-link {
+      justify-content: center;
+      padding: 0.75rem 0;
+    }
+
+    .sidebar-collapsed .logo-wrapper {
+      width: 40px;
+      height: 40px;
+    }
+
+    .sidebar-collapsed .sidebar-brand {
+      gap: 0;
+    }
+
+    #sidebarCollapseBtn {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      transition: transform 0.2s;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .sidebar-collapsed #sidebarCollapseBtn i {
+      transform: rotate(180deg);
+    }
+
+    .nav-menu {
+      padding: 1rem 0.5rem;
+    }
+
+    .nav-item {
+      list-style: none;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      margin: 0.25rem 0;
+      color: #475569;
+      font-weight: 500;
+      border-radius: 30px;
+      transition: all 0.2s;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav-link i {
+      width: 24px;
+      font-size: 1.2rem;
+      margin-right: 0.75rem;
+      color: #94a3b8;
+    }
+
+    .nav-link:hover {
+      background: rgba(46, 204, 113, 0.1);
+      color: #2ecc71;
+    }
+
+    .nav-link:hover i {
+      color: #2ecc71;
+    }
+
+    .nav-link.active {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      box-shadow: 0 6px 12px rgba(46, 204, 113, 0.2);
+    }
+
+    .nav-link.active i {
+      color: white;
+    }
+
+    .top-navbar {
+      height: var(--header-height);
+      background: white;
+      box-shadow: var(--shadow);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    .user-dropdown {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .dropdown-menu {
+      border: none;
+      border-radius: 20px;
+      box-shadow: var(--shadow-hover);
+      padding: 0.5rem;
+    }
+
+    .dropdown-item {
+      border-radius: 30px;
+      padding: 0.5rem 1.2rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(46, 204, 113, 0.1);
+      color: #2ecc71;
+    }
+
+    .main-content {
+      flex: 1;
+      background: #f8fafc;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+
+    .card-custom {
+      border: none;
+      border-radius: 24px;
+      background: white;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-header-custom {
+      background: linear-gradient(98deg, #2ecc71 0%, #27ae60 100%);
+      padding: 1.2rem 1.8rem;
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .table th {
+      background-color: #f9fafb;
+      font-weight: 600;
+      padding: 1rem;
+    }
+
+    .table td {
+      vertical-align: middle;
+      padding: 1rem;
+    }
+
+    .badge-rt {
+      background: #e9ecef;
+      padding: 0.35rem 0.85rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+    }
+
+    .btn-approve {
+      background: #2ecc71;
+      border: none;
+      border-radius: 30px;
+      padding: 0.35rem 1rem;
+      color: white;
+      transition: 0.2s;
+    }
+
+    .btn-approve:hover {
+      background: #27ae60;
+      transform: translateY(-2px);
+    }
+
+    .btn-reject {
+      background: #e74c3c;
+      border: none;
+      border-radius: 30px;
+      padding: 0.35rem 1rem;
+      color: white;
+      transition: 0.2s;
+    }
+
+    .btn-reject:hover {
+      background: #c0392b;
+      transform: translateY(-2px);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #6c757d;
+    }
+
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      border: none;
+      box-shadow: 0 6px 16px rgba(46, 204, 113, 0.3);
+      z-index: 1050;
+      font-size: 1.3rem;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 991.98px) {
+      .sidebar {
+        position: fixed;
+        transform: translateX(-100%);
+        height: 100vh;
+        transition: transform 0.3s ease, width 0.3s ease;
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        padding: 1rem;
+      }
+
+      .sidebar-toggle {
+        display: flex;
+      }
+
+      .sidebar-collapsed {
+        width: var(--sidebar-width);
+      }
+
+      .sidebar-collapsed .sidebar-brand h3,
+      .sidebar-collapsed .sidebar-header p,
+      .sidebar-collapsed .nav-link span {
+        display: block;
+      }
+
+      .sidebar-collapsed .nav-link i {
+        margin-right: 0.75rem;
+      }
+
+      .sidebar-collapsed .nav-link {
+        justify-content: flex-start;
+        padding: 0.75rem 1rem;
+      }
+    }
+
+    .refresh-indicator {
+      font-size: 0.75rem;
+      color: #6c757d;
+      margin-left: 1rem;
+      visibility: hidden;
+    }
+
+    .refresh-indicator.show {
+      visibility: visible;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-wrapper">
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-brand">
+          <div class="logo-wrapper"><img src="1.webp" alt="Logo SIP Demangan"></div>
+          <h3>SIP Demangan</h3>
+        </a>
+        <button class="btn btn-link text-dark p-0" id="sidebarCollapseBtn"><i class="fas fa-chevron-left"></i></button>
+      </div>
+      <p>Padukuhan Demangan</p>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="dashboard_admin.html" class="nav-link" id="menuDashboard"><i
+              class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+        <li class="nav-item"><a href="warga_admin.html" class="nav-link" id="menuWarga"><i class="fas fa-users"></i>
+            <span>Data Warga</span></a></li>
+        <li class="nav-item"><a href="surat_admin.html" class="nav-link" id="menuSurat"><i class="fas fa-envelope"></i>
+            <span>Surat</span></a></li>
+        <li class="nav-item"><a href="berita.html" class="nav-link" id="menuBerita"><i class="fas fa-newspaper"></i>
+            <span>Berita</span></a></li>
+        <li class="nav-item"><a href="galeri.html" class="nav-link" id="menuGaleri"><i class="fas fa-images"></i>
+            <span>Galeri</span></a></li>
+        <li class="nav-item"><a href="peta_sebaran_admin.html" class="nav-link" id="menuPeta"><i
+              class="fas fa-map-marked-alt"></i> <span>Peta Sebaran</span></a></li>
+        <li class="nav-item"><a href="pohon_keluarga.html" class="nav-link" id="menuKeluarga"><i
+              class="fas fa-tree"></i> <span>Pohon Keluarga</span></a></li>
+        <li class="nav-item"><a href="users.html" class="nav-link" id="menuUsers"><i class="fas fa-user-cog"></i>
+            <span>Kelola Pengguna</span></a></li>
+        <li class="nav-item"><a href="hash_tool.html" class="nav-link" id="menuHash"><i class="fas fa-hashtag"></i>
+            <span>Hash/Unhash SHA256</span></a></li>
+        <li class="nav-item"><a href="verifikasi_pendaftar.html" class="nav-link active" id="menuVerifikasi"><i
+              class="fas fa-user-check"></i> <span>Verifikasi Pendaftar</span></a></li>
+      </ul>
+    </div>
+
+    <!-- KONTEN KANAN -->
+    <div class="flex-grow-1">
+      <div class="top-navbar">
+        <div class="user-dropdown">
+          <span id="displayName" class="fw-semibold"></span>
+          <div class="dropdown">
+            <button class="btn p-0" type="button" data-bs-toggle="dropdown">
+              <div class="user-avatar"><i class="fas fa-user"></i></div>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="profile.html"><i class="fas fa-id-card me-2"></i> Profil Saya</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <h2 class="fw-bold mb-0"><i class="fas fa-user-check me-2 text-success"></i>Verifikasi Pendaftar Baru</h2>
+          <div>
+            <button class="btn btn-outline-secondary btn-sm" id="refreshBtn"><i class="fas fa-sync-alt"></i>
+              Refresh</button>
+            <span id="refreshIndicator" class="refresh-indicator"><i class="fas fa-spinner fa-pulse"></i>
+              Memperbarui...</span>
+          </div>
+        </div>
+        <p class="text-muted" id="scopeInfo"></p>
+
+        <div class="card-custom">
+          <div class="card-header-custom"><i class="fas fa-users"></i> Daftar Pendaftar Menunggu Verifikasi</div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Email</th>
+                    <th>Nama Lengkap</th>
+                    <th>RT</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="pendingTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    (function () {
+      // ==================== SIDEBAR COLLAPSE ====================
+      const sidebar = document.getElementById('sidebar');
+      const collapseBtn = document.getElementById('sidebarCollapseBtn');
+      const mobileToggle = document.getElementById('sidebarToggle');
+      if (sidebar && collapseBtn) {
+        const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        if (isCollapsed) {
+          sidebar.classList.add('sidebar-collapsed');
+          collapseBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        } else {
+          collapseBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        }
+        collapseBtn.addEventListener('click', () => {
+          sidebar.classList.toggle('sidebar-collapsed');
+          localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('sidebar-collapsed'));
+          collapseBtn.innerHTML = sidebar.classList.contains('sidebar-collapsed') ? '<i class="fas fa-chevron-right"></i>' : '<i class="fas fa-chevron-left"></i>';
+        });
+      }
+      if (mobileToggle) mobileToggle.addEventListener('click', () => sidebar.classList.toggle('show'));
+      document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 991.98 && sidebar && !sidebar.contains(e.target) && mobileToggle && !mobileToggle.contains(e.target) && sidebar.classList.contains('show')) {
+          sidebar.classList.remove('show');
+        }
+      });
+
+      // ==================== AUTH ====================
+      const user = checkAuth();
+      if (!user) return;
+      if (user.role !== 'admin' && user.role !== 'ketua_rt') {
+        alert('Halaman ini hanya untuk Administrator dan Ketua RT.');
+        window.location.href = (user.role === 'member') ? 'dashboard_member.html' : 'index.html';
+        return;
+      }
+
+      const isAdmin = (user.role === 'admin');
+      document.getElementById('displayName').innerText = user.nama || user.email;
+      // Sesuaikan menu untuk ketua rt
+      if (!isAdmin) {
+        const adminMenus = ['menuUsers', 'menuHash'];
+        adminMenus.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.closest('.nav-item').style.display = 'none';
+        });
+        const menuWarga = document.getElementById('menuWarga');
+        if (menuWarga) menuWarga.href = 'warga_ketua.html';
+        const menuSurat = document.getElementById('menuSurat');
+        if (menuSurat) menuSurat.href = 'surat_ketua.html';
+        const menuPeta = document.getElementById('menuPeta');
+        if (menuPeta) menuPeta.href = 'peta_sebaran_ketua.html';
+        const menuKeluarga = document.getElementById('menuKeluarga');
+        if (menuKeluarga) menuKeluarga.href = 'pohon_keluarga_ketua_rt.html';
+      }
+
+      // ==================== VARIABLES & CACHE ====================
+      const CACHE_KEY = 'pending_users_cache';
+      const tbody = document.getElementById('pendingTableBody');
+      const scopeInfo = document.getElementById('scopeInfo');
+      const refreshIndicator = document.getElementById('refreshIndicator');
+      scopeInfo.innerText = isAdmin ? 'Menampilkan seluruh pendaftar dari semua RT.' : `Menampilkan pendaftar RT ${user.rt} saja.`;
+
+      // Helper escape HTML (aman untuk semua tipe)
+      function escapeHtml(value) {
+        if (value === null || value === undefined) return '';
+        return String(value).replace(/[&<>]/g, function (m) {
+          if (m === '&') return '&amp;';
+          if (m === '<') return '&lt;';
+          if (m === '>') return '&gt;';
+          return m;
+        });
+      }
+
+      // Render tabel dari data array
+      function renderTable(pendingList) {
+        if (!pendingList || pendingList.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5"><div class="empty-state"><i class="fas fa-inbox fa-3x"></i><p class="mt-2">Tidak ada pendaftar baru yang menunggu verifikasi.</p></div></td></tr>';
+          return;
+        }
+        tbody.innerHTML = '';
+        pendingList.forEach(p => {
+          const email = escapeHtml(p.email);
+          const nama = escapeHtml(p.nama_lengkap);
+          const rt = escapeHtml(p.rt);
+          const row = document.createElement('tr');
+          row.innerHTML = `
+        <td style="word-break:break-word;">${email}</td>
+        <td><strong>${nama}</strong></td>
+        <td><span class="badge-rt"><i class="fas fa-home"></i> RT ${rt}</span></td>
+        <td>
+          <button class="btn btn-approve btn-sm me-2" data-email="${email}"><i class="fas fa-check-circle"></i> Terima</button>
+          <button class="btn btn-reject btn-sm" data-email="${email}"><i class="fas fa-times-circle"></i> Tolak</button>
+        </td>
+      `;
+          tbody.appendChild(row);
+        });
+        // Pasang event listener untuk tombol approve/reject
+        document.querySelectorAll('.btn-approve').forEach(btn => {
+          btn.removeEventListener('click', handleApprove);
+          btn.addEventListener('click', handleApprove);
+        });
+        document.querySelectorAll('.btn-reject').forEach(btn => {
+          btn.removeEventListener('click', handleReject);
+          btn.addEventListener('click', handleReject);
+        });
+      }
+
+      async function handleApprove(e) {
+        const email = e.currentTarget.getAttribute('data-email');
+        if (confirm(`Terima pendaftar dengan email ${email}? Akun akan aktif.`)) {
+          await handleVerification(email, 'approve');
+        }
+      }
+      async function handleReject(e) {
+        const email = e.currentTarget.getAttribute('data-email');
+        if (confirm(`Tolak pendaftar ${email}?`)) {
+          await handleVerification(email, 'reject');
+        }
+      }
+
+      async function handleVerification(email, action) {
+        try {
+          if (action === 'approve') {
+            await approveUser(email);
+            alert('✅ Pendaftar berhasil diverifikasi.');
+          } else {
+            await rejectUser(email);
+            alert('❌ Pendaftar ditolak.');
+          }
+          // Setelah sukses, lakukan refresh background dan update cache
+          await refreshBackground(true); // force refresh
+        } catch (err) {
+          alert(`Gagal: ${err.message}`);
+        }
+      }
+
+      // Mengambil data dari server (tanpa mengubah tampilan, hanya return data)
+      async function fetchPendingFromServer() {
+        return await getPendingUsers();
+      }
+
+      // Memperbarui cache dan render ulang jika data berubah
+      async function refreshBackground(showIndicator = false) {
+        if (showIndicator && refreshIndicator) refreshIndicator.classList.add('show');
+        try {
+          const freshData = await fetchPendingFromServer();
+          const cachedRaw = sessionStorage.getItem(CACHE_KEY);
+          let cachedData = null;
+          if (cachedRaw) {
+            try { cachedData = JSON.parse(cachedRaw); } catch (e) { }
+          }
+          // Bandingkan apakah ada perubahan (sederhana: JSON stringify)
+          if (JSON.stringify(freshData) !== JSON.stringify(cachedData)) {
+            sessionStorage.setItem(CACHE_KEY, JSON.stringify(freshData));
+            renderTable(freshData);
+          }
+        } catch (err) {
+          console.error('Background refresh gagal:', err);
+          // Jika tidak ada cache sama sekali, tampilkan error di tabel
+          const cachedRaw = sessionStorage.getItem(CACHE_KEY);
+          if (!cachedRaw) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4"><i class="fas fa-exclamation-triangle"></i> Gagal memuat data: ${escapeHtml(err.message)}<br><button class="btn btn-sm btn-outline-success mt-2" id="retryBtn"><i class="fas fa-sync-alt"></i> Coba Lagi</button></td></tr>`;
+            const retryBtn = document.getElementById('retryBtn');
+            if (retryBtn) retryBtn.addEventListener('click', () => refreshBackground(true));
+          }
+        } finally {
+          if (showIndicator && refreshIndicator) refreshIndicator.classList.remove('show');
+        }
+      }
+
+      // Inisialisasi: muat dari cache (jika ada) lalu refresh background
+      function initPage() {
+        const cachedRaw = sessionStorage.getItem(CACHE_KEY);
+        if (cachedRaw) {
+          try {
+            const cachedData = JSON.parse(cachedRaw);
+            renderTable(cachedData);
+          } catch (e) { }
+        } else {
+          // Tidak ada cache, tampilkan pesan loading sederhana (tanpa spinner besar)
+          tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted"><i class="fas fa-circle-notch fa-spin"></i> Memuat data pertama kali...</td></tr>';
+        }
+        // Lakukan refresh background (tanpa indikator visual agar tidak mengganggu)
+        refreshBackground(false).catch(console.error);
+      }
+
+      // ==================== AUTO REFRESH PERIODIK ====================
+      let refreshInterval = setInterval(() => {
+        if (document.visibilityState === 'visible') {
+          refreshBackground(false);
+        }
+      }, 30000); // setiap 30 detik
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          refreshBackground(false);
+        }
+      });
+
+      // Tombol refresh manual dengan indikator
+      document.getElementById('refreshBtn').addEventListener('click', () => refreshBackground(true));
+      document.getElementById('logoutBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('user');
+        window.location.href = 'index.html';
+      });
+
+      // Bersihkan interval saat halaman ditutup
+      window.addEventListener('beforeunload', () => clearInterval(refreshInterval));
+
+      initPage();
+    })();
+  </script>
+</body>
+
+</html>

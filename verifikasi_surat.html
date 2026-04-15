@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Verifikasi Surat - SIP Demangan</title>
+  <link rel="icon" type="image/webp" href="2.webp">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      background: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .verification-card {
+      border-radius: 28px;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+      border: none;
+      overflow: hidden;
+      transition: transform 0.2s;
+    }
+    .verification-header {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      padding: 2rem 1.5rem;
+    }
+    .status-badge {
+      font-size: 0.9rem;
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      font-weight: 600;
+    }
+    .info-row {
+      border-bottom: 1px solid #e9ecef;
+      padding: 0.85rem 0;
+    }
+    .info-label {
+      font-weight: 700;
+      color: #2c3e50;
+      display: inline-block;
+      min-width: 140px;
+    }
+    .info-value {
+      color: #2d3748;
+      word-break: break-word;
+    }
+    .verified-icon {
+      font-size: 4.2rem;
+      color: #2ecc71;
+      filter: drop-shadow(0 4px 8px rgba(46,204,113,0.2));
+    }
+    .invalid-icon {
+      font-size: 4.2rem;
+      color: #e74c3c;
+    }
+    .btn-verifikasi {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      border: none;
+      border-radius: 60px;
+      padding: 0.7rem 2rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-verifikasi:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(46,204,113,0.4);
+    }
+    footer {
+      margin-top: auto;
+      background: #1e293b;
+      color: #cbd5e1;
+      padding: 1.5rem 0;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+    @media (max-width: 576px) {
+      .info-label {
+        display: block;
+        margin-bottom: 0.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-light bg-white shadow-sm py-2 sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="index.html">
+      <img src="1.webp" alt="Logo" width="38" class="rounded"> Padukuhan Demangan
+    </a>
+    <div>
+      <a href="index.html" class="btn btn-outline-success rounded-pill btn-sm px-3"><i class="fas fa-home me-1"></i> Beranda</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      <div class="card verification-card">
+        <div class="verification-header text-center">
+          <i class="fas fa-file-certificate fa-2x mb-2"></i>
+          <h2 class="fw-bold mb-1">Verifikasi Keaslian Surat</h2>
+          <p class="mb-0 opacity-75 small">Pastikan surat yang Anda terima diterbitkan secara resmi oleh Padukuhan Demangan</p>
+        </div>
+        <div class="card-body p-4 p-md-5">
+          <!-- Form input nomor surat -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold"><i class="fas fa-qrcode me-1 text-success"></i> Nomor Surat / Scan QR</label>
+            <div class="input-group">
+              <input type="text" class="form-control form-control-lg rounded-pill border-2" id="nomorSuratInput" 
+                     placeholder="Contoh: SURAT-20260315-0001" autocomplete="off">
+              <button class="btn btn-verifikasi rounded-pill px-4 ms-2" id="btnVerifikasi">
+                <i class="fas fa-search me-2"></i>Verifikasi
+              </button>
+            </div>
+            <div class="form-text mt-2">
+              <i class="fas fa-info-circle text-muted"></i> Anda bisa memasukkan nomor surat secara manual atau scan QR code yang tertera pada surat.
+            </div>
+          </div>
+
+          <!-- Loading state -->
+          <div id="loadingVerifikasi" class="text-center py-5" style="display: none;">
+            <div class="spinner-border text-success" style="width: 3rem; height: 3rem;" role="status"></div>
+            <p class="mt-3 fw-semibold">Memeriksa keabsahan surat...</p>
+          </div>
+
+          <!-- Error message -->
+          <div id="errorMessage" class="alert alert-danger d-flex align-items-center gap-2" style="display: none;">
+            <i class="fas fa-exclamation-triangle fs-5"></i>
+            <span></span>
+          </div>
+
+          <!-- Hasil verifikasi sukses -->
+          <div id="hasilVerifikasi" style="display: none;">
+            <hr class="my-4">
+            <div class="text-center mb-4" id="statusIcon"></div>
+            <div id="verifikasiContent" class="bg-light p-3 rounded-4"></div>
+            <div class="text-center mt-4">
+              <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="window.print()">
+                <i class="fas fa-print me-1"></i> Cetak Hasil Verifikasi
+              </button>
+            </div>
+          </div>
+
+          <!-- Info keamanan -->
+          <div class="alert alert-success bg-light border-0 mt-4 small">
+            <i class="fas fa-shield-alt me-2"></i> Verifikasi ini menjamin bahwa surat tersebut <strong>asli</strong> dan telah ditandatangani secara resmi oleh perangkat Padukuhan Demangan.
+          </div>
+        </div>
+      </div>
+
+      <!-- Info tambahan -->
+      <div class="text-center mt-4">
+        <p class="text-muted small mb-0">
+          <i class="fas fa-laptop"></i> Sistem Informasi Padukuhan Demangan – Layanan Verifikasi Digital
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    &copy; 2026 Padukuhan Demangan, Bangunharjo, Sewon, Bantul. Semua hak dilindungi.
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/api.js"></script>
+<script>
+  // ========== HELPER FUNCTIONS ==========
+  function formatTanggal(isoString) {
+    if (!isoString) return '-';
+    const date = new Date(isoString);
+    return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function getJenisSuratLabel(jenis) {
+    const mapping = {
+      'keterangan_domisili': 'Surat Keterangan Domisili',
+      'keterangan_tidak_mampu': 'Surat Keterangan Tidak Mampu',
+      'pengantar_skck': 'Surat Pengantar SKCK',
+      'pengantar_ktp': 'Surat Pengantar KTP',
+      'keterangan_usaha': 'Surat Keterangan Usaha',
+      'keterangan_penghasilan': 'Surat Keterangan Penghasilan'
+    };
+    return mapping[jenis] || jenis || '-';
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+      return c;
+    });
+  }
+
+  // ========== DOM ELEMENTS ==========
+  const nomorInput = document.getElementById('nomorSuratInput');
+  const btnVerif = document.getElementById('btnVerifikasi');
+  const loadingDiv = document.getElementById('loadingVerifikasi');
+  const errorDiv = document.getElementById('errorMessage');
+  const hasilDiv = document.getElementById('hasilVerifikasi');
+  const statusIconDiv = document.getElementById('statusIcon');
+  const verifikasiContent = document.getElementById('verifikasiContent');
+
+  function showError(msg) {
+    errorDiv.style.display = 'flex';
+    errorDiv.querySelector('span').innerHTML = escapeHtml(msg);
+    hasilDiv.style.display = 'none';
+    loadingDiv.style.display = 'none';
+  }
+
+  function hideError() {
+    errorDiv.style.display = 'none';
+  }
+
+  async function verifikasiSurat(nomorSurat) {
+    if (!nomorSurat || nomorSurat.trim() === '') {
+      showError('Harap masukkan nomor surat terlebih dahulu.');
+      return;
+    }
+
+    // Reset tampilan
+    hideError();
+    hasilDiv.style.display = 'none';
+    loadingDiv.style.display = 'block';
+
+    try {
+      const result = await verifySuratByNomor(nomorSurat.trim());
+      loadingDiv.style.display = 'none';
+
+      if (result && result.valid === true) {
+        // Tampilkan sukses
+        statusIconDiv.innerHTML = `
+          <i class="fas fa-check-circle verified-icon"></i>
+          <h3 class="fw-bold text-success mt-2 mb-0">✓ SURAT ASLI / TERDAFTAR</h3>
+          <p class="text-muted">Dokumen ini telah diverifikasi secara digital</p>
+        `;
+
+        // Data pemohon
+        const pemohon = result.pemohon || {};
+        
+        verifikasiContent.innerHTML = `
+          <div class="info-row d-flex flex-wrap justify-content-between align-items-start">
+            <span class="info-label"><i class="fas fa-hashtag me-1 text-success"></i> Nomor Surat :</span>
+            <span class="info-value fw-bold fs-6">${escapeHtml(result.nomor_surat)}</span>
+          </div>
+          <div class="info-row d-flex flex-wrap justify-content-between align-items-start">
+            <span class="info-label"><i class="fas fa-file-alt me-1 text-success"></i> Jenis Surat :</span>
+            <span class="info-value">${escapeHtml(getJenisSuratLabel(result.jenis_surat))}</span>
+          </div>
+          <div class="info-row d-flex flex-wrap justify-content-between align-items-start">
+            <span class="info-label"><i class="fas fa-tag me-1 text-success"></i> Status :</span>
+            <span class="info-value"><span class="badge bg-success status-badge">${escapeHtml(result.status?.toUpperCase() || 'SELESAI')}</span></span>
+          </div>
+          <div class="info-row d-flex flex-wrap justify-content-between align-items-start">
+            <span class="info-label"><i class="fas fa-calendar-alt me-1 text-success"></i> Tanggal Pengajuan :</span>
+            <span class="info-value">${formatTanggal(result.tgl_pengajuan)}</span>
+          </div>
+          <div class="info-row d-flex flex-wrap justify-content-between align-items-start">
+            <span class="info-label"><i class="fas fa-stamp me-1 text-success"></i> Tanggal Diterbitkan :</span>
+            <span class="info-value">${formatTanggal(result.tgl_selesai)}</span>
+          </div>
+          <div class="info-row d-flex flex-wrap justify-content-between align-items-start">
+            <span class="info-label"><i class="fas fa-user me-1 text-success"></i> Nama Pemohon :</span>
+            <span class="info-value fw-semibold">${escapeHtml(pemohon.nama || '-')}</span>
+          </div>
+          <div class="info-row d-flex flex-wrap justify-content-between align-items-start">
+            <span class="info-label"><i class="fas fa-id-card me-1 text-success"></i> NIK Pemohon :</span>
+            <span class="info-value">${escapeHtml(pemohon.nik || '-')}</span>
+          </div>
+          <div class="info-row d-flex flex-wrap justify-content-between align-items-start">
+            <span class="info-label"><i class="fas fa-home me-1 text-success"></i> RT Pemohon :</span>
+            <span class="info-value">RT ${escapeHtml(pemohon.rt || '-')}</span>
+          </div>
+          <div class="info-row d-flex flex-wrap justify-content-between align-items-start">
+            <span class="info-label"><i class="fas fa-comment me-1 text-success"></i> Keperluan :</span>
+            <span class="info-value">${escapeHtml(result.keperluan || '-')}</span>
+          </div>
+          <div class="info-row d-flex flex-wrap justify-content-between align-items-start">
+            <span class="info-label"><i class="fas fa-signature me-1 text-success"></i> Ditandatangani Oleh :</span>
+            <span class="info-value">${escapeHtml(result.ditandatangani_oleh || 'Ketua RT')}</span>
+          </div>
+        `;
+        hasilDiv.style.display = 'block';
+      } else {
+        showError('Surat tidak ditemukan atau belum diterbitkan secara resmi.');
+      }
+    } catch (err) {
+      loadingDiv.style.display = 'none';
+      console.error('Verifikasi error:', err);
+      let msg = err.message || 'Terjadi kesalahan saat verifikasi.';
+      if (msg.toLowerCase().includes('tidak ditemukan')) {
+        msg = 'Nomor surat tidak terdaftar dalam sistem. Pastikan nomor yang dimasukkan benar.';
+      } else if (msg.toLowerCase().includes('belum diterbitkan')) {
+        msg = 'Surat ini belum diterbitkan / masih dalam proses. Silakan hubungi perangkat padukuhan.';
+      }
+      showError(msg);
+    }
+  }
+
+  // Event listeners
+  btnVerif.addEventListener('click', () => {
+    verifikasiSurat(nomorInput.value);
+  });
+
+  nomorInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') verifikasiSurat(nomorInput.value);
+  });
+
+  // Jika ada parameter ?nomor=... di URL (dari scan QR)
+  const urlParams = new URLSearchParams(window.location.search);
+  const nomorFromUrl = urlParams.get('nomor');
+  if (nomorFromUrl) {
+    nomorInput.value = nomorFromUrl;
+    verifikasiSurat(nomorFromUrl);
+  }
+
+  // Optional: Auto-focus
+  nomorInput.focus();
+</script>
+</body>
+</html>

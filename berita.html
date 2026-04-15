@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Berita - SIP Demangan</title>
+    <link rel="icon" type="image/webp" href="2.webp">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2ecc71;
+            --primary-dark: #27ae60;
+            --sidebar-bg: #ffffff;
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 80px;
+            --header-height: 70px;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        .app-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.03);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar-collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem 0.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-brand {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-brand:hover {
+            transform: translateY(-2px);
+        }
+
+        .logo-wrapper {
+            width: 48px;
+            height: 48px;
+            background: transparent;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 6px 12px rgba(46, 204, 113, 0.25);
+            transition: all 0.2s;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .logo-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 16px;
+        }
+
+        .sidebar-brand:hover .logo-wrapper {
+            box-shadow: 0 8px 16px rgba(46, 204, 113, 0.4);
+            transform: scale(1.02);
+        }
+
+        .sidebar-brand h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-header p {
+            color: #64748b;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            padding-left: calc(48px + 0.75rem);
+            transition: opacity 0.2s;
+        }
+
+        .sidebar-collapsed .sidebar-brand h3,
+        .sidebar-collapsed .sidebar-header p,
+        .sidebar-collapsed .nav-link span {
+            display: none;
+        }
+
+        .sidebar-collapsed .nav-link i {
+            margin-right: 0;
+        }
+
+        .sidebar-collapsed .nav-link {
+            justify-content: center;
+            padding: 0.75rem 0;
+        }
+
+        .sidebar-collapsed .logo-wrapper {
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+        }
+
+        .sidebar-collapsed .sidebar-brand {
+            gap: 0;
+        }
+
+        #sidebarCollapseBtn {
+            background: transparent;
+            border: none;
+            color: #64748b;
+            transition: transform 0.2s;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .sidebar-collapsed #sidebarCollapseBtn i {
+            transform: rotate(180deg);
+        }
+
+        .nav-menu {
+            padding: 1rem 0.5rem;
+        }
+
+        .nav-item {
+            list-style: none;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            color: #475569;
+            font-weight: 500;
+            border-radius: 30px;
+            transition: all 0.2s;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .nav-link i {
+            width: 24px;
+            font-size: 1.2rem;
+            margin-right: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .nav-link:hover {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+
+        .nav-link:hover i {
+            color: #2ecc71;
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            box-shadow: 0 6px 12px rgba(46, 204, 113, 0.2);
+        }
+
+        .nav-link.active i {
+            color: white;
+        }
+
+        .badge-notif {
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 20px;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.75rem;
+            margin-left: auto;
+        }
+
+        .sidebar-collapsed .badge-notif {
+            display: none;
+        }
+
+        .top-navbar {
+            height: var(--header-height);
+            background: white;
+            box-shadow: var(--shadow);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .user-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .dropdown-menu {
+            border: none;
+            border-radius: 20px;
+            box-shadow: var(--shadow-hover);
+            padding: 0.5rem;
+        }
+
+        .dropdown-item {
+            border-radius: 30px;
+            padding: 0.5rem 1.2rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+
+        .main-content {
+            flex: 1;
+            background: #f8fafc;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        .card {
+            border: none;
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+            padding: 1.2rem 1.5rem;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            box-shadow: 0 6px 16px rgba(46, 204, 113, 0.3);
+            z-index: 1050;
+            font-size: 1.3rem;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 991.98px) {
+            .sidebar {
+                position: fixed;
+                transform: translateX(-100%);
+                height: 100vh;
+                transition: transform 0.3s ease, width 0.3s ease;
+            }
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            .main-content {
+                padding: 1rem;
+            }
+            .sidebar-toggle {
+                display: flex;
+            }
+            .logo-wrapper {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            .sidebar-brand h3 {
+                font-size: 1.2rem;
+            }
+            .sidebar-header p {
+                padding-left: calc(40px + 0.75rem);
+            }
+            .sidebar-collapsed {
+                width: var(--sidebar-width);
+            }
+            .sidebar-collapsed .sidebar-brand h3,
+            .sidebar-collapsed .sidebar-header p,
+            .sidebar-collapsed .nav-link span {
+                display: block;
+            }
+            .sidebar-collapsed .nav-link i {
+                margin-right: 0.75rem;
+            }
+            .sidebar-collapsed .nav-link {
+                justify-content: flex-start;
+                padding: 0.75rem 1rem;
+            }
+        }
+
+        .media-preview {
+            max-width: 100px;
+            max-height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .media-preview-pdf {
+            font-size: 1.8rem;
+            color: #e74c3c;
+        }
+        .media-preview-video {
+            font-size: 1.8rem;
+            color: #3498db;
+        }
+
+        /* Rich Editor Toolbar */
+        .rich-editor-toolbar {
+            border: 1px solid #dee2e6;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            padding: 8px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .rich-editor-toolbar button,
+        .rich-editor-toolbar select,
+        .rich-editor-toolbar input {
+            background: white;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .rich-editor-toolbar button:hover {
+            background: #e9ecef;
+        }
+        .rich-editor-toolbar input[type="color"] {
+            width: 32px;
+            height: 32px;
+            padding: 2px;
+        }
+        .rich-editor-content {
+            border: 1px solid #dee2e6;
+            border-radius: 0 0 8px 8px;
+            min-height: 250px;
+            padding: 12px;
+            background: white;
+            overflow-y: auto;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+        }
+        .rich-editor-content:focus {
+            outline: none;
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        .rich-editor-content h1 { font-size: 2rem; margin-top: 1rem; margin-bottom: 0.75rem; }
+        .rich-editor-content h2 { font-size: 1.75rem; margin-top: 1rem; }
+        .rich-editor-content h3 { font-size: 1.5rem; }
+        .rich-editor-content ul, .rich-editor-content ol { padding-left: 1.5rem; }
+        .rich-editor-content a { color: #2ecc71; text-decoration: underline; }
+    </style>
+</head>
+
+<body>
+<div class="app-wrapper">
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="sidebar-brand">
+                <div class="logo-wrapper"><img src="1.webp" alt="Logo SIP Demangan"></div>
+                <h3>SIP Demangan</h3>
+            </a>
+            <button class="btn btn-link text-dark p-0" id="sidebarCollapseBtn" aria-label="Toggle sidebar">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+        <p>Padukuhan Demangan</p>
+        <ul class="nav-menu" id="sidebarMenu">
+            <li class="nav-item"><a href="dashboard_admin.html" class="nav-link" id="menuDashboard"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+            <li class="nav-item"><a href="warga_admin.html" class="nav-link" id="menuWarga"><i class="fas fa-users"></i> <span>Data Warga</span></a></li>
+            <li class="nav-item"><a href="surat_admin.html" class="nav-link" id="menuSurat"><i class="fas fa-envelope"></i> <span>Surat</span><span class="badge-notif" id="suratNotifBadge" style="display:none;">0</span></a></li>
+            <li class="nav-item"><a href="berita.html" class="nav-link active" id="menuBerita"><i class="fas fa-newspaper"></i> <span>Berita</span></a></li>
+            <li class="nav-item"><a href="peta_sebaran_admin.html" class="nav-link" id="menuPeta"><i class="fas fa-map-marked-alt"></i> <span>Peta Sebaran</span></a></li>
+            <li class="nav-item" id="menuKeluargaItem"><a href="pohon_keluarga.html" class="nav-link" id="menuKeluarga"><i class="fas fa-tree"></i> <span>Pohon Keluarga</span></a></li>
+            <li class="nav-item" id="navUsers"><a href="users.html" class="nav-link" id="menuUsers"><i class="fas fa-user-cog"></i> <span>Kelola Pengguna</span></a></li>
+            <li class="nav-item"><a href="hash_tool.html" class="nav-link" id="menuHash"><i class="fas fa-hashtag"></i> <span>Hash/Unhash SHA256</span></a></li>
+            <li class="nav-item"><a href="verifikasi_pendaftar.html" class="nav-link" id="menuVerifikasi"><i class="fas fa-user-check"></i> <span>Verifikasi Pendaftar</span></a></li>
+        </ul>
+    </div>
+
+    <div class="flex-grow-1">
+        <div class="top-navbar">
+            <div class="user-dropdown">
+                <span id="displayName" class="fw-semibold"></span>
+                <div class="dropdown">
+                    <button class="btn p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="user-avatar"><i class="fas fa-user"></i></div>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="profile.html"><i class="fas fa-id-card me-2"></i> Profil Saya</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+                <h2 class="fw-bold mb-0"><i class="fas fa-newspaper me-2 text-success"></i>Kelola Berita</h2>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#beritaModal" id="btnTambahBerita"><i class="fas fa-plus"></i> Tambah Berita</button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Daftar Berita</div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0 align-middle">
+                            <thead>
+                                <tr><th>Judul</th><th>Isi (Ringkasan)</th><th>Tanggal</th><th>Media</th><th>RT</th><th>Aksi</th></tr>
+                            </thead>
+                            <tbody id="beritaList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+
+<!-- Modal Tambah/Edit Berita -->
+<div class="modal fade" id="beritaModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Tambah Berita</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="beritaForm">
+                    <input type="hidden" id="beritaId">
+                    <div class="mb-3">
+                        <label class="form-label">Judul *</label>
+                        <input type="text" class="form-control" id="judul" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Isi *</label>
+                        <div class="rich-editor-toolbar">
+                            <button type="button" data-command="bold" title="Tebal (Ctrl+B)"><i class="fas fa-bold"></i></button>
+                            <button type="button" data-command="italic" title="Miring (Ctrl+I)"><i class="fas fa-italic"></i></button>
+                            <button type="button" data-command="underline" title="Garis Bawah (Ctrl+U)"><i class="fas fa-underline"></i></button>
+                            <button type="button" data-command="strikeThrough" title="Coret"><i class="fas fa-strikethrough"></i></button>
+                            <span class="mx-1 text-muted">|</span>
+                            
+                            <select id="headingSelect" class="form-select form-select-sm d-inline-block w-auto" style="width: auto;">
+                                <option value="">Normal</option>
+                                <option value="h1">Heading 1</option>
+                                <option value="h2">Heading 2</option>
+                                <option value="h3">Heading 3</option>
+                                <option value="h4">Heading 4</option>
+                                <option value="h5">Heading 5</option>
+                                <option value="h6">Heading 6</option>
+                            </select>
+                            
+                            <select id="fontSizeSelect" class="form-select form-select-sm d-inline-block w-auto">
+                                <option value="1">10px</option>
+                                <option value="2">13px</option>
+                                <option value="3" selected>16px</option>
+                                <option value="4">18px</option>
+                                <option value="5">24px</option>
+                                <option value="6">32px</option>
+                                <option value="7">48px</option>
+                            </select>
+                            <span class="mx-1 text-muted">|</span>
+                            
+                            <input type="color" id="foreColorPicker" class="btn btn-sm border" value="#000000" title="Warna Teks">
+                            <input type="color" id="backColorPicker" class="btn btn-sm border" value="#ffffff" title="Warna Latar">
+                            <span class="mx-1 text-muted">|</span>
+                            
+                            <button type="button" data-command="justifyLeft" title="Rata Kiri"><i class="fas fa-align-left"></i></button>
+                            <button type="button" data-command="justifyCenter" title="Rata Tengah"><i class="fas fa-align-center"></i></button>
+                            <button type="button" data-command="justifyRight" title="Rata Kanan"><i class="fas fa-align-right"></i></button>
+                            <button type="button" data-command="justifyFull" title="Rata Kiri-Kanan"><i class="fas fa-align-justify"></i></button>
+                            <span class="mx-1 text-muted">|</span>
+                            
+                            <button type="button" data-command="insertUnorderedList" title="Bullet List"><i class="fas fa-list-ul"></i></button>
+                            <button type="button" data-command="insertOrderedList" title="Number List"><i class="fas fa-list-ol"></i></button>
+                            <button type="button" data-command="indent" title="Geser Kanan"><i class="fas fa-indent"></i></button>
+                            <button type="button" data-command="outdent" title="Geser Kiri"><i class="fas fa-outdent"></i></button>
+                            <span class="mx-1 text-muted">|</span>
+                            
+                            <button type="button" id="createLinkBtn" title="Buat Link"><i class="fas fa-link"></i></button>
+                            <button type="button" data-command="unlink" title="Hapus Link"><i class="fas fa-unlink"></i></button>
+                            <span class="mx-1 text-muted">|</span>
+                            
+                            <button type="button" data-command="removeFormat" title="Hapus Format"><i class="fas fa-eraser"></i></button>
+                            <button type="button" data-command="undo" title="Undo"><i class="fas fa-undo-alt"></i></button>
+                            <button type="button" data-command="redo" title="Redo"><i class="fas fa-redo-alt"></i></button>
+                        </div>
+                        <div id="isiEditor" class="rich-editor-content" contenteditable="true"></div>
+                    </div>
+
+                    <!-- Pilihan Tipe Media -->
+                    <div class="mb-3">
+                        <label class="form-label">Tipe Media</label>
+                        <select class="form-select" id="mediaTypeSelect">
+                            <option value="image">Gambar</option>
+                            <option value="pdf">PDF</option>
+                            <option value="video">Video (URL)</option>
+                        </select>
+                    </div>
+
+                    <!-- Group Gambar -->
+                    <div id="mediaImageGroup" class="mb-3">
+                        <label class="form-label">Gambar URL (opsional)</label>
+                        <input type="text" class="form-control" id="gambar_url" placeholder="https://...">
+                        <div class="mt-2">
+                            <label class="form-label">Atau upload gambar:</label>
+                            <input type="file" class="form-control" id="gambarFile" accept="image/*">
+                            <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="uploadGambarBtn">Upload</button>
+                        </div>
+                    </div>
+
+                    <!-- Group PDF -->
+                    <div id="mediaPdfGroup" class="mb-3" style="display:none;">
+                        <label class="form-label">Upload PDF</label>
+                        <input type="file" class="form-control" id="pdfFile" accept="application/pdf">
+                        <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="uploadPdfBtn">Upload PDF</button>
+                        <div class="mt-2">
+                            <label class="form-label">Atau URL PDF:</label>
+                            <input type="text" class="form-control" id="pdfUrl" placeholder="https://...">
+                        </div>
+                    </div>
+
+                    <!-- Group Video -->
+                    <div id="mediaVideoGroup" class="mb-3" style="display:none;">
+                        <label class="form-label">URL Video (YouTube, Vimeo, dll)</label>
+                        <input type="text" class="form-control" id="videoUrl" placeholder="https://www.youtube.com/watch?v=...">
+                    </div>
+
+                    <div class="mb-3" id="rtFieldContainer" style="display:none;">
+                        <label class="form-label">RT (kosongkan untuk semua RT)</label>
+                        <select class="form-select" id="rtSelect">
+                            <option value="">Semua RT</option>
+                            <option value="1">RT 1</option><option value="2">RT 2</option><option value="3">RT 3</option>
+                            <option value="4">RT 4</option><option value="5">RT 5</option><option value="6">RT 6</option><option value="7">RT 7</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-success" id="simpanBeritaBtn">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/auth.js"></script>
+<script>
+(function() {
+    // ==================== SIDEBAR ====================
+    const sidebar = document.getElementById('sidebar');
+    const collapseBtn = document.getElementById('sidebarCollapseBtn');
+    const mobileToggle = document.getElementById('sidebarToggle');
+    if (sidebar && collapseBtn) {
+        const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        if (isCollapsed) sidebar.classList.add('sidebar-collapsed');
+        collapseBtn.innerHTML = isCollapsed ? '<i class="fas fa-chevron-right"></i>' : '<i class="fas fa-chevron-left"></i>';
+        collapseBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-collapsed');
+            const nowCollapsed = sidebar.classList.contains('sidebar-collapsed');
+            localStorage.setItem('sidebarCollapsed', nowCollapsed);
+            collapseBtn.innerHTML = nowCollapsed ? '<i class="fas fa-chevron-right"></i>' : '<i class="fas fa-chevron-left"></i>';
+        });
+    }
+    if (mobileToggle) mobileToggle.addEventListener('click', () => sidebar.classList.toggle('show'));
+    document.addEventListener('click', (event) => {
+        if (window.innerWidth <= 991.98 && sidebar && !sidebar.contains(event.target) && mobileToggle && !mobileToggle.contains(event.target) && sidebar.classList.contains('show')) {
+            sidebar.classList.remove('show');
+        }
+    });
+
+    // ==================== AUTH ====================
+    const user = checkAuth();
+    if (!user) return;
+    if (user.role !== 'admin' && user.role !== 'ketua_rt') {
+        window.location.href = 'dashboard_member.html';
+        return;
+    }
+    document.getElementById('displayName').innerText = user.nama || user.email;
+
+    if (user.role !== 'admin') {
+        ['navUsers', 'menuHash'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
+        const menuMap = { menuDashboard: 'dashboard_ketua_rt.html', menuWarga: 'warga_ketua.html', menuSurat: 'surat_ketua.html', menuPeta: 'peta_sebaran_ketua.html', menuKeluarga: 'pohon_keluarga_ketua_rt.html' };
+        for (const [menuId, target] of Object.entries(menuMap)) { const link = document.getElementById(menuId); if(link) link.setAttribute('href', target); }
+        const badge = document.getElementById('suratNotifBadge');
+        if(badge) badge.style.display = 'none';
+    } else {
+        async function updateSuratBadge() {
+            try {
+                const surat = await apiRequest('/surat', 'GET');
+                const count = surat.filter(s => s.status === 'diajukan').length;
+                const badge = document.getElementById('suratNotifBadge');
+                if(badge) { if(count>0) { badge.innerText = count; badge.style.display = 'inline-block'; } else badge.style.display = 'none'; }
+            } catch(e) { console.error(e); }
+        }
+        updateSuratBadge();
+    }
+
+    const currentPage = window.location.pathname.split('/').pop();
+    document.querySelectorAll('.nav-link').forEach(link => { link.classList.remove('active'); if(link.getAttribute('href') === currentPage) link.classList.add('active'); });
+
+    // ==================== RICH TEXT EDITOR ====================
+    const editor = document.getElementById('isiEditor');
+    function exec(cmd, value = null) {
+        document.execCommand(cmd, false, value);
+        editor.focus();
+    }
+
+    document.querySelectorAll('.rich-editor-toolbar button[data-command]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const cmd = btn.getAttribute('data-command');
+            if (cmd === 'undo') exec('undo');
+            else if (cmd === 'redo') exec('redo');
+            else if (cmd === 'removeFormat') exec('removeFormat');
+            else exec(cmd);
+        });
+    });
+
+    const headingSelect = document.getElementById('headingSelect');
+    headingSelect.addEventListener('change', () => {
+        const val = headingSelect.value;
+        if (val) exec('formatBlock', val);
+        else exec('formatBlock', '<p>');
+        headingSelect.value = '';
+    });
+
+    const fontSizeSelect = document.getElementById('fontSizeSelect');
+    fontSizeSelect.addEventListener('change', () => {
+        exec('fontSize', fontSizeSelect.value);
+        fontSizeSelect.value = '3';
+    });
+
+    const foreColorPicker = document.getElementById('foreColorPicker');
+    foreColorPicker.addEventListener('input', () => exec('foreColor', foreColorPicker.value));
+    const backColorPicker = document.getElementById('backColorPicker');
+    backColorPicker.addEventListener('input', () => exec('backColor', backColorPicker.value));
+
+    document.getElementById('createLinkBtn').addEventListener('click', () => {
+        const url = prompt('Masukkan URL:', 'https://');
+        if (url) exec('createLink', url);
+    });
+
+    editor.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+        document.execCommand('insertText', false, text);
+    });
+
+    // ==================== MEDIA TOGGLE ====================
+    const mediaTypeSelect = document.getElementById('mediaTypeSelect');
+    const mediaImageGroup = document.getElementById('mediaImageGroup');
+    const mediaPdfGroup = document.getElementById('mediaPdfGroup');
+    const mediaVideoGroup = document.getElementById('mediaVideoGroup');
+    const gambarUrlInput = document.getElementById('gambar_url');
+    const pdfUrlInput = document.getElementById('pdfUrl');
+    const videoUrlInput = document.getElementById('videoUrl');
+    const gambarFile = document.getElementById('gambarFile');
+    const pdfFile = document.getElementById('pdfFile');
+
+    mediaTypeSelect.addEventListener('change', () => {
+        const type = mediaTypeSelect.value;
+        mediaImageGroup.style.display = type === 'image' ? 'block' : 'none';
+        mediaPdfGroup.style.display = type === 'pdf' ? 'block' : 'none';
+        mediaVideoGroup.style.display = type === 'video' ? 'block' : 'none';
+    });
+
+    async function uploadFileToServer(base64Data, fileName) {
+        return apiRequest('/upload', 'POST', { data: base64Data, filename: fileName, isSurat: false });
+    }
+
+    document.getElementById('uploadGambarBtn').addEventListener('click', async () => {
+        if (!gambarFile.files.length) { alert('Pilih file gambar terlebih dahulu'); return; }
+        const file = gambarFile.files[0];
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const base64 = e.target.result.split(',')[1];
+            try {
+                const result = await uploadFileToServer(base64, file.name);
+                gambarUrlInput.value = result.url;
+                alert('Gambar berhasil diupload');
+            } catch(err) { alert('Upload gagal: ' + err.message); }
+        };
+        reader.readAsDataURL(file);
+    });
+
+    document.getElementById('uploadPdfBtn').addEventListener('click', async () => {
+        if (!pdfFile.files.length) { alert('Pilih file PDF terlebih dahulu'); return; }
+        const file = pdfFile.files[0];
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const base64 = e.target.result.split(',')[1];
+            try {
+                const result = await uploadFileToServer(base64, file.name);
+                pdfUrlInput.value = result.url;
+                alert('PDF berhasil diupload');
+            } catch(err) { alert('Upload gagal: ' + err.message); }
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // ==================== CACHE & DATA ====================
+    const CACHE_KEY = 'berita_data';
+    let beritaData = [];
+    let currentBeritaHash = '';
+    const beritaList = document.getElementById('beritaList');
+    const modal = new bootstrap.Modal(document.getElementById('beritaModal'));
+    const modalTitle = document.getElementById('modalTitle');
+    const beritaId = document.getElementById('beritaId');
+    const judulInput = document.getElementById('judul');
+    const rtSelect = document.getElementById('rtSelect');
+    const rtFieldContainer = document.getElementById('rtFieldContainer');
+    if (user.role === 'admin') rtFieldContainer.style.display = 'block';
+    else rtFieldContainer.style.display = 'none';
+
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    function stripHtml(html) { if(!html) return ''; const div = document.createElement('div'); div.innerHTML = html; return div.textContent || div.innerText || ''; }
+
+    function renderBeritaTable(data) {
+        if (!beritaList) return;
+        if (!data || data.length === 0) { beritaList.innerHTML = '<tr><td colspan="6" class="text-center">Belum ada berita</td></tr>'; return; }
+        beritaList.innerHTML = data.map(berita => {
+            let mediaHtml = '-';
+            const mediaType = berita.media_type || 'image';
+            const mediaUrl = berita.media_url || berita.gambar_url;
+            if (mediaUrl) {
+                if (mediaType === 'image') mediaHtml = `<img src="${mediaUrl}" class="media-preview" onerror="this.style.display='none'">`;
+                else if (mediaType === 'pdf') mediaHtml = `<a href="${mediaUrl}" target="_blank"><i class="fas fa-file-pdf fa-2x media-preview-pdf"></i></a>`;
+                else if (mediaType === 'video') mediaHtml = `<a href="${mediaUrl}" target="_blank"><i class="fas fa-video fa-2x media-preview-video"></i></a>`;
+            }
+            return `<tr>
+                <td><strong>${escapeHtml(berita.judul)}</strong></td>
+                <td>${stripHtml(berita.isi).substring(0, 100)}${berita.isi && berita.isi.length > 100 ? '...' : ''}</td>
+                <td>${new Date(berita.tgl_publikasi).toLocaleDateString()}</td>
+                <td>${mediaHtml}</td>
+                <td>${berita.rt ? `RT ${berita.rt}` : 'Semua RT'}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-warning me-1" onclick="editBerita(${berita.id})"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteBerita(${berita.id})"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    async function fetchFreshBerita() { return apiRequest('/berita', 'GET'); }
+
+    async function refreshBackground() {
+        try {
+            const freshData = await fetchFreshBerita();
+            const freshStr = JSON.stringify(freshData);
+            const cached = sessionStorage.getItem(CACHE_KEY);
+            if (freshStr !== cached) {
+                sessionStorage.setItem(CACHE_KEY, freshStr);
+                if (freshStr !== currentBeritaHash) {
+                    beritaData = freshData;
+                    currentBeritaHash = freshStr;
+                    renderBeritaTable(beritaData);
+                }
+            }
+        } catch(e) { console.error('Background refresh gagal:', e); }
+    }
+
+    async function loadBeritaWithCache() {
+        const cached = sessionStorage.getItem(CACHE_KEY);
+        if (cached) {
+            beritaData = JSON.parse(cached);
+            currentBeritaHash = cached;
+            renderBeritaTable(beritaData);
+        } else { beritaList.innerHTML = '<tr><td colspan="6" class="text-center">Memuat berita...</td></tr>'; }
+        await refreshBackground();
+    }
+
+    window.editBerita = function(id) {
+        const berita = beritaData.find(b => b.id == id);
+        if (!berita) return;
+        beritaId.value = berita.id;
+        judulInput.value = berita.judul;
+        editor.innerHTML = berita.isi || '';
+        const mediaType = berita.media_type || 'image';
+        mediaTypeSelect.value = mediaType;
+        mediaTypeSelect.dispatchEvent(new Event('change'));
+        if (mediaType === 'image') gambarUrlInput.value = berita.media_url || berita.gambar_url || '';
+        else if (mediaType === 'pdf') pdfUrlInput.value = berita.media_url || '';
+        else if (mediaType === 'video') videoUrlInput.value = berita.media_url || '';
+        if (user.role === 'admin') rtSelect.value = berita.rt || '';
+        modalTitle.innerText = 'Edit Berita';
+        modal.show();
+    };
+
+    window.deleteBerita = async function(id) {
+        if (!confirm('Yakin ingin menghapus berita ini?')) return;
+        try {
+            await apiRequest(`/berita/${id}`, 'DELETE');
+            await refreshBackground();
+            alert('Berita berhasil dihapus');
+        } catch(err) { alert('Gagal hapus: ' + err.message); }
+    };
+
+    document.getElementById('simpanBeritaBtn').addEventListener('click', async () => {
+        const id = beritaId.value;
+        const mediaType = mediaTypeSelect.value;
+        let mediaUrl = '';
+        let mediaFileData = null;
+        let mediaFileName = '';
+
+        if (mediaType === 'image') {
+            if (gambarFile.files.length) {
+                const file = gambarFile.files[0];
+                const reader = new FileReader();
+                const base64Promise = new Promise((resolve) => { reader.onload = (e) => resolve(e.target.result.split(',')[1]); reader.readAsDataURL(file); });
+                mediaFileData = await base64Promise;
+                mediaFileName = file.name;
+            } else { mediaUrl = gambarUrlInput.value; }
+        } else if (mediaType === 'pdf') {
+            if (pdfFile.files.length) {
+                const file = pdfFile.files[0];
+                const reader = new FileReader();
+                const base64Promise = new Promise((resolve) => { reader.onload = (e) => resolve(e.target.result.split(',')[1]); reader.readAsDataURL(file); });
+                mediaFileData = await base64Promise;
+                mediaFileName = file.name;
+            } else { mediaUrl = pdfUrlInput.value; }
+        } else if (mediaType === 'video') {
+            mediaUrl = videoUrlInput.value;
+        }
+
+        const payload = {
+            judul: judulInput.value,
+            isi: editor.innerHTML,
+            mediaType: mediaType,
+            mediaUrl: mediaUrl,
+            mediaFileData: mediaFileData,
+            mediaFileName: mediaFileName
+        };
+        if (user.role === 'admin') payload.rt = rtSelect.value;
+
+        try {
+            if (id) await apiRequest(`/berita/${id}`, 'PUT', payload);
+            else await apiRequest('/berita', 'POST', payload);
+            await refreshBackground();
+            modal.hide();
+            // reset form
+            beritaId.value = ''; judulInput.value = ''; editor.innerHTML = '';
+            gambarUrlInput.value = ''; pdfUrlInput.value = ''; videoUrlInput.value = '';
+            gambarFile.value = ''; pdfFile.value = '';
+            mediaTypeSelect.value = 'image';
+            mediaTypeSelect.dispatchEvent(new Event('change'));
+            if (user.role === 'admin') rtSelect.value = '';
+            modalTitle.innerText = 'Tambah Berita';
+        } catch(err) { alert('Gagal simpan: ' + err.message); }
+    });
+
+    document.getElementById('btnTambahBerita').addEventListener('click', () => {
+        beritaId.value = ''; judulInput.value = ''; editor.innerHTML = '';
+        gambarUrlInput.value = ''; pdfUrlInput.value = ''; videoUrlInput.value = '';
+        gambarFile.value = ''; pdfFile.value = '';
+        mediaTypeSelect.value = 'image';
+        mediaTypeSelect.dispatchEvent(new Event('change'));
+        if (user.role === 'admin') rtSelect.value = '';
+        modalTitle.innerText = 'Tambah Berita';
+        modal.show();
+    });
+
+    loadBeritaWithCache();
+    setInterval(() => { if (document.visibilityState === 'visible') refreshBackground(); }, 30000);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshBackground(); });
+
+    document.getElementById('logoutBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+    });
+})();
+</script>
+</body>
+</html>
