@@ -5,7 +5,7 @@
 // knowledge base Sipade, chatbot, upload foto profil, dan pengaturan akses role.
 // ============================================================
 
-const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbymxazwCsPOriwIulPRjFOudxNr4SEuD7OJRc-PyYq7oNsYgCDgH_TEPOF7ZBfV5AohyQ/exec';
+const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbyVRoiEoK6ZI2P-z11r8fUm_cEDePiMahUt8sVJ1skzIUeIWkTRdAgYLkbBb71UelnHnA/exec';
 
 /**
  * Helper: Mendapatkan user yang login dari localStorage atau sessionStorage.
