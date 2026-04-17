@@ -198,13 +198,26 @@
     /* ========== CHATBOT ========== */
     .chatbot-button {
       position: fixed; bottom: 24px; right: 24px; width: 65px; height: 65px; border-radius: 50%;
-      background: linear-gradient(145deg, #5a67d8, #4c51bf); color: white; border: none;
+      background: white;
+      color: white; border: none;
       box-shadow: 0 10px 25px rgba(90, 103, 216, 0.5); cursor: pointer; z-index: 1060;
       transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: 30px;
       animation: pulse-glow 2s infinite;
+      padding: 0;
+      overflow: hidden;
+    }
+    .chatbot-button img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    .chatbot-button:hover img {
+      transform: scale(1.08);
     }
     @keyframes pulse-glow { 0% { box-shadow: 0 0 0 0 rgba(90,103,216,0.6); transform: scale(1); } 70% { box-shadow: 0 0 0 15px rgba(90,103,216,0); transform: scale(1.02); } 100% { box-shadow: 0 0 0 0 rgba(90,103,216,0); transform: scale(1); } }
-    .chatbot-button:hover { transform: scale(1.1) rotate(5deg); background: linear-gradient(145deg, #4c51bf, #3c44a0); }
+    .chatbot-button:hover { transform: scale(1.05); background: white; }
     .chatbot-window {
       position: fixed; bottom: 100px; right: 24px; width: 400px; max-width: calc(100vw - 48px);
       height: 600px; max-height: calc(100vh - 120px); background: white;
@@ -272,6 +285,98 @@
       font-size: 0.95rem;
       line-height: 1.5;
       color: #334155;
+    }
+
+    /* ========== POPUP INSTALL PWA ========== */
+    .pwa-install-popup {
+      position: fixed;
+      bottom: 100px;
+      right: 100px;
+      width: 260px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+      padding: 16px 18px;
+      z-index: 1061;
+      border: 1px solid rgba(90, 103, 216, 0.2);
+      animation: slideInPopup 0.4s ease;
+      transition: opacity 0.3s;
+    }
+    .pwa-install-popup.hidden {
+      display: none;
+    }
+    .pwa-install-popup .popup-arrow {
+      position: absolute;
+      bottom: -10px;
+      right: 20px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      transform: rotate(45deg);
+      border-right: 1px solid rgba(90, 103, 216, 0.2);
+      border-bottom: 1px solid rgba(90, 103, 216, 0.2);
+      box-shadow: 4px 4px 8px rgba(0,0,0,0.05);
+    }
+    .pwa-install-popup .popup-content {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .pwa-install-popup h6 {
+      font-weight: 700;
+      margin: 0;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pwa-install-popup p {
+      font-size: 0.85rem;
+      color: #475569;
+      margin: 0;
+      line-height: 1.4;
+    }
+    .pwa-install-popup .popup-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .pwa-install-popup .btn-install {
+      background: linear-gradient(135deg, #5a67d8, #4c51bf);
+      color: white;
+      border: none;
+      border-radius: 40px;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+    .pwa-install-popup .btn-install:hover {
+      background: #434aa8;
+      transform: scale(0.97);
+    }
+    .pwa-install-popup .btn-close-popup {
+      background: transparent;
+      border: 1px solid #e2e8f0;
+      border-radius: 40px;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      color: #64748b;
+      transition: 0.2s;
+    }
+    .pwa-install-popup .btn-close-popup:hover {
+      background: #f1f5f9;
+    }
+    @keyframes slideInPopup {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @media (max-width: 576px) {
+      .pwa-install-popup {
+        right: 90px;
+        bottom: 90px;
+        width: 220px;
+      }
     }
   </style>
 </head>
@@ -508,8 +613,24 @@
   </div>
 </div>
 
-<!-- CHATBOT SIPADE -->
-<div class="chatbot-button" id="chatbotToggleBtn"><i class="fas fa-robot"></i></div>
+<!-- CHATBOT SIPADE dengan Logo Gambar -->
+<button class="chatbot-button" id="chatbotToggleBtn">
+  <img src="sipade.webp" alt="Sipade AI" onerror="this.onerror=null; this.src='https://placehold.co/65x65?text=Sipade';">
+</button>
+
+<!-- POPUP INSTALL APLIKASI WEB SIPADE -->
+<div class="pwa-install-popup hidden" id="pwaInstallPopup">
+  <div class="popup-arrow"></div>
+  <div class="popup-content">
+    <h6><i class="fas fa-mobile-alt text-primary"></i> Install Sipade</h6>
+    <p>Tambahkan ke layar utama untuk akses lebih cepat dan mudah, seperti aplikasi native.</p>
+    <div class="popup-actions">
+      <button class="btn-install" id="pwaInstallBtn"><i class="fas fa-download me-1"></i> Install</button>
+      <button class="btn-close-popup" id="pwaClosePopupBtn">Nanti</button>
+    </div>
+  </div>
+</div>
+
 <div class="chatbot-window hidden" id="chatbotWindow">
   <div class="chatbot-header"><h6><i class="fas fa-robot me-1"></i> Sipade · Asisten Humanis</h6><i class="fas fa-times" id="chatbotCloseBtn"></i></div>
   <div class="chatbot-messages" id="chatMessages">
@@ -577,7 +698,7 @@
   
   function setActiveNavLink() {
     let currentSection = '';
-    const scrollPos = window.scrollY + 150; // offset untuk navbar fixed
+    const scrollPos = window.scrollY + 150;
     
     for (let i = 0; i < sections.length; i++) {
       const section = document.getElementById(sections[i]);
@@ -591,7 +712,6 @@
       }
     }
     
-    // Jika di hero (di atas fitur) maka tidak ada active atau bisa set ke home? Kita biarkan tidak ada yang active.
     navLinks.forEach(link => {
       link.classList.remove('active');
       const href = link.getAttribute('href');
@@ -614,14 +734,11 @@
         const targetElement = document.getElementById(targetId);
         if (targetElement) {
           targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          // update URL tanpa reload
           history.pushState(null, null, href);
-          // set active langsung
           navLinks.forEach(l => l.classList.remove('active'));
           this.classList.add('active');
         }
       }
-      // untuk link verifikasi_surat.html biarkan default (tidak dicegah)
     });
   });
 
@@ -848,6 +965,71 @@
     if (judul && isi) { await addKnowledge(judul, kategori, isi); document.getElementById('knowledgeTitle').value = ''; document.getElementById('knowledgeContent').value = ''; alert('Data berhasil ditambahkan!'); }
     else alert('Judul dan isi harus diisi.');
   });
+
+  // ========== PWA INSTALL POPUP ==========
+  let deferredPrompt = null;
+  const popup = document.getElementById('pwaInstallPopup');
+  const installBtn = document.getElementById('pwaInstallBtn');
+  const closePopupBtn = document.getElementById('pwaClosePopupBtn');
+
+  // Cek apakah popup pernah ditutup (simpan di sessionStorage agar muncul lagi di sesi baru)
+  const popupDismissed = sessionStorage.getItem('pwaPopupDismissed');
+
+  // Tangkap event beforeinstallprompt
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // Tampilkan popup setelah 3 detik jika belum pernah ditutup di sesi ini
+    if (!popupDismissed) {
+      setTimeout(() => {
+        popup.classList.remove('hidden');
+      }, 3000);
+    }
+  });
+
+  // Fungsi untuk menampilkan popup secara manual (misal jika tidak ada prompt)
+  function showInstallPopupManually() {
+    if (!popupDismissed) {
+      setTimeout(() => {
+        popup.classList.remove('hidden');
+      }, 3000);
+    }
+  }
+
+  // Jika tidak ada beforeinstallprompt, tetap tampilkan popup sebagai panduan manual
+  if (!window.matchMedia('(display-mode: standalone)').matches && !popupDismissed) {
+    // Cek apakah sudah diinstal (standalone)
+    showInstallPopupManually();
+  }
+
+  // Tombol Install
+  installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        console.log('User accepted install');
+      }
+      deferredPrompt = null;
+      popup.classList.add('hidden');
+    } else {
+      // Jika prompt tidak tersedia, beri instruksi manual
+      alert('Untuk menginstal: buka menu browser (⋮) lalu pilih "Tambahkan ke Layar Utama" atau "Install app".');
+      popup.classList.add('hidden');
+    }
+    sessionStorage.setItem('pwaPopupDismissed', 'true');
+  });
+
+  // Tombol tutup
+  closePopupBtn.addEventListener('click', () => {
+    popup.classList.add('hidden');
+    sessionStorage.setItem('pwaPopupDismissed', 'true');
+  });
+
+  // Sembunyikan popup jika aplikasi sudah diinstal (display-mode standalone)
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    popup.classList.add('hidden');
+  }
 
   (async function init() {
     await loadAllPublicData();
