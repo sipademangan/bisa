@@ -23,7 +23,10 @@
       --header-height: 70px;
       --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
       --shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.1);
+      --bottom-nav-height: 70px;
+      --toggle-bottom-offset: 20px;
     }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e293b; min-height: 100vh; }
     .app-wrapper { display: flex; min-height: 100vh; }
@@ -39,367 +42,86 @@
       z-index: 1000;
     }
     .sidebar-collapsed { width: var(--sidebar-collapsed-width); }
-    .sidebar-header {
-      padding: 1.5rem 1rem 0.5rem;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .sidebar-brand {
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    .logo-wrapper {
-      width: 48px;
-      height: 48px;
-      background: transparent;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 6px 12px rgba(46, 204, 113, 0.25);
-      flex-shrink: 0;
-      overflow: hidden;
-    }
+    .sidebar-header { padding: 1.5rem 1rem 0.5rem; border-bottom: 1px solid rgba(0, 0, 0, 0.05); display: flex; align-items: center; justify-content: space-between; }
+    .sidebar-brand { text-decoration: none; color: inherit; display: flex; align-items: center; gap: 0.75rem; }
+    .logo-wrapper { width: 48px; height: 48px; background: transparent; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 12px rgba(46, 204, 113, 0.25); flex-shrink: 0; overflow: hidden; }
     .logo-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
-    .sidebar-brand h3 {
-      font-size: 1.4rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #2ecc71, #27ae60);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .sidebar-header p {
-      color: #64748b;
-      font-size: 0.8rem;
-      margin-top: 0.5rem;
-      padding-left: calc(48px + 0.75rem);
-    }
-    .sidebar-collapsed .sidebar-brand h3,
-    .sidebar-collapsed .sidebar-header p,
-    .sidebar-collapsed .nav-link span { display: none; }
+    .sidebar-brand h3 { font-size: 1.4rem; font-weight: 700; background: linear-gradient(135deg, #2ecc71, #27ae60); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .sidebar-header p { color: #64748b; font-size: 0.8rem; margin-top: 0.5rem; padding-left: calc(48px + 0.75rem); }
+    .sidebar-collapsed .sidebar-brand h3, .sidebar-collapsed .sidebar-header p, .sidebar-collapsed .nav-link span { display: none; }
     .sidebar-collapsed .nav-link i { margin-right: 0; }
     .sidebar-collapsed .nav-link { justify-content: center; padding: 0.75rem 0; }
     #sidebarCollapseBtn { background: transparent; border: none; color: #64748b; cursor: pointer; }
     .nav-menu { padding: 1rem 0.5rem; }
     .nav-item { list-style: none; }
-    .nav-link {
-      display: flex;
-      align-items: center;
-      padding: 0.75rem 1rem;
-      margin: 0.25rem 0;
-      color: #475569;
-      font-weight: 500;
-      border-radius: 30px;
-      text-decoration: none;
-      white-space: nowrap;
-    }
-    .nav-link i {
-      width: 24px;
-      font-size: 1.2rem;
-      margin-right: 0.75rem;
-      color: #94a3b8;
-    }
+    .nav-link { display: flex; align-items: center; padding: 0.75rem 1rem; margin: 0.25rem 0; color: #475569; font-weight: 500; border-radius: 30px; text-decoration: none; white-space: nowrap; }
+    .nav-link i { width: 24px; font-size: 1.2rem; margin-right: 0.75rem; color: #94a3b8; }
     .nav-link:hover { background: rgba(46, 204, 113, 0.1); color: #2ecc71; }
-    .nav-link.active {
-      background: linear-gradient(135deg, #2ecc71, #27ae60);
-      color: white;
-      box-shadow: 0 6px 12px rgba(46, 204, 113, 0.2);
-    }
+    .nav-link.active { background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; box-shadow: 0 6px 12px rgba(46, 204, 113, 0.2); }
     .nav-link.active i { color: white; }
-    .badge-notif {
-      background-color: #e74c3c;
-      color: white;
-      border-radius: 20px;
-      padding: 0.2rem 0.6rem;
-      font-size: 0.75rem;
-      margin-left: auto;
-    }
-    .top-navbar {
-      height: var(--header-height);
-      background: white;
-      box-shadow: var(--shadow);
-      padding: 0 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      position: sticky;
-      top: 0;
-      z-index: 999;
-    }
+    .badge-notif { background-color: #e74c3c; color: white; border-radius: 20px; padding: 0.2rem 0.6rem; font-size: 0.75rem; margin-left: auto; }
+    .top-navbar { height: var(--header-height); background: white; box-shadow: var(--shadow); padding: 0 2rem; display: flex; align-items: center; justify-content: flex-end; position: sticky; top: 0; z-index: 999; }
     .user-dropdown { display: flex; align-items: center; gap: 1rem; }
-    .user-avatar {
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #2ecc71, #27ae60);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-    .dropdown-menu {
-      border: none;
-      border-radius: 20px;
-      box-shadow: var(--shadow-hover);
-      padding: 0.5rem;
-    }
-    .dropdown-item {
-      border-radius: 30px;
-      padding: 0.5rem 1.2rem;
-      font-weight: 500;
-    }
+    .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, #2ecc71, #27ae60); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; cursor: pointer; }
+    .dropdown-menu { border: none; border-radius: 20px; box-shadow: var(--shadow-hover); padding: 0.5rem; }
+    .dropdown-item { border-radius: 30px; padding: 0.5rem 1.2rem; font-weight: 500; }
     .dropdown-item:hover { background: rgba(46, 204, 113, 0.1); color: #2ecc71; }
-    .main-content {
-      flex: 1;
-      background: #f8fafc;
-      padding: 2rem;
-      overflow-x: hidden;
-    }
-    .card {
-      border: none;
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-    }
-    .card-header {
-      background: transparent;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-      font-weight: 600;
-      padding: 1.2rem 1.5rem;
-    }
-    .btn-success {
-      background: linear-gradient(135deg, #2ecc71, #27ae60);
-      border: none;
-      border-radius: 30px;
-      padding: 0.6rem 1.8rem;
-      font-weight: 600;
-      transition: all 0.2s;
-    }
-    .btn-success:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 16px rgba(46, 204, 113, 0.3);
-    }
+    .main-content { flex: 1; background: #f8fafc; padding: 2rem; overflow-x: hidden; }
+    .card { border: none; border-radius: 24px; box-shadow: var(--shadow); }
+    .card-header { background: transparent; border-bottom: 1px solid rgba(0, 0, 0, 0.05); font-weight: 600; padding: 1.2rem 1.5rem; }
+    .btn-success { background: linear-gradient(135deg, #2ecc71, #27ae60); border: none; border-radius: 30px; padding: 0.6rem 1.8rem; font-weight: 600; transition: all 0.2s; }
+    .btn-success:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(46, 204, 113, 0.3); }
     .btn-outline-secondary { border-radius: 30px; }
-    .modal-content {
-      border: none;
-      border-radius: 24px;
-      box-shadow: var(--shadow-hover);
-    }
-    .modal-header {
-      background: linear-gradient(135deg, #2ecc71, #27ae60);
-      color: white;
-      border-radius: 24px 24px 0 0;
-      padding: 1.2rem 1.5rem;
-    }
+    .modal-content { border: none; border-radius: 24px; box-shadow: var(--shadow-hover); }
+    .modal-header { background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; border-radius: 24px 24px 0 0; padding: 1.2rem 1.5rem; }
     .modal-header .btn-close { filter: brightness(0) invert(1); }
-    .form-control, .form-select {
-      border-radius: 16px;
-      padding: 0.75rem 1rem;
-      border: 1px solid #e2e8f0;
-    }
-    .sidebar-toggle {
-      display: none;
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #2ecc71, #27ae60);
-      color: white;
-      border: none;
-      box-shadow: 0 6px 16px rgba(46, 204, 113, 0.3);
-      z-index: 1050;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-    /* BOTTOM NAVIGATION (TELEGRAM STYLE) */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(255, 255, 255, 0.96);
-      backdrop-filter: blur(12px);
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      padding: 8px 12px 12px;
-      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
-      border-top: 1px solid rgba(0, 0, 0, 0.05);
-      z-index: 1040;
-      transition: transform 0.2s ease;
-    }
-    .bottom-nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      background: none;
-      border: none;
-      color: #6c757d;
-      font-size: 12px;
-      font-weight: 500;
-      transition: 0.2s;
-      cursor: pointer;
-      padding: 6px 12px;
-      border-radius: 30px;
-    }
-    .bottom-nav-item i {
-      font-size: 22px;
-      margin-bottom: 2px;
-    }
-    .bottom-nav-item.active {
-      color: #2ecc71;
-      background: rgba(46, 204, 113, 0.12);
-    }
-    .bottom-nav-item .label {
-      font-size: 11px;
-      font-weight: 500;
-    }
+    .form-control, .form-select { border-radius: 16px; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; }
+    .sidebar-toggle { display: none; position: fixed; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; border: none; box-shadow: 0 6px 16px rgba(46, 204, 113, 0.3); z-index: 1050; font-size: 1.3rem; cursor: pointer; align-items: center; justify-content: center; bottom: calc(var(--bottom-nav-height) + var(--toggle-bottom-offset)); }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(12px); display: flex; justify-content: space-around; align-items: center; padding: 8px 12px 12px; box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08); border-top: 1px solid rgba(0, 0, 0, 0.05); z-index: 1040; height: var(--bottom-nav-height); }
+    .bottom-nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; color: #6c757d; font-size: 12px; font-weight: 500; cursor: pointer; padding: 6px 12px; border-radius: 30px; }
+    .bottom-nav-item i { font-size: 22px; margin-bottom: 2px; }
+    .bottom-nav-item.active { color: #2ecc71; background: rgba(46, 204, 113, 0.12); }
+    .bottom-nav-item .label { font-size: 11px; }
     @media (max-width: 991.98px) {
-      .sidebar {
-        position: fixed;
-        transform: translateX(-100%);
-        height: 100vh;
-        transition: transform 0.3s ease;
-      }
+      .sidebar { position: fixed; transform: translateX(-100%); height: 100vh; transition: transform 0.3s ease; }
       .sidebar.show { transform: translateX(0); }
       .main-content { padding: 1rem; padding-bottom: 80px; }
       .sidebar-toggle { display: flex; }
       .bottom-nav { display: flex; }
+      .sidebar-collapsed { width: var(--sidebar-width); }
+      .sidebar-collapsed .sidebar-brand h3, .sidebar-collapsed .sidebar-header p, .sidebar-collapsed .nav-link span { display: block; }
+      .sidebar-collapsed .nav-link i { margin-right: 0.75rem; }
+      .sidebar-collapsed .nav-link { justify-content: flex-start; padding: 0.75rem 1rem; }
     }
-    @media (min-width: 992px) {
-      .bottom-nav { display: none; }
-      body { padding-bottom: 0; }
+    @media (max-width: 576px) {
+      .sidebar-toggle { bottom: calc(var(--bottom-nav-height) + 10px); width: 45px; height: 45px; right: 15px; }
+      .bottom-nav { padding: 6px 10px 10px; height: 65px; }
+      .bottom-nav-item i { font-size: 20px; }
+      .bottom-nav-item .label { font-size: 10px; }
     }
-    .signature-pad {
-      border: 2px dashed #ccc;
-      border-radius: 16px;
-      background: #fff;
-      touch-action: none;
-      width: 100%;
-      height: 180px;
-    }
-    .signature-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-      justify-content: center;
-    }
-    .qr-verif {
-      text-align: center;
-      margin-top: 15px;
-      padding: 10px;
-      background: #f8f9fa;
-      border-radius: 16px;
-    }
-    .preview-surat-wrapper {
-      background: #f0f2f5;
-      padding: 15px;
-      border-radius: 16px;
-      overflow-x: auto;
-    }
-    .nav-tabs .nav-link {
-      color: #475569;
-      font-weight: 500;
-      border: none;
-    }
-    .nav-tabs .nav-link.active {
-      color: #2ecc71;
-      border-bottom: 2px solid #2ecc71;
-      background: transparent;
-    }
+    @media (min-width: 992px) { .bottom-nav { display: none; } .sidebar-toggle { display: none !important; } }
+    .signature-pad { border: 2px dashed #ccc; border-radius: 16px; background: #fff; touch-action: none; width: 100%; height: 180px; }
+    .signature-actions { display: flex; gap: 10px; margin-top: 10px; justify-content: center; }
+    .qr-verif { text-align: center; margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 16px; }
+    .preview-surat-wrapper { background: #f0f2f5; padding: 15px; border-radius: 16px; overflow-x: auto; }
+    .nav-tabs .nav-link { color: #475569; font-weight: 500; border: none; }
+    .nav-tabs .nav-link.active { color: #2ecc71; border-bottom: 2px solid #2ecc71; background: transparent; }
     .btn-refresh { margin-left: 1rem; }
-    .warga-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 8px 0;
-      background: transparent;
-    }
-    .warga-table td {
-      padding: 4px 4px;
-      border: none;
-      vertical-align: top;
-    }
-    .warga-table td.label {
-      font-weight: 600;
-      text-align: left;
-      white-space: nowrap;
-      padding-right: 8px;
-    }
-    .warga-table td.colon {
-      text-align: center;
-      width: 24px;
-      font-weight: 600;
-      padding: 4px 0;
-    }
-    .warga-table td.value {
-      text-align: left;
-      padding-left: 8px;
-    }
-    .surat-pdf {
-      font-family: 'Times New Roman', serif;
-      font-size: 11pt;
-      width: 100%;
-      max-width: 100%;
-      margin: 0 auto !important;
-      background: white;
-      padding: 0.3cm 2cm 1.2cm 2cm !important;
-      box-sizing: border-box;
-      page-break-inside: avoid;
-      break-inside: avoid;
-    }
-    .qr-ttd-wrapper {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-top: 20px;
-      gap: 20px;
-    }
-    .qr-box, .ttd-box {
-      flex: 1;
-      text-align: center;
-      background: white;
-      padding: 10px;
-      border: none;
-    }
-    .qr-box img {
-      display: block;
-      margin: 0 auto;
-      max-width: 100px;
-      width: 100px;
-      height: auto;
-    }
-    .ttd-box img {
-      max-width: 180px;
-      max-height: 80px;
-      background: white;
-      border: none;
-      padding: 0;
-    }
-    @media print {
-      body { margin: 0; padding: 0; }
-      .surat-pdf { margin: 0; padding: 0.3cm 2cm 1.2cm 2cm !important; width: 100%; }
-    }
+    .warga-table { width: 100%; border-collapse: collapse; margin: 8px 0; background: transparent; }
+    .warga-table td { padding: 4px 4px; border: none; vertical-align: top; }
+    .surat-pdf { font-family: 'Times New Roman', serif; font-size: 11pt; width: 100%; max-width: 100%; margin: 0 auto !important; background: white; padding: 0.3cm 2cm 1.2cm 2cm !important; box-sizing: border-box; page-break-inside: avoid; break-inside: avoid; }
+    .qr-ttd-wrapper { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 20px; gap: 20px; }
+    .qr-box, .ttd-box { flex: 1; text-align: center; background: white; padding: 10px; border: none; }
+    .qr-box img { display: block; margin: 0 auto; max-width: 100px; width: 100px; height: auto; }
+    .ttd-box img { max-width: 180px; max-height: 80px; background: white; border: none; padding: 0; }
+    @media print { body { margin: 0; padding: 0; } .surat-pdf { margin: 0; padding: 0.3cm 2cm 1.2cm 2cm !important; width: 100%; } }
   </style>
 </head>
 <body>
 <div class="app-wrapper">
-  <!-- SIDEBAR (DESKTOP) -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <a href="index.html" class="sidebar-brand">
-        <div class="logo-wrapper"><img src="1.webp" alt="Logo"></div>
-        <h3>SIP Demangan</h3>
-      </a>
+      <a href="index.html" class="sidebar-brand"><div class="logo-wrapper"><img src="1.webp" alt="Logo"></div><h3>SIP Demangan</h3></a>
       <button class="btn btn-link text-dark p-0" id="sidebarCollapseBtn"><i class="fas fa-chevron-left"></i></button>
     </div>
     <p>Padukuhan Demangan</p>
@@ -418,23 +140,12 @@
     </ul>
   </div>
 
-  <!-- BOTTOM NAVIGATION (MOBILE) -->
   <div class="bottom-nav" id="bottomNav">
-    <button class="bottom-nav-item" data-url="dashboard_admin.html">
-      <i class="fas fa-tachometer-alt"></i><span class="label">Dashboard</span>
-    </button>
-    <button class="bottom-nav-item" data-url="warga_admin.html">
-      <i class="fas fa-users"></i><span class="label">Warga</span>
-    </button>
-    <button class="bottom-nav-item active" data-url="surat_admin.html">
-      <i class="fas fa-envelope"></i><span class="label">Surat</span>
-    </button>
-    <button class="bottom-nav-item" data-url="berita.html">
-      <i class="fas fa-newspaper"></i><span class="label">Berita</span>
-    </button>
-    <button class="bottom-nav-item" data-url="galeri.html">
-      <i class="fas fa-images"></i><span class="label">Galeri</span>
-    </button>
+    <button class="bottom-nav-item" data-url="dashboard_admin.html"><i class="fas fa-tachometer-alt"></i><span class="label">Dashboard</span></button>
+    <button class="bottom-nav-item" data-url="warga_admin.html"><i class="fas fa-users"></i><span class="label">Warga</span></button>
+    <button class="bottom-nav-item active" data-url="surat_admin.html"><i class="fas fa-envelope"></i><span class="label">Surat</span></button>
+    <button class="bottom-nav-item" data-url="berita.html"><i class="fas fa-newspaper"></i><span class="label">Berita</span></button>
+    <button class="bottom-nav-item" data-url="galeri.html"><i class="fas fa-images"></i><span class="label">Galeri</span></button>
   </div>
 
   <div class="flex-grow-1">
@@ -442,9 +153,7 @@
       <div class="user-dropdown">
         <span id="displayName" class="fw-semibold"></span>
         <div class="dropdown">
-          <button class="btn p-0" data-bs-toggle="dropdown">
-            <div class="user-avatar"><i class="fas fa-user"></i></div>
-          </button>
+          <button class="btn p-0" data-bs-toggle="dropdown"><div class="user-avatar"><i class="fas fa-user"></i></div></button>
           <ul class="dropdown-menu dropdown-menu-end">
             <li><a class="dropdown-item" href="profile.html"><i class="fas fa-id-card me-2"></i> Profil Saya</a></li>
             <li><hr class="dropdown-divider"></li>
@@ -456,10 +165,7 @@
 
     <div class="main-content">
       <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-        <div>
-          <h2 class="fw-bold d-inline-block">Manajemen Surat</h2>
-          <button class="btn btn-sm btn-outline-secondary btn-refresh" id="refreshDataBtn" title="Refresh data"><i class="fas fa-sync-alt"></i> Refresh</button>
-        </div>
+        <div><h2 class="fw-bold d-inline-block">Manajemen Surat</h2><button class="btn btn-sm btn-outline-secondary btn-refresh" id="refreshDataBtn" title="Refresh data"><i class="fas fa-sync-alt"></i> Refresh</button></div>
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalSurat" id="btnTambahSurat"><i class="fas fa-plus me-2"></i>Buat Surat Baru</button>
       </div>
 
@@ -479,90 +185,22 @@
 </div>
 <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
 
-<!-- Modal Tambah/Edit Surat -->
 <div class="modal fade" id="modalSurat" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header"><h5 class="modal-title" id="modalSuratTitle">Tambah Surat</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body">
-        <form id="formSurat">
-          <input type="hidden" id="suratId">
-          <div class="mb-3"><label class="form-label">NIK Pemohon</label><input type="text" class="form-control" id="pengajuId" required></div>
-          <div class="mb-3"><label class="form-label">Jenis Surat</label><select class="form-select" id="jenisSurat" required>
-              <option value="">-- Pilih --</option>
-              <option value="keterangan_domisili">Keterangan Domisili</option>
-              <option value="keterangan_tidak_mampu">Keterangan Tidak Mampu</option>
-              <option value="pengantar_skck">Pengantar SKCK</option>
-              <option value="pengantar_ktp">Surat Pengantar KTP</option>
-            </select></div>
-          <div class="mb-3"><label class="form-label">Keperluan</label><textarea class="form-control" id="keterangan" rows="3" required></textarea></div>
-          <div class="mb-3"><label class="form-label">Status</label><select class="form-select" id="statusSurat">
-              <option value="diajukan">Diajukan</option>
-              <option value="disetujui">Disetujui</option>
-              <option value="selesai">Selesai</option>
-              <option value="ditolak">Ditolak</option>
-            </select></div>
-        </form>
-      </div>
-      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button type="button" class="btn btn-success" id="simpanSuratBtn">Simpan</button></div>
-    </div>
-  </div>
+  <div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="modalSuratTitle">Tambah Surat</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body"><form id="formSurat"><input type="hidden" id="suratId"><div class="mb-3"><label class="form-label">NIK Pemohon</label><input type="text" class="form-control" id="pengajuId" required></div>
+  <div class="mb-3"><label class="form-label">Jenis Surat</label><select class="form-select" id="jenisSurat" required><option value="">-- Pilih --</option><option value="keterangan_domisili">Keterangan Domisili</option><option value="keterangan_tidak_mampu">Keterangan Tidak Mampu</option><option value="pengantar_skck">Pengantar SKCK</option><option value="pengantar_ktp">Surat Pengantar KTP</option></select></div>
+  <div class="mb-3"><label class="form-label">Keperluan</label><textarea class="form-control" id="keterangan" rows="3" required></textarea></div>
+  <div class="mb-3"><label class="form-label">Status</label><select class="form-select" id="statusSurat"><option value="diajukan">Diajukan</option><option value="disetujui">Disetujui</option><option value="selesai">Selesai</option><option value="ditolak">Ditolak</option></select></div></form></div>
+  <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button type="button" class="btn btn-success" id="simpanSuratBtn">Simpan</button></div></div></div>
 </div>
 
-<!-- Modal Pratinjau Surat + Edit Data Warga -->
 <div class="modal fade" id="previewSuratModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-  <div class="modal-dialog modal-xl modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header bg-success text-white"><h5 class="modal-title"><i class="fas fa-file-alt me-2"></i>Pratinjau & Verifikasi Surat</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body">
-        <div class="row g-3">
-          <div class="col-lg-7"><div class="preview-surat-wrapper"><div id="previewSuratContainer"><div class="text-center p-5"><i class="fas fa-spinner fa-spin"></i> Memuat preview...</div></div></div></div>
-          <div class="col-lg-5">
-            <div class="card shadow-sm">
-              <div class="card-header bg-light fw-bold">
-                <ul class="nav nav-tabs card-header-tabs" id="editTab" role="tablist">
-                  <li class="nav-item"><button class="nav-link active" id="edit-surat-tab" data-bs-toggle="tab" data-bs-target="#editSurat" type="button" role="tab">Edit Surat</button></li>
-                  <li class="nav-item"><button class="nav-link" id="edit-warga-tab" data-bs-toggle="tab" data-bs-target="#editWarga" type="button" role="tab">Edit Data Warga</button></li>
-                </ul>
-              </div>
-              <div class="card-body">
-                <div class="tab-content">
-                  <div class="tab-pane fade show active" id="editSurat" role="tabpanel">
-                    <label class="form-label">Jenis Surat</label>
-                    <select id="editJenisSurat" class="form-select mb-2"><option value="keterangan_domisili">Keterangan Domisili</option><option value="keterangan_tidak_mampu">Keterangan Tidak Mampu</option><option value="pengantar_skck">Pengantar SKCK</option><option value="pengantar_ktp">Surat Pengantar KTP</option></select>
-                    <label class="form-label">Keperluan</label><textarea id="editKeperluan" class="form-control mb-2" rows="2"></textarea>
-                    <label class="form-label">Status</label><select id="editStatus" class="form-select mb-3"><option value="diajukan">Diajukan</option><option value="disetujui">Disetujui</option><option value="selesai">Selesai</option><option value="ditolak">Ditolak</option></select>
-                    <button id="saveEditSuratBtn" class="btn btn-success w-100 mb-3"><i class="fas fa-save"></i> Simpan Perubahan Surat</button>
-                    <hr>
-                    <div class="fw-bold mb-2"><i class="fas fa-signature"></i> Tanda Tangan RT (Touchscreen)</div>
-                    <canvas id="signatureCanvas" class="signature-pad" width="400" height="180" style="width:100%; height:180px; background:white;"></canvas>
-                    <div class="signature-actions"><button id="clearSignatureBtn" class="btn btn-outline-secondary btn-sm"><i class="fas fa-eraser"></i> Hapus</button><button id="saveSignatureBtn" class="btn btn-outline-success btn-sm"><i class="fas fa-save"></i> Simpan TTD RT</button></div>
-                    <div class="qr-verif mt-3"><div id="qrContainer"></div><small class="text-muted">QR Code Verifikasi Keaslian Surat</small></div>
-                  </div>
-                  <div class="tab-pane fade" id="editWarga" role="tabpanel">
-                    <form id="formEditWarga">
-                      <input type="hidden" id="editWargaId">
-                      <div class="mb-2"><label class="form-label">Nama Lengkap</label><input type="text" class="form-control" id="editWargaNama" readonly disabled></div>
-                      <div class="mb-2"><label class="form-label">NIK</label><input type="text" class="form-control" id="editWargaNik" readonly disabled></div>
-                      <div class="mb-2"><label class="form-label">Tempat Lahir</label><input type="text" class="form-control" id="editWargaTempatLahir" placeholder="Contoh: Yogyakarta"></div>
-                      <div class="mb-2"><label class="form-label">Tanggal Lahir</label><input type="date" class="form-control" id="editWargaTglLahir"></div>
-                      <div class="mb-2"><label class="form-label">Jenis Kelamin</label><select class="form-select" id="editWargaJenisKelamin"><option value="">-- Pilih --</option><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option></select></div>
-                      <div class="mb-2"><label class="form-label">Status Perkawinan</label><select class="form-select" id="editWargaStatusPerkawinan"><option value="">-- Pilih --</option><option value="Belum Kawin">Belum Kawin</option><option value="Kawin">Kawin</option><option value="Cerai Hidup">Cerai Hidup</option><option value="Cerai Mati">Cerai Mati</option></select></div>
-                      <div class="mb-2"><label class="form-label">Agama</label><select class="form-select" id="editWargaAgama"><option value="">-- Pilih --</option><option value="Islam">Islam</option><option value="Kristen">Kristen</option><option value="Katolik">Katolik</option><option value="Hindu">Hindu</option><option value="Buddha">Buddha</option><option value="Konghucu">Konghucu</option></select></div>
-                      <div class="mb-2"><label class="form-label">Pekerjaan</label><input type="text" class="form-control" id="editWargaPekerjaan"></div>
-                      <div class="mb-2"><label class="form-label">Alamat Lengkap (opsional)</label><textarea class="form-control" id="editWargaAlamat" rows="2" placeholder="Jalan, dusun, dll"></textarea><small class="text-muted">Kosongkan jika ingin menggunakan format "RT xx, Padukuhan Demangan..."</small></div>
-                      <button type="button" id="saveEditWargaBtn" class="btn btn-primary w-100"><i class="fas fa-save"></i> Simpan Data Warga</button>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button><button type="button" class="btn btn-info" id="saveAsImageBtn"><i class="fas fa-camera"></i> Simpan sebagai Gambar</button></div>
-    </div>
-  </div>
+  <div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content"><div class="modal-header bg-success text-white"><h5 class="modal-title"><i class="fas fa-file-alt me-2"></i>Pratinjau & Verifikasi Surat</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body"><div class="row g-3"><div class="col-lg-7"><div class="preview-surat-wrapper"><div id="previewSuratContainer"><div class="text-center p-5"><i class="fas fa-spinner fa-spin"></i> Memuat preview...</div></div></div></div>
+  <div class="col-lg-5"><div class="card shadow-sm"><div class="card-header bg-light fw-bold"><ul class="nav nav-tabs card-header-tabs" id="editTab" role="tablist"><li class="nav-item"><button class="nav-link active" id="edit-surat-tab" data-bs-toggle="tab" data-bs-target="#editSurat" type="button" role="tab">Edit Surat</button></li><li class="nav-item"><button class="nav-link" id="edit-warga-tab" data-bs-toggle="tab" data-bs-target="#editWarga" type="button" role="tab">Edit Data Warga</button></li></ul></div>
+  <div class="card-body"><div class="tab-content"><div class="tab-pane fade show active" id="editSurat" role="tabpanel"><label class="form-label">Jenis Surat</label><select id="editJenisSurat" class="form-select mb-2"><option value="keterangan_domisili">Keterangan Domisili</option><option value="keterangan_tidak_mampu">Keterangan Tidak Mampu</option><option value="pengantar_skck">Pengantar SKCK</option><option value="pengantar_ktp">Surat Pengantar KTP</option></select><label class="form-label">Keperluan</label><textarea id="editKeperluan" class="form-control mb-2" rows="2"></textarea><label class="form-label">Status</label><select id="editStatus" class="form-select mb-3"><option value="diajukan">Diajukan</option><option value="disetujui">Disetujui</option><option value="selesai">Selesai</option><option value="ditolak">Ditolak</option></select><button id="saveEditSuratBtn" class="btn btn-success w-100 mb-3"><i class="fas fa-save"></i> Simpan Perubahan Surat</button><hr><div class="fw-bold mb-2"><i class="fas fa-signature"></i> Tanda Tangan RT (Touchscreen)</div><canvas id="signatureCanvas" class="signature-pad" width="400" height="180" style="width:100%; height:180px; background:white;"></canvas><div class="signature-actions"><button id="clearSignatureBtn" class="btn btn-outline-secondary btn-sm"><i class="fas fa-eraser"></i> Hapus</button><button id="saveSignatureBtn" class="btn btn-outline-success btn-sm"><i class="fas fa-save"></i> Simpan TTD RT</button></div><div class="qr-verif mt-3"><div id="qrContainer"></div><small class="text-muted">QR Code Verifikasi Keaslian Surat</small></div></div>
+  <div class="tab-pane fade" id="editWarga" role="tabpanel"><form id="formEditWarga"><input type="hidden" id="editWargaId"><div class="mb-2"><label class="form-label">Nama Lengkap</label><input type="text" class="form-control" id="editWargaNama" readonly disabled></div><div class="mb-2"><label class="form-label">NIK</label><input type="text" class="form-control" id="editWargaNik" readonly disabled></div><div class="mb-2"><label class="form-label">Tempat Lahir</label><input type="text" class="form-control" id="editWargaTempatLahir" placeholder="Contoh: Yogyakarta"></div><div class="mb-2"><label class="form-label">Tanggal Lahir</label><input type="date" class="form-control" id="editWargaTglLahir"></div><div class="mb-2"><label class="form-label">Jenis Kelamin</label><select class="form-select" id="editWargaJenisKelamin"><option value="">-- Pilih --</option><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option></select></div><div class="mb-2"><label class="form-label">Status Perkawinan</label><select class="form-select" id="editWargaStatusPerkawinan"><option value="">-- Pilih --</option><option value="Belum Kawin">Belum Kawin</option><option value="Kawin">Kawin</option><option value="Cerai Hidup">Cerai Hidup</option><option value="Cerai Mati">Cerai Mati</option></select></div><div class="mb-2"><label class="form-label">Agama</label><select class="form-select" id="editWargaAgama"><option value="">-- Pilih --</option><option value="Islam">Islam</option><option value="Kristen">Kristen</option><option value="Katolik">Katolik</option><option value="Hindu">Hindu</option><option value="Buddha">Buddha</option><option value="Konghucu">Konghucu</option></select></div><div class="mb-2"><label class="form-label">Pekerjaan</label><input type="text" class="form-control" id="editWargaPekerjaan"></div><div class="mb-2"><label class="form-label">Alamat Lengkap (opsional)</label><textarea class="form-control" id="editWargaAlamat" rows="2" placeholder="Jalan, dusun, dll"></textarea><small class="text-muted">Kosongkan jika ingin menggunakan format "RT xx, Padukuhan Demangan..."</small></div><button type="button" id="saveEditWargaBtn" class="btn btn-primary w-100"><i class="fas fa-save"></i> Simpan Data Warga</button></form></div></div></div></div></div></div></div>
+  <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button><button type="button" class="btn btn-info" id="saveAsImageBtn"><i class="fas fa-camera"></i> Simpan sebagai Gambar</button></div></div></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -572,127 +210,42 @@
 <script src="assets/js/api.js"></script>
 <script src="assets/js/auth.js"></script>
 <script>
-  // ======================== HELPER FUNCTIONS (sama seperti asli) ========================
-  function formatDateOnly(timestamp) {
-    const date = timestamp ? new Date(timestamp) : new Date();
-    if (isNaN(date)) return 'Tanggal tidak valid';
-    const days = date.getDate();
-    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-    return `${days} ${months[date.getMonth()]} ${date.getFullYear()}`;
-  }
-  function formatTanggalWithPlace(timestamp) {
-    const date = timestamp ? new Date(timestamp) : new Date();
-    if (isNaN(date)) return 'Bangunharjo, Tanggal tidak valid';
-    const days = date.getDate();
-    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-    return `Bangunharjo, ${days} ${months[date.getMonth()]} ${date.getFullYear()}`;
-  }
+  // ======================== HELPER FUNCTIONS ========================
+  function formatDateOnly(timestamp) { const date = timestamp ? new Date(timestamp) : new Date(); if (isNaN(date)) return 'Tanggal tidak valid'; const days = date.getDate(); const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']; return `${days} ${months[date.getMonth()]} ${date.getFullYear()}`; }
+  function formatTanggalWithPlace(timestamp) { const date = timestamp ? new Date(timestamp) : new Date(); if (isNaN(date)) return 'Bangunharjo, Tanggal tidak valid'; const days = date.getDate(); const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']; return `Bangunharjo, ${days} ${months[date.getMonth()]} ${date.getFullYear()}`; }
   function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
-  function getNamaKetuaRtByRt(rt, daftarKetua) {
-    if (!daftarKetua || daftarKetua.length === 0) return 'Ketua RT (data tidak tersedia)';
-    const rtNum = parseInt(rt, 10);
-    const ketua = daftarKetua.find(k => parseInt(k.rt, 10) === rtNum);
-    return ketua ? ketua.nama : 'Ketua RT';
-  }
+  function getNamaKetuaRtByRt(rt, daftarKetua) { if (!daftarKetua || daftarKetua.length === 0) return 'Ketua RT (data tidak tersedia)'; const rtNum = parseInt(rt, 10); const ketua = daftarKetua.find(k => parseInt(k.rt, 10) === rtNum); return ketua ? ketua.nama : 'Ketua RT'; }
   function formatWargaList(warga) {
     let tempatTglLahir = '-';
-    if (warga.tempat_lahir && warga.tgl_lahir) {
-      const tglF = formatDateOnly(warga.tgl_lahir);
-      tempatTglLahir = `${warga.tempat_lahir}, ${tglF}`;
-    } else if (warga.tempat_lahir) {
-      tempatTglLahir = warga.tempat_lahir;
-    } else if (warga.tgl_lahir) {
-      tempatTglLahir = formatDateOnly(warga.tgl_lahir);
-    }
+    if (warga.tempat_lahir && warga.tgl_lahir) { const tglF = formatDateOnly(warga.tgl_lahir); tempatTglLahir = `${warga.tempat_lahir}, ${tglF}`; }
+    else if (warga.tempat_lahir) { tempatTglLahir = warga.tempat_lahir; }
+    else if (warga.tgl_lahir) { tempatTglLahir = formatDateOnly(warga.tgl_lahir); }
     const alamatLengkap = warga.alamat || `RT ${warga.alamat_rt}, Padukuhan Demangan, Bangunharjo, Sewon, Bantul`;
-    const items = [
-      { label: 'Nama Lengkap', value: warga.nama || '-' },
-      { label: 'Tempat/Tgl Lahir', value: tempatTglLahir },
-      { label: 'Jenis Kelamin', value: warga.jenis_kelamin || '-' },
-      { label: 'Status Perkawinan', value: warga.status_perkawinan || '-' },
-      { label: 'Pekerjaan', value: warga.pekerjaan || '-' },
-      { label: 'Agama', value: warga.agama || '-' },
-      { label: 'No. KTP/NIK', value: warga.nik || '-' },
-      { label: 'Alamat', value: alamatLengkap }
-    ];
+    const items = [{ label: 'Nama Lengkap', value: warga.nama || '-' },{ label: 'Tempat/Tgl Lahir', value: tempatTglLahir },{ label: 'Jenis Kelamin', value: warga.jenis_kelamin || '-' },{ label: 'Status Perkawinan', value: warga.status_perkawinan || '-' },{ label: 'Pekerjaan', value: warga.pekerjaan || '-' },{ label: 'Agama', value: warga.agama || '-' },{ label: 'No. KTP/NIK', value: warga.nik || '-' },{ label: 'Alamat', value: alamatLengkap }];
     let html = `<table class="warga-table" style="width:100%; background:transparent;">`;
-    items.forEach(item => {
-      html += `<tr><td class="label">${escapeHtml(item.label)}</td><td class="colon">:</td><td class="value">${escapeHtml(item.value)}</td></tr>`;
-    });
-    html += `</table>`;
-    return html;
+    items.forEach(item => { html += `<tr><td class="label">${escapeHtml(item.label)}</td><td class="colon">:</td><td class="value">${escapeHtml(item.value)}</td>`; });
+    html += `</td>`; return html;
   }
-
-  function getQRDataURL(text, size = 100) {
-    return new Promise((resolve, reject) => {
-      const tempDiv = document.createElement('div');
-      try {
-        new QRCode(tempDiv, { text: text, width: size, height: size });
-        setTimeout(() => {
-          const canvas = tempDiv.querySelector('canvas');
-          if (canvas) resolve(canvas.toDataURL('image/png'));
-          else reject(new Error('Gagal generate QR Code'));
-        }, 150);
-      } catch (err) { reject(err); }
-    });
-  }
-
+  function getQRDataURL(text, size = 100) { return new Promise((resolve, reject) => { const tempDiv = document.createElement('div'); try { new QRCode(tempDiv, { text: text, width: size, height: size }); setTimeout(() => { const canvas = tempDiv.querySelector('canvas'); if (canvas) resolve(canvas.toDataURL('image/png')); else reject(new Error('Gagal generate QR Code')); }, 150); } catch (err) { reject(err); } }); }
   async function buildPreviewHTMLAsync(surat, warga, ttdRtBase64, daftarKetua) {
-    let rtWarga = (warga.alamat_rt || '03').toString().match(/\d+/);
-    rtWarga = rtWarga ? rtWarga[0] : '03';
+    let rtWarga = (warga.alamat_rt || '03').toString().match(/\d+/); rtWarga = rtWarga ? rtWarga[0] : '03';
     const ketuaRt = getNamaKetuaRtByRt(rtWarga, daftarKetua);
     const nomorSurat = surat.nomor_surat || `SUR-${surat.id || Date.now()}`;
-    const berlakuDate = new Date(); berlakuDate.setMonth(berlakuDate.getMonth() + 1);
-    const berlaku = formatDateOnly(berlakuDate);
+    const berlakuDate = new Date(); berlakuDate.setMonth(berlakuDate.getMonth() + 1); const berlaku = formatDateOnly(berlakuDate);
     const ttdRtImg = (ttdRtBase64 && ttdRtBase64.startsWith('data:image/')) ? `<img src="${ttdRtBase64}" alt="TTD Ketua RT" style="max-width:180px; max-height:80px;">` : '<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>';
     const verifUrl = `./verifikasi_surat.html?nomor=${encodeURIComponent(nomorSurat)}`;
-    let qrDataUrl = null;
-    try { qrDataUrl = await getQRDataURL(verifUrl, 100); } catch(e) { console.warn(e); qrDataUrl = null; }
+    let qrDataUrl = null; try { qrDataUrl = await getQRDataURL(verifUrl, 100); } catch(e) { console.warn(e); qrDataUrl = null; }
     const wargaListHtml = formatWargaList(warga);
     const keperluan = escapeHtml(surat.keterangan || surat.keperluan || '-');
     const tanggalSurat = formatTanggalWithPlace(surat.tgl_pengajuan);
     const qrImageHtml = qrDataUrl ? `<img src="${qrDataUrl}" alt="QR Verifikasi" style="width:100px; height:100px; display:block; margin:0 auto;">` : '<div style="width:100px; height:100px; background:#f0f0f0; display:flex; align-items:center; justify-content:center;">QR Error</div>';
-    return `<div class="surat-pdf" id="suratToCapture">
-      <div style="text-align:center;"><div style="font-size:14pt; font-weight:bold;">RUKUN TETANGGA</div><div style="font-size:13pt;">NGIJO RT ${String(rtWarga).padStart(2, '0')} PADUKUHAN DEMANGAN</div><div>KALURAHAN BANGUNHARJO</div><hr style="border: none; border-top: 2px solid black; margin: 4px 0;"></div>
-      <div style="text-align:center;"><div style="font-size:13pt; font-weight:bold;">SURAT PENGANTAR / KETERANGAN</div><div>Nomor: ${escapeHtml(nomorSurat)}</div></div>
-      <div style="margin:0.5rem 0;">Yang bertanda tangan di bawah ini, Ketua RT ${String(rtWarga).padStart(2, '0')} Ngijo, Padukuhan Demangan, Kalurahan Bangunharjo, menerangkan bahwa:</div>
-      ${wargaListHtml}
-      <div style="margin-top:0.5rem;">Orang tersebut adalah warga kami. Surat ini diberikan untuk keperluan:</div>
-      <div style="margin:0.2rem 0 0.5rem 1rem; font-weight:bold;">${keperluan}</div>
-      <div>Demikian surat ini dibuat untuk dipergunakan sebagaimana mestinya.</div>
-      <div><strong>Berlaku s/d:</strong> ${berlaku}</div>
-      <div class="qr-ttd-wrapper"><div class="qr-box">${qrImageHtml}<div style="font-size: 9px; margin-top: 8px;">Verifikasi Digital</div></div><div class="ttd-box">${tanggalSurat}<br>Hormat Kami,<br>Ketua RT ${String(rtWarga).padStart(2, '0')}<br>${ttdRtImg}<br>( ${escapeHtml(ketuaRt)} )</div></div>
-    </div>`;
+    return `<div class="surat-pdf" id="suratToCapture"><div style="text-align:center;"><div style="font-size:14pt; font-weight:bold;">RUKUN TETANGGA</div><div style="font-size:13pt;">NGIJO RT ${String(rtWarga).padStart(2, '0')} PADUKUHAN DEMANGAN</div><div>KALURAHAN BANGUNHARJO</div><hr style="border: none; border-top: 2px solid black; margin: 4px 0;"></div><div style="text-align:center;"><div style="font-size:13pt; font-weight:bold;">SURAT PENGANTAR / KETERANGAN</div><div>Nomor: ${escapeHtml(nomorSurat)}</div></div><div style="margin:0.5rem 0;">Yang bertanda tangan di bawah ini, Ketua RT ${String(rtWarga).padStart(2, '0')} Ngijo, Padukuhan Demangan, Kalurahan Bangunharjo, menerangkan bahwa:</div>${wargaListHtml}<div style="margin-top:0.5rem;">Orang tersebut adalah warga kami. Surat ini diberikan untuk keperluan:</div><div style="margin:0.2rem 0 0.5rem 1rem; font-weight:bold;">${keperluan}</div><div>Demikian surat ini dibuat untuk dipergunakan sebagaimana mestinya.</div><div><strong>Berlaku s/d:</strong> ${berlaku}</div><div class="qr-ttd-wrapper"><div class="qr-box">${qrImageHtml}<div style="font-size: 9px; margin-top: 8px;">Verifikasi Digital</div></div><div class="ttd-box">${tanggalSurat}<br>Hormat Kami,<br>Ketua RT ${String(rtWarga).padStart(2, '0')}<br>${ttdRtImg}<br>( ${escapeHtml(ketuaRt)} )</div></div></div>`;
   }
 
   // ======================== SIGNATURE PAD ========================
-  function initSignaturePad(canvasId) {
-    const canvas = document.getElementById(canvasId); if (!canvas) return;
-    let drawing = false, lastX = 0, lastY = 0;
-    const ctx = canvas.getContext('2d');
-    ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#000';
-    function getCoords(e) {
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
-      let clientX, clientY;
-      if (e.touches) { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; }
-      else { clientX = e.clientX; clientY = e.clientY; }
-      let x = (clientX - rect.left) * scaleX, y = (clientY - rect.top) * scaleY;
-      x = Math.min(Math.max(0, x), canvas.width); y = Math.min(Math.max(0, y), canvas.height);
-      return { x, y };
-    }
-    function start(e) { drawing = true; const { x, y } = getCoords(e); lastX = x; lastY = y; ctx.beginPath(); ctx.moveTo(x, y); e.preventDefault(); }
-    function draw(e) { if (!drawing) return; const { x, y } = getCoords(e); ctx.lineTo(x, y); ctx.stroke(); lastX = x; lastY = y; e.preventDefault(); }
-    function stop() { drawing = false; ctx.beginPath(); }
-    canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', stop);
-    canvas.addEventListener('touchstart', start); canvas.addEventListener('touchmove', draw); canvas.addEventListener('touchend', stop);
-  }
+  function initSignaturePad(canvasId) { const canvas = document.getElementById(canvasId); if (!canvas) return; let drawing = false, lastX = 0, lastY = 0; const ctx = canvas.getContext('2d'); ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#000'; function getCoords(e) { const rect = canvas.getBoundingClientRect(); const scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height; let clientX, clientY; if (e.touches) { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; } else { clientX = e.clientX; clientY = e.clientY; } let x = (clientX - rect.left) * scaleX, y = (clientY - rect.top) * scaleY; x = Math.min(Math.max(0, x), canvas.width); y = Math.min(Math.max(0, y), canvas.height); return { x, y }; } function start(e) { drawing = true; const { x, y } = getCoords(e); lastX = x; lastY = y; ctx.beginPath(); ctx.moveTo(x, y); e.preventDefault(); } function draw(e) { if (!drawing) return; const { x, y } = getCoords(e); ctx.lineTo(x, y); ctx.stroke(); lastX = x; lastY = y; e.preventDefault(); } function stop() { drawing = false; ctx.beginPath(); } canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', stop); canvas.addEventListener('touchstart', start); canvas.addEventListener('touchmove', draw); canvas.addEventListener('touchend', stop); }
   function clearSignatureCanvas(canvasId) { const canvas = document.getElementById(canvasId); if (!canvas) return; const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height); }
   function getSignatureBase64(canvasId) { return document.getElementById(canvasId).toDataURL('image/png'); }
-
-  // ======================== GLOBAL VARIABLES ========================
-  let allSurat = [], daftarWarga = [], daftarKetuaRt = [], tabelSurat;
-  let currentSurat = null, currentWarga = null;
 
   // ======================== SIDEBAR & BOTTOM NAV ========================
   (function() {
@@ -707,9 +260,7 @@
       });
     }
     if (mobileToggle) mobileToggle.addEventListener('click', () => sidebar.classList.toggle('show'));
-    document.addEventListener('click', (e) => {
-      if (window.innerWidth <= 991.98 && sidebar && !sidebar.contains(e.target) && mobileToggle && !mobileToggle.contains(e.target) && sidebar.classList.contains('show')) sidebar.classList.remove('show');
-    });
+    document.addEventListener('click', (e) => { if (window.innerWidth <= 991.98 && sidebar && !sidebar.contains(e.target) && mobileToggle && !mobileToggle.contains(e.target) && sidebar.classList.contains('show')) sidebar.classList.remove('show'); });
 
     const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
     bottomNavItems.forEach(item => {
@@ -734,9 +285,7 @@
     function renderTable(suratList) {
       if (!tabelSurat) return;
       const data = suratList.map((s, idx) => {
-        let pengajuNama = s.nik_pemohon;
-        const w = daftarWarga.find(w => String(w.nik) === String(s.nik_pemohon));
-        if (w) pengajuNama = w.nama;
+        let pengajuNama = s.nik_pemohon; const w = daftarWarga.find(w => String(w.nik) === String(s.nik_pemohon)); if (w) pengajuNama = w.nama;
         const nomorSurat = s.nomor_surat || `SUR-${String(s.id).padStart(4, '0')}`;
         let fileLink = (s.file_url && s.file_url.trim() !== '') ? `<a href="${s.file_url}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-file-pdf"></i> Lihat</a>` : '-';
         const previewBtn = `<button class="btn btn-sm btn-outline-info previewSuratBtn" data-id="${s.id}" title="Pratinjau & Edit"><i class="fas fa-eye"></i></button>`;
@@ -745,10 +294,7 @@
       });
       tabelSurat.clear().rows.add(data).draw();
     }
-    function initDataTable() {
-      if (tabelSurat) return;
-      tabelSurat = $('#tableSurat').DataTable({ columns: [{ data: 'no' }, { data: 'nomor_surat' }, { data: 'pengaju' }, { data: 'jenis' }, { data: 'tanggal' }, { data: 'statusHtml' }, { data: 'fileUrl' }, { data: 'aksi' }], columnDefs: [{ targets: 5, render: (d, t, r) => r.statusHtml }, { targets: 6, render: (d, t, r) => r.fileUrl }, { targets: 7, render: (d, t, r) => r.aksi }] });
-    }
+    function initDataTable() { if (tabelSurat) return; tabelSurat = $('#tableSurat').DataTable({ columns: [{ data: 'no' }, { data: 'nomor_surat' }, { data: 'pengaju' }, { data: 'jenis' }, { data: 'tanggal' }, { data: 'statusHtml' }, { data: 'fileUrl' }, { data: 'aksi' }], columnDefs: [{ targets: 5, render: (d, t, r) => r.statusHtml }, { targets: 6, render: (d, t, r) => r.fileUrl }, { targets: 7, render: (d, t, r) => r.aksi }] }); }
     async function simpanSurat() {
       const id = document.getElementById('suratId').value;
       const data = { nik_pemohon: document.getElementById('pengajuId').value, jenis_surat: document.getElementById('jenisSurat').value, keterangan: document.getElementById('keterangan').value, status: document.getElementById('statusSurat').value };
@@ -758,22 +304,15 @@
       try { if (id) await updateSurat(id, data); else await createSurat(data); alert('Berhasil'); bootstrap.Modal.getInstance(document.getElementById('modalSurat')).hide(); await loadSurat(); } catch(e) { alert('Gagal: ' + e.message); } finally { btn.disabled = false; btn.innerHTML = orig; }
     }
     async function hapusSurat(id) { if (!confirm('Yakin ingin menghapus surat ini?')) return; try { await deleteSurat(id); alert('Terhapus'); await loadSurat(); } catch(e) { alert(e.message); } }
-    window.editSurat = async function(id) {
-      let surat = allSurat.find(s => s.id == id);
-      if (!surat) surat = await getSuratById(id);
-      document.getElementById('suratId').value = surat.id; document.getElementById('pengajuId').value = surat.nik_pemohon; document.getElementById('jenisSurat').value = surat.jenis_surat; document.getElementById('keterangan').value = surat.keterangan; document.getElementById('statusSurat').value = surat.status; document.getElementById('modalSuratTitle').innerText = 'Edit Surat';
-      new bootstrap.Modal(document.getElementById('modalSurat')).show();
-    };
+    window.editSurat = async function(id) { let surat = allSurat.find(s => s.id == id); if (!surat) surat = await getSuratById(id); document.getElementById('suratId').value = surat.id; document.getElementById('pengajuId').value = surat.nik_pemohon; document.getElementById('jenisSurat').value = surat.jenis_surat; document.getElementById('keterangan').value = surat.keterangan; document.getElementById('statusSurat').value = surat.status; document.getElementById('modalSuratTitle').innerText = 'Edit Surat'; new bootstrap.Modal(document.getElementById('modalSurat')).show(); };
     $('#tableSurat').on('click', '.editSurat', function() { window.editSurat($(this).data('id')); });
     $('#tableSurat').on('click', '.hapusSurat', function() { hapusSurat($(this).data('id')); });
 
-    // PREVIEW SURAT
     $('#tableSurat').on('click', '.previewSuratBtn', async function() {
       const id = $(this).data('id'); const btn = $(this); const originalHtml = btn.html();
       btn.html('<i class="fas fa-spinner fa-spin"></i>').prop('disabled', true);
       try {
-        let surat = allSurat.find(s => s.id == id);
-        if (!surat) { surat = await getSuratById(id); if (surat) allSurat.push(surat); }
+        let surat = allSurat.find(s => s.id == id); if (!surat) { surat = await getSuratById(id); if (surat) allSurat.push(surat); }
         if (!surat) throw new Error('Surat tidak ditemukan');
         let warga = daftarWarga.find(w => String(w.nik) === String(surat.nik_pemohon));
         if (!warga) { const allWarga = await getWarga(); warga = allWarga.find(w => String(w.nik) === String(surat.nik_pemohon)); if (warga) daftarWarga = allWarga; else throw new Error('Data warga tidak ditemukan'); }

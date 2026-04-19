@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Undangan & Sertifikat - SIP Demangan</title>
+  <link rel="icon" type="image/webp" href="2.webp">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <style>
+    :root {
+      --primary: #2ecc71;
+      --sidebar-width: 280px;
+      --shadow: 0 8px 20px rgba(0,0,0,0.06);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      min-height: 100vh;
+    }
+    .app-wrapper { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: var(--sidebar-width);
+      background: #ffffff;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.03);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      transition: width 0.3s;
+      z-index: 1000;
+    }
+    .sidebar-collapsed { width: 80px; }
+    .sidebar-header {
+      padding: 1.5rem 1rem 0.5rem;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sidebar-brand {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .logo-wrapper {
+      width: 48px;
+      height: 48px;
+      background: transparent;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 12px rgba(46,204,113,0.25);
+      overflow: hidden;
+    }
+    .logo-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+    .sidebar-brand h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-menu { padding: 1rem 0.5rem; }
+    .nav-item { list-style: none; }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      margin: 0.25rem 0;
+      color: #475569;
+      font-weight: 500;
+      border-radius: 30px;
+      text-decoration: none;
+    }
+    .nav-link i { width: 24px; margin-right: 0.75rem; color: #94a3b8; }
+    .nav-link:hover, .nav-link.active {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+    }
+    .nav-link.active i { color: white; }
+    .top-navbar {
+      height: 70px;
+      background: white;
+      box-shadow: var(--shadow);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+    .user-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+    }
+    .main-content {
+      flex: 1;
+      background: #f8fafc;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+    .card {
+      border: none;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
+    }
+    .card-header {
+      background: transparent;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      font-weight: 600;
+      padding: 1.2rem 1.5rem;
+    }
+    .btn-sm-action { padding: 5px 12px; border-radius: 30px; }
+    .preview-frame {
+      border: 1px solid #ddd;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      min-height: 400px;
+    }
+    .placeholder-badge {
+      background: #e9ecef;
+      border-radius: 20px;
+      padding: 4px 12px;
+      margin: 2px;
+      display: inline-block;
+      font-size: 12px;
+    }
+    @media (max-width: 992px) {
+      .sidebar { position: fixed; transform: translateX(-100%); }
+      .sidebar.show { transform: translateX(0); }
+      .main-content { padding: 1rem; }
+      .sidebar-toggle {
+        display: flex;
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #2ecc71;
+        color: white;
+        border: none;
+        z-index: 1050;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+    @media (min-width: 992px) { .sidebar-toggle { display: none !important; } }
+    .sidebar-toggle { display: none; }
+  </style>
+</head>
+<body>
+<div class="app-wrapper">
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html" class="sidebar-brand">
+        <div class="logo-wrapper"><img src="1.webp" alt="Logo"></div>
+        <h3>SIP Demangan</h3>
+      </a>
+      <button class="btn btn-link text-dark p-0" id="sidebarCollapseBtn"><i class="fas fa-chevron-left"></i></button>
+    </div>
+    <p class="px-3 text-muted small">Padukuhan Demangan</p>
+    <ul class="nav-menu" id="dynamicMenu"></ul>
+  </div>
+
+  <div class="flex-grow-1">
+    <div class="top-navbar">
+      <div class="d-flex align-items-center gap-3">
+        <span id="displayName" class="fw-semibold"></span>
+        <div class="dropdown">
+          <button class="btn p-0" type="button" data-bs-toggle="dropdown">
+            <div class="user-avatar"><i class="fas fa-user"></i></div>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-id-card me-2"></i> Profil Saya</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h2><i class="fas fa-envelope-open-text text-success me-2"></i> Undangan & Sertifikat</h2>
+        <button class="btn btn-outline-secondary btn-sm" onclick="location.href='dashboard_admin.html'"><i class="fas fa-arrow-left"></i> Kembali</button>
+      </div>
+
+      <ul class="nav nav-tabs mb-4" id="mainTab" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#templatesTab">📄 Kelola Template</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#mailmergeTab">✉️ Mail Merge (CSV)</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#historyTab">📜 Riwayat Generate</button></li>
+      </ul>
+
+      <div class="tab-content">
+        <!-- TAB TEMPLATE -->
+        <div class="tab-pane fade show active" id="templatesTab">
+          <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <span><i class="fas fa-file-alt me-2"></i> Daftar Template</span>
+              <button class="btn btn-sm btn-success" onclick="showTemplateModal()"><i class="fas fa-plus"></i> Template Baru</button>
+            </div>
+            <div class="card-body" id="templateList">Memuat...</div>
+          </div>
+        </div>
+
+        <!-- TAB MAIL MERGE -->
+        <div class="tab-pane fade" id="mailmergeTab">
+          <div class="row">
+            <div class="col-lg-5">
+              <div class="card">
+                <div class="card-header">1. Pilih Template & Ukuran</div>
+                <div class="card-body">
+                  <select id="mergeTemplateSelect" class="form-select mb-3"></select>
+                  <label class="form-label">Ukuran Kertas</label>
+                  <select id="paperSize" class="form-select mb-3">
+                    <option value="a4">A4 (210x297mm)</option>
+                    <option value="a5">A5 (148x210mm)</option>
+                  </select>
+                  <label class="form-label">Format Output</label>
+                  <select id="outputFormat" class="form-select mb-3">
+                    <option value="pdf">PDF</option>
+                    <option value="jpg">JPG (Batch)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">2. Unggah CSV</div>
+                <div class="card-body">
+                  <input type="file" id="csvFile" accept=".csv" class="form-control mb-2">
+                  <button class="btn btn-primary w-100" id="parseCsvBtn"><i class="fas fa-upload"></i> Proses CSV</button>
+                  <div id="csvPreview" class="mt-2 small text-muted"></div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">3. Kirim ke Member</div>
+                <div class="card-body">
+                  <button class="btn btn-info w-100" id="sendBulkEmailBtn"><i class="fas fa-paper-plane"></i> Kirim ke Semua Email (Lampirkan PDF)</button>
+                  <small class="text-muted d-block mt-2">Mengirim ke alamat email yang ada di kolom 'email' CSV</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-7">
+              <div class="card">
+                <div class="card-header">Pratinjau & Generate</div>
+                <div class="card-body">
+                  <div id="previewContainer" class="preview-frame"></div>
+                  <div class="mt-3 d-flex gap-2 flex-wrap">
+                    <button class="btn btn-danger" id="generateBatchBtn"><i class="fas fa-file-pdf"></i> Generate Batch (PDF/JPG)</button>
+                  </div>
+                  <div id="generateStatus" class="mt-2 small text-muted"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB HISTORY -->
+        <div class="tab-pane fade" id="historyTab">
+          <div class="card">
+            <div class="card-header">Riwayat Generate Mail Merge</div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-striped mb-0 align-middle">
+                  <thead><tr><th>Tanggal</th><th>Template</th><th>Jumlah File</th><th>Aksi</th></tr></thead>
+                  <tbody id="historyList"><tr><td colspan="4" class="text-center">Memuat...</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+
+<!-- MODAL TEMPLATE -->
+<div class="modal fade" id="templateModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Tambah / Edit Template</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="templateId">
+        <label class="form-label">Nama Template</label>
+        <input type="text" id="templateName" class="form-control mb-2">
+        <label class="form-label">Jenis (undangan/sertifikat)</label>
+        <input type="text" id="templateType" class="form-control mb-2" value="undangan">
+        <label class="form-label">Konten HTML + CSS (gunakan placeholder seperti {{nama}}, {{tanggal}})</label>
+        <textarea id="templateHtml" rows="10" class="form-control font-monospace"></textarea>
+        <div class="mt-2"><strong>Placeholder tersedia:</strong> <span id="placeholderHint"></span></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="saveTemplateBtn">Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/auth.js"></script>
+<script>
+  (function() {
+    // ========== AUTH & SIDEBAR ==========
+    const user = checkAuth();
+    if (!user) return;
+    if (user.role !== 'admin' && user.role !== 'ketua_rt') {
+      window.location.href = user.role === 'member' ? 'dashboard_member.html' : 'index.html';
+    }
+    document.getElementById('displayName').innerText = user.nama || user.email;
+
+    // Sidebar collapse
+    const sidebar = document.getElementById('sidebar');
+    const collapseBtn = document.getElementById('sidebarCollapseBtn');
+    const mobileToggle = document.getElementById('sidebarToggle');
+    if (collapseBtn) {
+      const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+      if (isCollapsed) sidebar.classList.add('sidebar-collapsed');
+      collapseBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('sidebar-collapsed');
+        localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('sidebar-collapsed'));
+      });
+    }
+    if (mobileToggle) mobileToggle.addEventListener('click', () => sidebar.classList.toggle('show'));
+
+    // Dynamic menu
+    const menuContainer = document.getElementById('dynamicMenu');
+    const menuItems = [
+      { url: 'dashboard_admin.html', icon: 'tachometer-alt', label: 'Dashboard', role: ['admin'] },
+      { url: 'dashboard_ketua_rt.html', icon: 'tachometer-alt', label: 'Dashboard', role: ['ketua_rt'] },
+      { url: 'warga_admin.html', icon: 'users', label: 'Data Warga', role: ['admin'] },
+      { url: 'warga_ketua.html', icon: 'users', label: 'Data Warga', role: ['ketua_rt'] },
+      { url: 'surat_admin.html', icon: 'envelope', label: 'Surat', role: ['admin'] },
+      { url: 'surat_ketua.html', icon: 'envelope', label: 'Surat', role: ['ketua_rt'] },
+      { url: 'berita.html', icon: 'newspaper', label: 'Berita', role: ['admin','ketua_rt'] },
+      { url: 'galeri.html', icon: 'images', label: 'Galeri', role: ['admin','ketua_rt'] },
+      { url: 'invitation_maker.html', icon: 'envelope-open-text', label: 'Undangan & Sertifikat', role: ['admin','ketua_rt'], active: true },
+      { url: 'pawartos_lelayu.html', icon: 'leaf', label: 'Pawartos Lelayu', role: ['admin','ketua_rt'] },
+    ];
+    let menuHtml = '';
+    const currentFile = window.location.pathname.split('/').pop();
+    menuItems.forEach(item => {
+      if (item.role.includes(user.role)) {
+        const activeClass = (item.active || item.url === currentFile) ? 'active' : '';
+        menuHtml += `<li class="nav-item"><a href="${item.url}" class="nav-link ${activeClass}"><i class="fas fa-${item.icon}"></i><span>${item.label}</span></a></li>`;
+      }
+    });
+    if (menuContainer) menuContainer.innerHTML = menuHtml;
+
+    // ========== GLOBAL VARIABLES ==========
+    let templates = [];
+    let currentCsvData = [];  // array of objects dari CSV
+    let currentTemplate = null;
+
+    // ========== LOAD TEMPLATES ==========
+    async function loadTemplates() {
+      try {
+        templates = await apiRequest('/templates', 'GET');
+        renderTemplateList();
+        const select = document.getElementById('mergeTemplateSelect');
+        select.innerHTML = '<option value="">-- Pilih Template --</option>' + 
+          templates.map(t => `<option value="${t.id}">${escapeHtml(t.name)} (${t.type})</option>`).join('');
+        if (templates.length > 0) {
+          select.value = templates[0].id;
+          select.dispatchEvent(new Event('change'));
+        }
+      } catch(err) {
+        document.getElementById('templateList').innerHTML = '<p class="text-danger">Gagal memuat template</p>';
+      }
+    }
+
+    function renderTemplateList() {
+      const container = document.getElementById('templateList');
+      if (!templates.length) { container.innerHTML = '<p class="text-muted">Belum ada template. Buat baru.</p>'; return; }
+      container.innerHTML = templates.map(t => `
+        <div class="border rounded p-3 mb-2">
+          <div class="d-flex justify-content-between align-items-center">
+            <div><strong>${escapeHtml(t.name)}</strong> <span class="badge bg-secondary">${escapeHtml(t.type)}</span></div>
+            <div>
+              <button class="btn btn-sm btn-outline-primary me-1" onclick="editTemplate('${t.id}')"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="deleteTemplate('${t.id}')"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+          <div class="small text-muted mt-1">Placeholder: ${extractPlaceholders(t.html).map(p => `<code>{{${p}}}</code>`).join(', ')}</div>
+        </div>
+      `).join('');
+    }
+
+    function extractPlaceholders(html) {
+      const matches = html.match(/{{(.*?)}}/g) || [];
+      return [...new Set(matches.map(m => m.slice(2,-2)))];
+    }
+
+    window.editTemplate = (id) => {
+      const t = templates.find(t => t.id === id);
+      if (!t) return;
+      document.getElementById('templateId').value = t.id;
+      document.getElementById('templateName').value = t.name;
+      document.getElementById('templateType').value = t.type;
+      document.getElementById('templateHtml').value = t.html;
+      updatePlaceholderHint(t.html);
+      new bootstrap.Modal(document.getElementById('templateModal')).show();
+    };
+
+    window.deleteTemplate = async (id) => {
+      if (!confirm('Hapus template ini?')) return;
+      await apiRequest(`/templates/${id}`, 'DELETE');
+      loadTemplates();
+    };
+
+    function updatePlaceholderHint(html) {
+      const placeholders = extractPlaceholders(html);
+      document.getElementById('placeholderHint').innerHTML = placeholders.map(p => `<code>{{${p}}}</code>`).join(', ') || '(tidak ada)';
+    }
+
+    document.getElementById('saveTemplateBtn').addEventListener('click', async () => {
+      const id = document.getElementById('templateId').value;
+      const data = {
+        name: document.getElementById('templateName').value,
+        type: document.getElementById('templateType').value,
+        html: document.getElementById('templateHtml').value
+      };
+      if (!data.name || !data.html) return alert('Nama dan konten template harus diisi');
+      if (id) await apiRequest(`/templates/${id}`, 'PUT', data);
+      else await apiRequest('/templates', 'POST', data);
+      bootstrap.Modal.getInstance(document.getElementById('templateModal')).hide();
+      loadTemplates();
+    });
+
+    window.showTemplateModal = () => {
+      document.getElementById('templateId').value = '';
+      document.getElementById('templateName').value = '';
+      document.getElementById('templateType').value = 'undangan';
+      document.getElementById('templateHtml').value = '<div style="font-family: serif; text-align: center;"><h2>Undangan</h2><p>Kepada Yth. {{nama}}</p><p>Acara pada tanggal {{tanggal}}</p><p>Bertempat di Balai Padukuhan</p></div>';
+      updatePlaceholderHint(document.getElementById('templateHtml').value);
+      new bootstrap.Modal(document.getElementById('templateModal')).show();
+    };
+
+    document.getElementById('templateHtml').addEventListener('input', function() {
+      updatePlaceholderHint(this.value);
+    });
+
+    // ========== PREVIEW TEMPLATE ==========
+    document.getElementById('mergeTemplateSelect').addEventListener('change', () => {
+      const tplId = document.getElementById('mergeTemplateSelect').value;
+      currentTemplate = templates.find(t => t.id === tplId);
+      if (!currentTemplate) {
+        document.getElementById('previewContainer').innerHTML = '<p class="text-muted">Pilih template terlebih dahulu</p>';
+        return;
+      }
+      let previewHtml = currentTemplate.html.replace(/{{(.*?)}}/g, (m,p1) => `<span class="placeholder-badge">{{${p1}}}</span>`);
+      document.getElementById('previewContainer').innerHTML = previewHtml;
+    });
+
+    // ========== CSV PROCESSING ==========
+    document.getElementById('parseCsvBtn').addEventListener('click', () => {
+      const file = document.getElementById('csvFile').files[0];
+      if (!file) return alert('Pilih file CSV');
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          currentCsvData = results.data.filter(row => Object.values(row).some(v => v && v.trim() !== ''));
+          document.getElementById('csvPreview').innerHTML = `<span class="badge bg-success">${currentCsvData.length} baris data</span> Contoh kolom: ${Object.keys(currentCsvData[0] || {}).join(', ')}`;
+        },
+        error: (err) => alert('Gagal parse CSV: ' + err.message)
+      });
+    });
+
+    // ========== GENERATE BATCH (PDF/JPG) ==========
+    async function blobToBase64(blob) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    async function generateSingleDocument(row, index, template, paperSize, format) {
+      let htmlContent = template.html;
+      for (let [key, value] of Object.entries(row)) {
+        htmlContent = htmlContent.replace(new RegExp(`{{${key}}}`, 'g'), value || '');
+      }
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = htmlContent;
+      wrapper.style.background = 'white';
+      wrapper.style.padding = '20px';
+      if (format === 'pdf') {
+        const opt = {
+          margin: [0.5, 0.5, 0.5, 0.5],
+          filename: `doc_${Date.now()}_${index}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: 'mm', format: paperSize, orientation: 'portrait' }
+        };
+        const pdfBlob = await html2pdf().set(opt).from(wrapper).outputPdf('blob');
+        return { blob: pdfBlob, ext: 'pdf' };
+      } else { // JPG
+        const canvas = await html2canvas(wrapper, { scale: 3 });
+        const jpgBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
+        return { blob: jpgBlob, ext: 'jpg' };
+      }
+    }
+
+    document.getElementById('generateBatchBtn').addEventListener('click', async () => {
+      const tplId = document.getElementById('mergeTemplateSelect').value;
+      const template = templates.find(t => t.id === tplId);
+      if (!template) return alert('Pilih template');
+      if (!currentCsvData.length) return alert('Unggah CSV terlebih dahulu');
+      const paperSize = document.getElementById('paperSize').value;
+      const format = document.getElementById('outputFormat').value;
+      const statusDiv = document.getElementById('generateStatus');
+      statusDiv.innerHTML = 'Memproses batch... 0%';
+      const results = [];
+      for (let i = 0; i < currentCsvData.length; i++) {
+        statusDiv.innerHTML = `Memproses ${i+1} / ${currentCsvData.length}...`;
+        try {
+          const { blob, ext } = await generateSingleDocument(currentCsvData[i], i, template, paperSize, format);
+          const base64 = await blobToBase64(blob);
+          const base64Data = base64.split(',')[1];
+          const fileName = `batch_${Date.now()}_${i+1}.${ext}`;
+          const uploadResult = await uploadFile(base64Data, fileName, false);
+          results.push({
+            row: currentCsvData[i],
+            fileUrl: uploadResult.url,
+            fileName: fileName
+          });
+        } catch (err) {
+          console.error(err);
+          results.push({ row: currentCsvData[i], error: err.message });
+        }
+      }
+      statusDiv.innerHTML = `✅ Selesai! ${results.filter(r => r.fileUrl).length} berhasil, ${results.filter(r => r.error).length} gagal.`;
+      // Simpan ke history
+      await apiRequest('/mailmerge/generate', 'POST', {
+        templateId: tplId,
+        paperSize: paperSize,
+        data: results.map(r => ({ email: r.row.email, pdfUrl: r.fileUrl }))
+      });
+      alert('Batch selesai. Cek riwayat untuk melihat file yang tersimpan.');
+      loadHistory();
+    });
+
+    // ========== KIRIM EMAIL MASSAL ==========
+    document.getElementById('sendBulkEmailBtn').addEventListener('click', async () => {
+      if (!currentCsvData.length) return alert('Tidak ada data CSV');
+      const emails = currentCsvData.map(row => row.email).filter(e => e && e.includes('@'));
+      if (!emails.length) return alert('Tidak ada kolom email di CSV');
+      if (!confirm(`Kirim undangan/sertifikat ke ${emails.length} email? (Harap generate batch terlebih dahulu dan pastikan file tersedia)`)) return;
+      // Untuk sederhana, kita kirim pesan tanpa lampiran (hanya link). Bisa diperluas dengan mengambil file terbaru dari history.
+      alert('Fitur pengiriman email memerlukan file PDF yang sudah di-generate. Silakan gunakan tombol "Kirim ke Semua Email" dari halaman Pawartos atau implementasi lanjutan. Sementara ini hanya notifikasi.');
+    });
+
+    // ========== LOAD HISTORY ==========
+    async function loadHistory() {
+      try {
+        const history = await apiRequest('/mailmerge/history', 'GET');
+        const tbody = document.getElementById('historyList');
+        if (!history || history.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" class="text-center">Belum ada riwayat</td></tr>';
+          return;
+        }
+        let html = '';
+        for (let h of history) {
+          const date = new Date(h.created_at).toLocaleString('id-ID');
+          let templateName = templates.find(t => t.id === h.templateId)?.name || h.templateId;
+          html += `<tr>
+            <td>${date}</td>
+            <td>${escapeHtml(templateName)}</td>
+            <td>${h.data ? JSON.parse(h.data || '[]').length : 0}</td>
+            <td><button class="btn btn-sm btn-outline-info" onclick="alert('Detail: ${h.id}')">Detail</button></td>
+          </tr>`;
+        }
+        tbody.innerHTML = html;
+      } catch(err) {
+        console.error(err);
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]));
+    }
+
+    // ========== INIT ==========
+    loadTemplates();
+    loadHistory();
+
+    document.getElementById('logoutBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.removeItem('user');
+      window.location.href = 'index.html';
+    });
+  })();
+</script>
+</body>
+</html>

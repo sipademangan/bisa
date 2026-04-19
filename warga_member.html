@@ -3,17 +3,14 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Data Warga - SIP Demangan (Member)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Data Warga - SIP Demangan (Warga)</title>
   <link rel="icon" type="image/webp" href="2.webp">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700&display=swap"
-    rel="stylesheet">
-  <!-- Leaflet CSS & JS -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    /* ========== GAYA SAMA SEPERTI DASHBOARD KETUA ========== */
     :root {
       --primary: #2ecc71;
       --primary-dark: #27ae60;
@@ -23,26 +20,13 @@
       --header-height: 70px;
       --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
       --shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.1);
+      --bottom-nav-height: 70px;
+      --toggle-bottom-offset: 20px;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #f8fafc;
-      color: #1e293b;
-      min-height: 100vh;
-    }
-
-    .app-wrapper {
-      display: flex;
-      min-height: 100vh;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e293b; min-height: 100vh; }
+    .app-wrapper { display: flex; min-height: 100vh; }
     .sidebar {
       width: var(--sidebar-width);
       background: var(--sidebar-bg);
@@ -54,428 +38,115 @@
       transition: width 0.3s ease;
       z-index: 1000;
     }
-
-    .sidebar-collapsed {
-      width: var(--sidebar-collapsed-width);
+    .sidebar-collapsed { width: var(--sidebar-collapsed-width); }
+    .sidebar-header { padding: 1.5rem 1rem 0.5rem; border-bottom: 1px solid rgba(0, 0, 0, 0.05); display: flex; align-items: center; justify-content: space-between; }
+    .sidebar-brand { text-decoration: none; color: inherit; display: flex; align-items: center; gap: 0.75rem; transition: all 0.2s ease; }
+    .logo-wrapper { width: 48px; height: 48px; background: transparent; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 12px rgba(46, 204, 113, 0.25); flex-shrink: 0; overflow: hidden; }
+    .logo-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
+    .sidebar-brand h3 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0; background: linear-gradient(135deg, #2ecc71, #27ae60); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
+    .sidebar-header p { color: #64748b; font-size: 0.8rem; margin-top: 0.5rem; padding-left: calc(48px + 0.75rem); }
+    .sidebar-collapsed .sidebar-brand h3, .sidebar-collapsed .sidebar-header p, .sidebar-collapsed .nav-link span { display: none; }
+    .sidebar-collapsed .nav-link i { margin-right: 0; }
+    .sidebar-collapsed .nav-link { justify-content: center; padding: 0.75rem 0; }
+    .sidebar-collapsed .logo-wrapper { width: 40px; height: 40px; }
+    .sidebar-collapsed .sidebar-brand { gap: 0; }
+    #sidebarCollapseBtn { background: transparent; border: none; color: #64748b; transition: transform 0.2s; font-size: 1rem; cursor: pointer; }
+    .sidebar-collapsed #sidebarCollapseBtn i { transform: rotate(180deg); }
+    .nav-menu { padding: 1rem 0.5rem; }
+    .nav-item { list-style: none; }
+    .nav-link { display: flex; align-items: center; padding: 0.75rem 1rem; margin: 0.25rem 0; color: #475569; font-weight: 500; border-radius: 30px; transition: all 0.2s; text-decoration: none; white-space: nowrap; }
+    .nav-link i { width: 24px; font-size: 1.2rem; margin-right: 0.75rem; color: #94a3b8; }
+    .nav-link:hover { background: rgba(46, 204, 113, 0.1); color: #2ecc71; }
+    .nav-link.active { background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; box-shadow: 0 6px 12px rgba(46, 204, 113, 0.2); }
+    .nav-link.active i { color: white; }
+    .top-navbar { height: var(--header-height); background: white; box-shadow: var(--shadow); padding: 0 2rem; display: flex; align-items: center; justify-content: flex-end; position: sticky; top: 0; z-index: 999; }
+    .user-dropdown { display: flex; align-items: center; gap: 1rem; }
+    .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, #2ecc71, #27ae60); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; cursor: pointer; }
+    .dropdown-menu { border: none; border-radius: 20px; box-shadow: var(--shadow-hover); padding: 0.5rem; }
+    .dropdown-item { border-radius: 30px; padding: 0.5rem 1.2rem; font-weight: 500; transition: all 0.2s; }
+    .dropdown-item:hover { background: rgba(46, 204, 113, 0.1); color: #2ecc71; }
+    .dropdown-item i { width: 1.5rem; }
+    .main-content { flex: 1; background: #f8fafc; padding: 2rem; overflow-x: hidden; }
+    .btn-success { background: linear-gradient(135deg, #2ecc71, #27ae60); border: none; border-radius: 30px; padding: 0.5rem 1.5rem; font-weight: 500; transition: all 0.2s; }
+    .btn-success:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(46, 204, 113, 0.3); }
+    .btn-outline-info { border: 2px solid #00c0ef; color: #00c0ef; border-radius: 30px; padding: 0.4rem 1rem; }
+    .btn-outline-info:hover { background: #00c0ef; color: white; }
+    .card { border: none; border-radius: 24px; box-shadow: var(--shadow); }
+    .card-header { background: transparent; border-bottom: 1px solid rgba(0, 0, 0, 0.05); font-weight: 600; padding: 1.2rem 1.5rem; }
+    .table { --bs-table-striped-bg: rgba(0, 0, 0, 0.02); border-radius: 24px; overflow: hidden; }
+    .modal-content { border: none; border-radius: 24px; box-shadow: var(--shadow-hover); }
+    .modal-header { background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; border-radius: 24px 24px 0 0; padding: 1.2rem 1.5rem; }
+    .modal-header .btn-close { filter: brightness(0) invert(1); }
+    .modal-footer { border-top: none; padding: 1.2rem 1.5rem; }
+    .form-control, .form-select { border-radius: 16px; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; }
+    .form-control:focus, .form-select:focus { border-color: #2ecc71; box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25); }
+    #map { height: 250px; width: 100%; border-radius: 20px; border: 1px solid #e2e8f0; margin-top: 8px; }
+    .preview-img { max-height: 100px; border-radius: 12px; margin-top: 0.5rem; }
+    .sidebar-toggle { display: none; position: fixed; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; border: none; box-shadow: 0 6px 16px rgba(46, 204, 113, 0.3); z-index: 1050; font-size: 1.3rem; cursor: pointer; align-items: center; justify-content: center; bottom: calc(var(--bottom-nav-height) + var(--toggle-bottom-offset)); }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(12px); display: flex; justify-content: space-around; align-items: center; padding: 8px 12px 12px; box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08); border-top: 1px solid rgba(0, 0, 0, 0.05); z-index: 1040; height: var(--bottom-nav-height); }
+    .bottom-nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; color: #6c757d; font-size: 12px; font-weight: 500; cursor: pointer; padding: 6px 12px; border-radius: 30px; }
+    .bottom-nav-item i { font-size: 22px; margin-bottom: 2px; }
+    .bottom-nav-item.active { color: #2ecc71; background: rgba(46, 204, 113, 0.12); }
+    .bottom-nav-item .label { font-size: 11px; }
+    @media (max-width: 991.98px) {
+      .sidebar { position: fixed; transform: translateX(-100%); height: 100vh; transition: transform 0.3s ease, width 0.3s ease; }
+      .sidebar.show { transform: translateX(0); }
+      .main-content { padding: 1rem; padding-bottom: 80px; }
+      .sidebar-toggle { display: flex; }
+      .bottom-nav { display: flex; }
+      .logo-wrapper { width: 40px; height: 40px; }
+      .sidebar-brand h3 { font-size: 1.2rem; }
+      .sidebar-header p { padding-left: calc(40px + 0.75rem); }
+      .sidebar-collapsed { width: var(--sidebar-width); }
+      .sidebar-collapsed .sidebar-brand h3, .sidebar-collapsed .sidebar-header p, .sidebar-collapsed .nav-link span { display: block; }
+      .sidebar-collapsed .nav-link i { margin-right: 0.75rem; }
+      .sidebar-collapsed .nav-link { justify-content: flex-start; padding: 0.75rem 1rem; }
     }
-
-    .sidebar-header {
-      padding: 1.5rem 1rem 0.5rem;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    @media (max-width: 576px) {
+      .sidebar-toggle { bottom: calc(var(--bottom-nav-height) + 10px); width: 45px; height: 45px; right: 15px; }
+      .bottom-nav { padding: 6px 10px 10px; height: 65px; }
+      .bottom-nav-item i { font-size: 20px; }
+      .bottom-nav-item .label { font-size: 10px; }
     }
-
-    .sidebar-brand {
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      transition: all 0.2s ease;
-    }
-
-    .logo-wrapper {
-      width: 48px;
-      height: 48px;
-      background: transparent;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 6px 12px rgba(46, 204, 113, 0.25);
-      transition: all 0.2s;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-
-    .logo-wrapper img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 16px;
-    }
-
-    .sidebar-brand:hover .logo-wrapper {
-      box-shadow: 0 8px 16px rgba(46, 204, 113, 0.4);
-      transform: scale(1.02);
-    }
-
-    .sidebar-brand h3 {
-      font-size: 1.4rem;
-      font-weight: 700;
-      margin-bottom: 0;
-      background: linear-gradient(135deg, #2ecc71, #27ae60);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: -0.5px;
-    }
-
-    .sidebar-header p {
-      color: #64748b;
-      font-size: 0.8rem;
-      margin-top: 0.5rem;
-      padding-left: calc(48px + 0.75rem);
-    }
-
-    .sidebar-collapsed .sidebar-brand h3,
-    .sidebar-collapsed .sidebar-header p,
-    .sidebar-collapsed .nav-link span {
-      display: none;
-    }
-
-    .sidebar-collapsed .nav-link i {
-      margin-right: 0;
-    }
-
-    .sidebar-collapsed .nav-link {
-      justify-content: center;
-      padding: 0.75rem 0;
-    }
-
-    .sidebar-collapsed .logo-wrapper {
-      width: 40px;
-      height: 40px;
-    }
-
-    .sidebar-collapsed .sidebar-brand {
-      gap: 0;
-    }
-
-    #sidebarCollapseBtn {
-      background: transparent;
-      border: none;
-      color: #64748b;
-      transition: transform 0.2s;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-
-    .sidebar-collapsed #sidebarCollapseBtn i {
-      transform: rotate(180deg);
-    }
-
-    .nav-menu {
-      padding: 1rem 0.5rem;
-    }
-
-    .nav-item {
-      list-style: none;
-    }
-
-    .nav-link {
-      display: flex;
-      align-items: center;
-      padding: 0.75rem 1rem;
-      margin: 0.25rem 0;
-      color: #475569;
-      font-weight: 500;
-      border-radius: 30px;
-      transition: all 0.2s;
-      text-decoration: none;
-      white-space: nowrap;
-    }
-
-    .nav-link i {
-      width: 24px;
-      font-size: 1.2rem;
-      margin-right: 0.75rem;
-      color: #94a3b8;
-    }
-
-    .nav-link:hover {
-      background: rgba(46, 204, 113, 0.1);
-      color: #2ecc71;
-    }
-
-    .nav-link:hover i {
-      color: #2ecc71;
-    }
-
-    .nav-link.active {
-      background: linear-gradient(135deg, #2ecc71, #27ae60);
-      color: white;
-      box-shadow: 0 6px 12px rgba(46, 204, 113, 0.2);
-    }
-
-    .nav-link.active i {
-      color: white;
-    }
-
-    .top-navbar {
-      height: var(--header-height);
-      background: white;
-      box-shadow: var(--shadow);
-      padding: 0 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      position: sticky;
-      top: 0;
-      z-index: 999;
-    }
-
-    .user-dropdown {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .user-avatar {
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #2ecc71, #27ae60);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-
-    .dropdown-menu {
-      border: none;
-      border-radius: 20px;
-      box-shadow: var(--shadow-hover);
-      padding: 0.5rem;
-    }
-
-    .dropdown-item {
-      border-radius: 30px;
-      padding: 0.5rem 1.2rem;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-
-    .dropdown-item:hover {
-      background: rgba(46, 204, 113, 0.1);
-      color: #2ecc71;
-    }
-
-    .dropdown-item i {
-      width: 1.5rem;
-    }
-
-    .main-content {
-      flex: 1;
-      background: #f8fafc;
-      padding: 2rem;
-      overflow-x: hidden;
-    }
-
-    .btn-success {
-      background: linear-gradient(135deg, #2ecc71, #27ae60);
-      border: none;
-      border-radius: 30px;
-      padding: 0.5rem 1.5rem;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-
-    .btn-success:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 15px rgba(46, 204, 113, 0.3);
-    }
-
-    .btn-outline-info {
-      border: 2px solid #00c0ef;
-      color: #00c0ef;
-      border-radius: 30px;
-      padding: 0.4rem 1rem;
-    }
-
-    .btn-outline-info:hover {
-      background: #00c0ef;
-      color: white;
-    }
-
-    .card {
-      border: none;
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-    }
-
-    .card-header {
-      background: transparent;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-      font-weight: 600;
-      padding: 1.2rem 1.5rem;
-    }
-
-    .table {
-      --bs-table-striped-bg: rgba(0, 0, 0, 0.02);
-      border-radius: 24px;
-      overflow: hidden;
-    }
-
-    .modal-content {
-      border: none;
-      border-radius: 24px;
-      box-shadow: var(--shadow-hover);
-    }
-
-    .modal-header {
-      background: linear-gradient(135deg, #2ecc71, #27ae60);
-      color: white;
-      border-radius: 24px 24px 0 0;
-      padding: 1.2rem 1.5rem;
-    }
-
-    .modal-header .btn-close {
-      filter: brightness(0) invert(1);
-    }
-
-    .modal-footer {
-      border-top: none;
-      padding: 1.2rem 1.5rem;
-    }
-
-    .form-control,
-    .form-select {
-      border-radius: 16px;
-      padding: 0.75rem 1rem;
-      border: 1px solid #e2e8f0;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-      border-color: #2ecc71;
-      box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
-    }
-
-    /* Peta & preview gambar */
-    #map {
-      height: 250px;
-      width: 100%;
-      border-radius: 20px;
-      border: 1px solid #e2e8f0;
-      margin-top: 8px;
-    }
-
-    .preview-img {
-      max-height: 100px;
-      border-radius: 12px;
-      margin-top: 0.5rem;
-    }
-
-    .sidebar-toggle {
-      display: none;
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #2ecc71, #27ae60);
-      color: white;
-      border: none;
-      box-shadow: 0 6px 16px rgba(46, 204, 113, 0.3);
-      z-index: 1050;
-      font-size: 1.3rem;
-      cursor: pointer;
-      align-items: center;
-      justify-content: center;
-    }
-
-    @media (max-width:991.98px) {
-      .sidebar {
-        position: fixed;
-        transform: translateX(-100%);
-        height: 100vh;
-        transition: transform 0.3s ease, width 0.3s ease;
-      }
-
-      .sidebar.show {
-        transform: translateX(0);
-      }
-
-      .main-content {
-        padding: 1rem;
-      }
-
-      .sidebar-toggle {
-        display: flex;
-      }
-
-      .logo-wrapper {
-        width: 40px;
-        height: 40px;
-      }
-
-      .sidebar-brand h3 {
-        font-size: 1.2rem;
-      }
-
-      .sidebar-header p {
-        padding-left: calc(40px + 0.75rem);
-      }
-
-      .sidebar-collapsed {
-        width: var(--sidebar-width);
-      }
-
-      .sidebar-collapsed .sidebar-brand h3,
-      .sidebar-collapsed .sidebar-header p,
-      .sidebar-collapsed .nav-link span {
-        display: block;
-      }
-
-      .sidebar-collapsed .nav-link i {
-        margin-right: 0.75rem;
-      }
-
-      .sidebar-collapsed .nav-link {
-        justify-content: flex-start;
-        padding: 0.75rem 1rem;
-      }
-    }
+    @media (min-width: 992px) { .bottom-nav { display: none; } .sidebar-toggle { display: none !important; } }
   </style>
 </head>
 
 <body>
   <div class="app-wrapper">
-    <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <a href="index.html" class="sidebar-brand">
-          <div class="logo-wrapper"><img src="1.webp" alt="Logo SIP Demangan"></div>
-          <h3>SIP Demangan</h3>
-        </a>
+        <a href="index.html" class="sidebar-brand"><div class="logo-wrapper"><img src="1.webp" alt="Logo SIP Demangan"></div><h3>SIP Demangan</h3></a>
         <button class="btn btn-link text-dark p-0" id="sidebarCollapseBtn"><i class="fas fa-chevron-left"></i></button>
       </div>
       <p>Padukuhan Demangan</p>
       <ul class="nav-menu">
-        <li class="nav-item"><a href="dashboard_member.html" class="nav-link"><i class="fas fa-tachometer-alt"></i>
-            <span>Dashboard</span></a></li>
-        <li class="nav-item"><a href="warga_member.html" class="nav-link active"><i class="fas fa-users"></i> <span>Data
-              Warga</span></a></li>
-        <li class="nav-item"><a href="surat_member.html" class="nav-link"><i class="fas fa-envelope"></i>
-            <span>Surat</span></a></li>
-        <li class="nav-item"><a href="peta_sebaran_member.html" class="nav-link"><i class="fas fa-map-marked-alt"></i>
-            <span>Lokasi Saya</span></a></li>
-        <li class="nav-item" id="menuKeluargaItem"><a href="pohon_keluarga_member.html" class="nav-link"
-            id="menuKeluarga"><i class="fas fa-tree"></i> <span>Pohon Keluarga</span></a></li>
+        <li class="nav-item"><a href="dashboard_member.html" class="nav-link"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+        <li class="nav-item"><a href="warga_member.html" class="nav-link active"><i class="fas fa-users"></i><span>Data Warga</span></a></li>
+        <li class="nav-item"><a href="surat_member.html" class="nav-link"><i class="fas fa-envelope"></i><span>Surat</span></a></li>
+        <li class="nav-item"><a href="peta_sebaran_member.html" class="nav-link"><i class="fas fa-map-marked-alt"></i><span>Lokasi Saya</span></a></li>
+        <li class="nav-item" id="menuKeluargaItem"><a href="pohon_keluarga_member.html" class="nav-link" id="menuKeluarga"><i class="fas fa-tree"></i><span>Pohon Keluarga</span></a></li>
       </ul>
     </div>
 
-    <!-- KONTEN KANAN -->
+    <div class="bottom-nav" id="bottomNav">
+      <button class="bottom-nav-item" data-url="dashboard_member.html"><i class="fas fa-tachometer-alt"></i><span class="label">Dashboard</span></button>
+      <button class="bottom-nav-item active" data-url="warga_member.html"><i class="fas fa-users"></i><span class="label">Warga</span></button>
+      <button class="bottom-nav-item" data-url="surat_member.html"><i class="fas fa-envelope"></i><span class="label">Surat</span></button>
+      <button class="bottom-nav-item" data-url="peta_sebaran_member.html"><i class="fas fa-map-marked-alt"></i><span class="label">Peta</span></button>
+      <button class="bottom-nav-item" data-url="pohon_keluarga_member.html"><i class="fas fa-tree"></i><span class="label">Keluarga</span></button>
+    </div>
+
     <div class="flex-grow-1">
       <div class="top-navbar">
         <div class="user-dropdown">
           <span id="displayName" class="fw-semibold"></span>
           <div class="dropdown">
-            <button class="btn p-0" data-bs-toggle="dropdown">
-              <div class="user-avatar"><i class="fas fa-user"></i></div>
-            </button>
+            <button class="btn p-0" data-bs-toggle="dropdown"><div class="user-avatar"><i class="fas fa-user"></i></div></button>
             <ul class="dropdown-menu dropdown-menu-end">
               <li><a class="dropdown-item" href="profile.html"><i class="fas fa-id-card me-2"></i> Profil Saya</a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
-              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
             </ul>
           </div>
         </div>
@@ -484,29 +155,16 @@
       <div class="main-content">
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
           <h2 class="fw-bold mb-0"><i class="fas fa-users me-2 text-success"></i>Data Warga Saya</h2>
-          <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#wargaModal" id="btnTambahWarga"><i
-              class="fas fa-plus me-1"></i>Tambah / Edit Data Warga</button>
+          <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#wargaModal" id="btnTambahWarga"><i class="fas fa-plus me-1"></i>Tambah / Edit Data Warga</button>
         </div>
-        <p class="text-muted">Data warga yang terhubung dengan akun Anda. Form tambah/edit sekarang memiliki peta, foto,
-          dan data lengkap seperti tampilan Ketua RT.</p>
+        <p class="text-muted">Data warga yang terhubung dengan akun Anda. Form tambah/edit sekarang memiliki peta, foto, dan data lengkap.</p>
         <div class="card">
           <div class="card-header"><i class="fas fa-list me-2"></i>Informasi Warga</div>
           <div class="card-body p-0">
             <div class="table-responsive">
               <table class="table table-striped mb-0">
                 <thead>
-                  <tr>
-                    <th>NIK</th>
-                    <th>Nama</th>
-                    <th>RT</th>
-                    <th>JK</th>
-                    <th>Tgl Lahir</th>
-                    <th>Status Kawin</th>
-                    <th>Status</th>
-                    <th>Ekonomi</th>
-                    <th>Pekerjaan</th>
-                    <th>Aksi</th>
-                  </tr>
+                  <tr><th>NIK</th><th>Nama</th><th>RT</th><th>JK</th><th>Tgl Lahir</th><th>Status Kawin</th><th>Status</th><th>Ekonomi</th><th>Pekerjaan</th><th>Aksi</th></tr>
                 </thead>
                 <tbody id="wargaList"></tbody>
               </table>
@@ -518,144 +176,30 @@
   </div>
   <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
 
-  <!-- MODAL FORM WARGA (LENGKAP SEPERTI KETUA) -->
   <div class="modal fade" id="wargaModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalTitle"><i class="fas fa-user-plus me-2"></i>Tambah Data Warga</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
+        <div class="modal-header"><h5 class="modal-title" id="modalTitle"><i class="fas fa-user-plus me-2"></i>Tambah Data Warga</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
         <div class="modal-body">
           <form id="wargaForm">
             <input type="hidden" id="wargaId">
-            <div class="row">
-              <div class="col-md-6 mb-3"><label class="form-label">NIK *</label><input type="text" class="form-control"
-                  id="nik" required></div>
-              <div class="col-md-6 mb-3"><label class="form-label">NKK</label><input type="text" class="form-control"
-                  id="nkk"></div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3"><label class="form-label">Nama Lengkap *</label><input type="text"
-                  class="form-control" id="nama" required></div>
-              <div class="col-md-6 mb-3"><label class="form-label">No HP</label><input type="text" class="form-control"
-                  id="no_hp"></div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3"><label class="form-label">Email</label><input type="email" class="form-control"
-                  id="email_warga"></div>
-              <div class="col-md-6 mb-3"><label class="form-label">Alamat RT *</label>
-                <select class="form-select" id="alamat_rt" required>
-                  <option value="">Pilih RT</option>
-                  <option value="1">RT 01</option>
-                  <option value="2">RT 02</option>
-                  <option value="3">RT 03</option>
-                  <option value="4">RT 04</option>
-                  <option value="5">RT 05</option>
-                  <option value="6">RT 06</option>
-                  <option value="7">RT 07</option>
-                </select>
-              </div>
-            </div>
-            <!-- KOLOM BARU: Tempat Lahir, Tanggal Lahir, Jenis Kelamin, Status Kawin, Alamat Lengkap -->
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Tempat Lahir</label>
-                <input type="text" class="form-control" id="tempat_lahir">
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Tanggal Lahir</label>
-                <input type="date" class="form-control" id="tanggal_lahir">
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Jenis Kelamin</label>
-                <select class="form-select" id="jenis_kelamin">
-                  <option value="">Pilih</option>
-                  <option value="Laki-laki">Laki-laki</option>
-                  <option value="Perempuan">Perempuan</option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Status Kawin</label>
-                <select class="form-select" id="status_kawin">
-                  <option value="">Pilih</option>
-                  <option value="Belum Kawin">Belum Kawin</option>
-                  <option value="Kawin">Kawin</option>
-                  <option value="Cerai Hidup">Cerai Hidup</option>
-                  <option value="Cerai Mati">Cerai Mati</option>
-                </select>
-              </div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Alamat Lengkap (detail)</label>
-              <textarea class="form-control" id="alamat_lengkap" rows="2"></textarea>
-              <div class="form-text">Isi alamat lengkap seperti Dukuh, Jalan, RT/RW (jika berbeda dengan RT yang
-                dipilih).</div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3"><label class="form-label">Pekerjaan</label><input type="text"
-                  class="form-control" id="pekerjaan"></div>
-              <div class="col-md-6 mb-3"><label class="form-label">Pendidikan Terakhir</label><input type="text"
-                  class="form-control" id="pendidikan"></div>
-            </div>
-            <div class="mb-3"><label class="form-label">Keterangan</label><textarea class="form-control" id="keterangan"
-                rows="2"></textarea></div>
-            <div class="mb-3"><label class="form-label">Status Kependudukan</label><select class="form-select"
-                id="status_kependudukan" required>
-                <option value="">Pilih Status</option>
-                <option value="tetap">Tetap</option>
-                <option value="pindah">Pindah</option>
-                <option value="meninggal">Meninggal</option>
-                <option value="tidak diketahui">Tidak Diketahui</option>
-              </select></div>
-            <div class="mb-3"><label class="form-label">Status Ekonomi</label><select class="form-select"
-                id="status_ekonomi" required>
-                <option value="">Pilih Status Ekonomi</option>
-                <option value="mampu">Mampu</option>
-                <option value="tidak mampu">Tidak Mampu</option>
-              </select></div>
-            <div class="mb-3">
-              <label class="form-label">Status Bantuan</label>
-              <select class="form-select" id="status_bantuan" required>
-                <option value="">Pilih Status Bantuan</option>
-                <option value="Tidak/belum dapat">Tidak/belum dapat</option>
-                <option value="PKH">PKH</option>
-                <option value="BPNT">BPNT</option>
-                <option value="JSLU">JSLU</option>
-                <option value="Bantuan lainnya">Bantuan lainnya</option>
-              </select>
-            </div>
-            <div class="mb-3" id="bantuanLainnyaGroup" style="display: none;">
-              <label class="form-label">Jenis Bantuan Lainnya</label>
-              <input type="text" class="form-control" id="bantuan_lainnya_custom"
-                placeholder="Contoh: Bansos, Sembako, dll.">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Lokasi Rumah (klik peta atau gunakan tombol lokasi saya)</label>
-              <div id="map"></div>
-              <button type="button" class="btn btn-sm btn-primary mt-2" id="getLocationBtn"><i
-                  class="fas fa-location-dot me-1"></i> Lokasi Saya</button>
-              <input type="hidden" id="latitude">
-              <input type="hidden" id="longitude">
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3"><label class="form-label">Foto Diri</label><input type="file"
-                  class="form-control" id="foto_diri" accept="image/*"><img id="preview_foto_diri" src="#" alt=""
-                  class="preview-img" style="display:none;"></div>
-              <div class="col-md-6 mb-3"><label class="form-label">Foto Rumah</label><input type="file"
-                  class="form-control" id="foto_rumah" accept="image/*"><img id="preview_foto_rumah" src="#" alt=""
-                  class="preview-img" style="display:none;"></div>
-            </div>
+            <div class="row"><div class="col-md-6 mb-3"><label class="form-label">NIK *</label><input type="text" class="form-control" id="nik" required></div><div class="col-md-6 mb-3"><label class="form-label">NKK</label><input type="text" class="form-control" id="nkk"></div></div>
+            <div class="row"><div class="col-md-6 mb-3"><label class="form-label">Nama Lengkap *</label><input type="text" class="form-control" id="nama" required></div><div class="col-md-6 mb-3"><label class="form-label">No HP</label><input type="text" class="form-control" id="no_hp"></div></div>
+            <div class="row"><div class="col-md-6 mb-3"><label class="form-label">Email</label><input type="email" class="form-control" id="email_warga"></div><div class="col-md-6 mb-3"><label class="form-label">Alamat RT *</label><select class="form-select" id="alamat_rt" required><option value="">Pilih RT</option><option value="1">RT 01</option><option value="2">RT 02</option><option value="3">RT 03</option><option value="4">RT 04</option><option value="5">RT 05</option><option value="6">RT 06</option><option value="7">RT 07</option></select></div></div>
+            <div class="row"><div class="col-md-6 mb-3"><label class="form-label">Tempat Lahir</label><input type="text" class="form-control" id="tempat_lahir"></div><div class="col-md-6 mb-3"><label class="form-label">Tanggal Lahir</label><input type="date" class="form-control" id="tanggal_lahir"></div></div>
+            <div class="row"><div class="col-md-6 mb-3"><label class="form-label">Jenis Kelamin</label><select class="form-select" id="jenis_kelamin"><option value="">Pilih</option><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option></select></div><div class="col-md-6 mb-3"><label class="form-label">Status Kawin</label><select class="form-select" id="status_kawin"><option value="">Pilih</option><option value="Belum Kawin">Belum Kawin</option><option value="Kawin">Kawin</option><option value="Cerai Hidup">Cerai Hidup</option><option value="Cerai Mati">Cerai Mati</option></select></div></div>
+            <div class="mb-3"><label class="form-label">Alamat Lengkap (detail)</label><textarea class="form-control" id="alamat_lengkap" rows="2"></textarea><div class="form-text">Isi alamat lengkap seperti Dukuh, Jalan, RT/RW (jika berbeda dengan RT yang dipilih).</div></div>
+            <div class="row"><div class="col-md-6 mb-3"><label class="form-label">Pekerjaan</label><input type="text" class="form-control" id="pekerjaan"></div><div class="col-md-6 mb-3"><label class="form-label">Pendidikan Terakhir</label><input type="text" class="form-control" id="pendidikan"></div></div>
+            <div class="mb-3"><label class="form-label">Keterangan</label><textarea class="form-control" id="keterangan" rows="2"></textarea></div>
+            <div class="mb-3"><label class="form-label">Status Kependudukan</label><select class="form-select" id="status_kependudukan" required><option value="">Pilih Status</option><option value="tetap">Tetap</option><option value="pindah">Pindah</option><option value="meninggal">Meninggal</option><option value="tidak diketahui">Tidak Diketahui</option></select></div>
+            <div class="mb-3"><label class="form-label">Status Ekonomi</label><select class="form-select" id="status_ekonomi" required><option value="">Pilih Status Ekonomi</option><option value="mampu">Mampu</option><option value="tidak mampu">Tidak Mampu</option></select></div>
+            <div class="mb-3"><label class="form-label">Status Bantuan</label><select class="form-select" id="status_bantuan" required><option value="">Pilih Status Bantuan</option><option value="Tidak/belum dapat">Tidak/belum dapat</option><option value="PKH">PKH</option><option value="BPNT">BPNT</option><option value="JSLU">JSLU</option><option value="Bantuan lainnya">Bantuan lainnya</option></select></div>
+            <div class="mb-3" id="bantuanLainnyaGroup" style="display: none;"><label class="form-label">Jenis Bantuan Lainnya</label><input type="text" class="form-control" id="bantuan_lainnya_custom" placeholder="Contoh: Bansos, Sembako, dll."></div>
+            <div class="mb-3"><label class="form-label">Lokasi Rumah (klik peta atau gunakan tombol lokasi saya)</label><div id="map"></div><button type="button" class="btn btn-sm btn-primary mt-2" id="getLocationBtn"><i class="fas fa-location-dot me-1"></i> Lokasi Saya</button><input type="hidden" id="latitude"><input type="hidden" id="longitude"></div>
+            <div class="row"><div class="col-md-6 mb-3"><label class="form-label">Foto Diri</label><input type="file" class="form-control" id="foto_diri" accept="image/*"><img id="preview_foto_diri" src="#" alt="" class="preview-img" style="display:none;"></div><div class="col-md-6 mb-3"><label class="form-label">Foto Rumah</label><input type="file" class="form-control" id="foto_rumah" accept="image/*"><img id="preview_foto_rumah" src="#" alt="" class="preview-img" style="display:none;"></div></div>
           </form>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-          <button type="button" class="btn btn-success" id="saveWargaBtn"><span id="saveText">Simpan</span><span
-              id="saveSpinner" style="display:none;"><span class="spinner-border spinner-border-sm"></span>
-              Menyimpan...</span></button>
-        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button><button type="button" class="btn btn-success" id="saveWargaBtn"><span id="saveText">Simpan</span><span id="saveSpinner" style="display:none;"><span class="spinner-border spinner-border-sm"></span> Menyimpan...</span></button></div>
       </div>
     </div>
   </div>
@@ -666,7 +210,6 @@
   <script src="assets/js/auth.js"></script>
   <script>
     (function () {
-      // ==================== SIDEBAR COLLAPSE ====================
       const sidebar = document.getElementById('sidebar');
       const collapseBtn = document.getElementById('sidebarCollapseBtn');
       const mobileToggle = document.getElementById('sidebarToggle');
@@ -685,13 +228,16 @@
         if (window.innerWidth <= 991.98 && sidebar && !sidebar.contains(e.target) && mobileToggle && !mobileToggle.contains(e.target) && sidebar.classList.contains('show'))
           sidebar.classList.remove('show');
       });
-      const currentPage = window.location.pathname.split('/').pop();
-      document.querySelectorAll('.nav-link').forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === currentPage) link.classList.add('active');
+
+      const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+      bottomNavItems.forEach(item => {
+        item.addEventListener('click', (e) => { const url = item.getAttribute('data-url'); if (url) window.location.href = url; });
+        const currentPath = window.location.pathname.split('/').pop();
+        const itemUrl = item.getAttribute('data-url');
+        if (itemUrl === currentPath) item.classList.add('active');
+        else item.classList.remove('active');
       });
 
-      // ==================== AUTENTIKASI MEMBER ====================
       const user = checkAuth();
       if (!user) { window.location.href = 'login.html'; return; }
       if (user.role !== 'member') {
@@ -700,7 +246,7 @@
         return;
       }
       document.getElementById('displayName').innerText = user.nama || user.email;
-      const userRt = user.rt; // asumsi user memiliki field rt
+      const userRt = user.rt;
 
       const WARGA_CACHE_KEY = `warga_member_${user.email}`;
       let allWarga = [];
@@ -710,7 +256,7 @@
         if (!tbody) return;
         tbody.innerHTML = '';
         if (!data.length) {
-          tbody.innerHTML = '<tr><td colspan="10" class="text-center">Belum ada data warga. Silakan tambah data Anda.</td></tr>';
+          tbody.innerHTML = '<td><td colspan="10" class="text-center">Belum ada data warga. Silakan tambah data Anda.</td></tr>';
           return;
         }
         data.forEach(w => {
@@ -726,10 +272,7 @@
             <td><span class="badge ${w.status_kependudukan === 'tetap' ? 'bg-success' : w.status_kependudukan === 'pindah' ? 'bg-warning' : w.status_kependudukan === 'meninggal' ? 'bg-dark' : 'bg-secondary'}">${w.status_kependudukan || 'tidak diketahui'}</span></td>
             <td><span class="badge ${w.status_ekonomi === 'mampu' ? 'bg-primary' : 'bg-danger'}">${w.status_ekonomi || 'tidak diketahui'}</span></td>
             <td>${w.pekerjaan || '-'}</td>
-            <td>
-              <button class="btn btn-sm btn-outline-info editWarga" data-id="${w.id}"><i class="fas fa-edit"></i> Edit</button>
-              <button class="btn btn-sm btn-outline-danger hapusWarga" data-id="${w.id}"><i class="fas fa-trash"></i> Hapus</button>
-            </td>
+            <td><button class="btn btn-sm btn-outline-info editWarga" data-id="${w.id}"><i class="fas fa-edit"></i> Edit</button> <button class="btn btn-sm btn-outline-danger hapusWarga" data-id="${w.id}"><i class="fas fa-trash"></i> Hapus</button></td>
           `;
           tbody.appendChild(tr);
         });
@@ -740,7 +283,6 @@
       async function fetchFreshData() {
         try {
           const all = await apiRequest('/warga', 'GET');
-          // Filter hanya data yang dimiliki oleh member ini
           return all.filter(w => w.created_by === user.email || w.email === user.email);
         } catch (error) {
           console.error('Gagal fetch warga:', error);
@@ -773,7 +315,6 @@
         }
       }
 
-      // ==================== PETA & MARKER ====================
       let map, marker;
       const wargaModalEl = document.getElementById('wargaModal');
       if (wargaModalEl) {
@@ -800,24 +341,19 @@
         } else { alert('Geolocation tidak didukung.'); }
       });
 
-      // ==================== UPLOAD FILE ====================
       async function uploadFile(file) {
         if (!file) return null;
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = async function (e) {
             const base64 = e.target.result.split(',')[1];
-            try {
-              const result = await apiRequest('/upload', 'POST', { filename: file.name, data: base64 });
-              resolve(result.url);
-            } catch (err) { reject(err); }
+            try { const result = await apiRequest('/upload', 'POST', { filename: file.name, data: base64 }); resolve(result.url); } catch (err) { reject(err); }
           };
           reader.onerror = reject;
           reader.readAsDataURL(file);
         });
       }
 
-      // ==================== BANTUAN LAINNYA ====================
       const statusBantuanSelect = document.getElementById('status_bantuan');
       const bantuanLainnyaGroup = document.getElementById('bantuanLainnyaGroup');
       const bantuanLainnyaInput = document.getElementById('bantuan_lainnya_custom');
@@ -832,7 +368,6 @@
       }
       if (statusBantuanSelect) statusBantuanSelect.addEventListener('change', toggleBantuanLainnya);
 
-      // ==================== CRUD DENGAN FORM LENGKAP ====================
       function clearForm() {
         document.getElementById('wargaForm').reset();
         document.getElementById('wargaId').value = '';
@@ -842,7 +377,6 @@
         if (bantuanLainnyaGroup) bantuanLainnyaGroup.style.display = 'none';
         if (bantuanLainnyaInput) bantuanLainnyaInput.value = '';
         document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus me-2"></i>Tambah Data Warga';
-        // Reset field baru
         document.getElementById('tempat_lahir').value = '';
         document.getElementById('tanggal_lahir').value = '';
         document.getElementById('jenis_kelamin').value = '';
@@ -887,13 +421,8 @@
             alert('NIK, Nama, RT, Status Kependudukan, dan Status Ekonomi harus diisi');
             return;
           }
-          // Validasi RT harus sama dengan RT user
-          if (data.alamat_rt != userRt) {
-            alert(`Anda hanya dapat menambahkan warga untuk RT ${userRt}.`);
-            return;
-          }
+          if (data.alamat_rt != userRt) { alert(`Anda hanya dapat menambahkan warga untuk RT ${userRt}.`); return; }
 
-          // Upload foto jika ada
           const fotoDiriFile = document.getElementById('foto_diri').files[0];
           const fotoRumahFile = document.getElementById('foto_rumah').files[0];
           let foto_diri_url = document.getElementById('preview_foto_diri').src;
@@ -901,14 +430,8 @@
           let foto_rumah_url = document.getElementById('preview_foto_rumah').src;
           if (foto_rumah_url === '#' || foto_rumah_url.includes('null')) foto_rumah_url = '';
 
-          if (fotoDiriFile) {
-            try { foto_diri_url = await uploadFile(fotoDiriFile); }
-            catch (err) { alert('Gagal upload foto diri: ' + err.message); return; }
-          }
-          if (fotoRumahFile) {
-            try { foto_rumah_url = await uploadFile(fotoRumahFile); }
-            catch (err) { alert('Gagal upload foto rumah: ' + err.message); return; }
-          }
+          if (fotoDiriFile) { try { foto_diri_url = await uploadFile(fotoDiriFile); } catch (err) { alert('Gagal upload foto diri: ' + err.message); return; } }
+          if (fotoRumahFile) { try { foto_rumah_url = await uploadFile(fotoRumahFile); } catch (err) { alert('Gagal upload foto rumah: ' + err.message); return; } }
           data.foto_diri = foto_diri_url;
           data.foto_rumah = foto_rumah_url;
 
@@ -1002,7 +525,6 @@
         } catch (e) { alert('Gagal hapus: ' + e.message); }
       };
 
-      // ==================== AUTO REFRESH & LOGOUT ====================
       let refreshInterval = setInterval(() => { if (document.visibilityState === 'visible') refreshBackground(); }, 30000);
       document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshBackground(); });
       window.addEventListener('beforeunload', () => clearInterval(refreshInterval));
@@ -1017,5 +539,4 @@
     })();
   </script>
 </body>
-
 </html>

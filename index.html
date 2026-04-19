@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>Sistem Informasi Padukuhan Demangan | Sipade AI Humanis</title>
   <link rel="icon" type="image/webp" href="2.webp" sizes="128x128">
+  
+  <!-- PWA Manifest & Theme -->
+  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Sipade%20Demangan%22%2C%22short_name%22%3A%22Sipade%22%2C%22description%22%3A%22Sistem%20Informasi%20Padukuhan%20Demangan%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23ffffff%22%2C%22theme_color%22%3A%22%235a67d8%22%2C%22icons%22%3A%5B%7B%22src%22%3A%221.webp%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fwebp%22%7D%2C%7B%22src%22%3A%221.webp%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fwebp%22%7D%5D%7D">
+  <meta name="theme-color" content="#5a67d8">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Sipade">
+  <link rel="apple-touch-icon" href="1.webp">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -225,13 +235,24 @@
       overflow: hidden; z-index: 1065; transition: all 0.3s ease; border: 1px solid rgba(90, 103, 216, 0.3);
     }
     .chatbot-window.hidden { display: none; }
+    /* Header tipis hanya untuk close button */
     .chatbot-header {
-      background: linear-gradient(135deg, #5a67d8, #4c51bf); color: white; padding: 16px 20px;
-      display: flex; justify-content: space-between; align-items: center; font-weight: 600;
+      background: linear-gradient(135deg, #5a67d8, #4c51bf);
+      padding: 6px 16px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      min-height: 40px;
     }
-    .chatbot-header h6 { margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
-    .chatbot-header i.fa-times { cursor: pointer; font-size: 1.3rem; transition: transform 0.2s; }
-    .chatbot-header i.fa-times:hover { transform: scale(1.2); }
+    .chatbot-header i.fa-times {
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: transform 0.2s;
+      color: white;
+    }
+    .chatbot-header i.fa-times:hover {
+      transform: scale(1.2);
+    }
     .chatbot-messages {
       flex: 1; overflow-y: auto; padding: 20px; background: #f9fafb;
       display: flex; flex-direction: column; gap: 14px;
@@ -493,15 +514,15 @@
         <ul><li><strong>Dukuh Demangan:</strong> Bapak H. Sariyana, BA</li><li><strong>Sekretaris Padukuhan:</strong> Ibu Sri Rahayu</li><li><strong>Bendahara:</strong> Bapak Joko Supriyanto</li></ul>
         <h5>🏘️ Ketua Rukun Tetangga (RT)</h5>
         <div class="table-responsive"><table class="table table-bordered table-hover"><thead class="table-light"><tr><th>RT</th><th>Nama Ketua RT</th><th>Kontak</th></tr></thead><tbody>
-          <tr><td>01</td><td>Bapak Tugi Antara</td><td>0812-2702-2424</td></tr>
-          <tr><td>02</td><td>Bapak Supriyanta</td><td>0858-7751-1761</td></tr>
-          <tr><td>03</td><td>Bapak Suroto</td><td>0896-7499-7187</td></tr>
-          <tr><td>04</td><td>Bapak Jeriyanto</td><td>0852-1581-0017</td></tr>
-          <tr><td>05</td><td>Bapak Paryanto</td><td>0851-0162-5000</td></tr>
-          <tr><td>06</td><td>Bapak Suryanto</td><td>0882-2531-4439</td></tr>
-          <tr><td>07</td><td>Bapak Nur Widayatno</td><td>0813-2834-5357</td></tr>
+            <tr><td>01</td><td>Bapak Tugi Antara</td><td>0812-2702-2424</td></tr>
+            <tr><td>02</td><td>Bapak Supriyanta</td><td>0858-7751-1761</td></tr>
+            <tr><td>03</td><td>Bapak Suroto</td><td>0896-7499-7187</td></tr>
+            <tr><td>04</td><td>Bapak Jeriyanto</td><td>0852-1581-0017</td></tr>
+            <tr><td>05</td><td>Bapak Paryanto</td><td>0851-0162-5000</td></tr>
+            <tr><td>06</td><td>Bapak Suryanto</td><td>0882-2531-4439</td></tr>
+            <tr><td>07</td><td>Bapak Nur Widayatno</td><td>0813-2834-5357</td></tr>
         </tbody>
-      </table></div>
+        </table></div>
         <h5>📊 Data Umum & Statistik</h5>
         <ul><li>Jumlah RT: <strong>7</strong></li><li>Luas wilayah: ± 45 hektar</li><li>Jumlah penduduk terdata: <span id="modalStatWarga">-</span> jiwa (update berkala)</li><li>Jumlah KK: ± 850 KK</li><li>Kode Pos: 55185</li><li>Potensi Unggulan: Kerajinan batik, pertanian organik, UMKM makanan ringan</li></ul>
         <p class="small text-muted mt-2">Informasi ini bersumber dari data resmi Padukuhan Demangan tahun 2026.</p>
@@ -631,8 +652,11 @@
   </div>
 </div>
 
+<!-- CHATBOT WINDOW - Header tipis hanya berisi close button -->
 <div class="chatbot-window hidden" id="chatbotWindow">
-  <div class="chatbot-header"><h6><i class="fas fa-robot me-1"></i> Sipade · Asisten Humanis</h6><i class="fas fa-times" id="chatbotCloseBtn"></i></div>
+  <div class="chatbot-header">
+    <i class="fas fa-times" id="chatbotCloseBtn"></i>
+  </div>
   <div class="chatbot-messages" id="chatMessages">
     <div class="message bot">🌾 Halo, warga Demangan! Saya <strong>Sipade</strong>. Ada yang bisa saya bantu? (info kegiatan, surat, atau semangat gotong royong)</div>
     <div class="message bot"><button class="whatsapp-btn" onclick="startContactFlow()"><i class="fab fa-whatsapp"></i> 📨 Kirim Masukan ke Perangkat</button></div>
@@ -641,6 +665,7 @@
       <button class="suggestion-chip" onclick="askSuggestion('semangat gotong royong')">🤝 Gotong Royong</button>
       <button class="suggestion-chip" onclick="askSuggestion('donor darah')">🩸 Donor Darah</button>
       <button class="suggestion-chip" onclick="askSuggestion('kerja bakti')">🧹 Kerja Bakti</button>
+      <button class="suggestion-chip" onclick="installSipade()"><i class="fas fa-download me-1"></i> Install Sipade</button>
     </div>
   </div>
   <div class="chatbot-input"><input type="text" id="chatInput" placeholder="Tanya Sipade..."><button id="chatSendBtn"><i class="fas fa-paper-plane"></i></button></div>
@@ -744,7 +769,11 @@
 
   // ========== SEMUA FUNGSI ASLI ==========
   function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
-  function formatNumber(num) { return num >= 1000 ? (num/1000).toFixed(1)+'K+' : num; }
+  // Hapus formatNumber lama, ganti dengan formatFullNumber (pemisah ribuan)
+  function formatFullNumber(num) {
+    if (num === undefined || num === null) return '0';
+    return num.toLocaleString('id-ID');
+  }
   function getYouTubeThumb(url) { if (!url) return null; const match = url.match(/^.*(youtu.be\/|v\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/); return (match && match[2].length===11) ? `https://img.youtube.com/vi/${match[2]}/hqdefault.jpg` : null; }
   function getYouTubeEmbedUrl(url) { if (url.includes('youtube.com/watch?v=')) return url.replace('watch?v=', 'embed/'); else if (url.includes('youtu.be/')) return `https://www.youtube.com/embed/${url.split('youtu.be/')[1]}`; return url; }
 
@@ -755,9 +784,10 @@
   let knowledgeBase = [];
 
   function renderStats() {
-    document.getElementById('statWarga').innerText = formatNumber(statsData.total_warga);
-    document.getElementById('statSurat').innerText = formatNumber(statsData.total_surat_terbit);
-    document.getElementById('modalStatWarga').innerText = formatNumber(statsData.total_warga);
+    // Tampilkan angka penuh dengan pemisah ribuan
+    document.getElementById('statWarga').innerText = formatFullNumber(statsData.total_warga);
+    document.getElementById('statSurat').innerText = formatFullNumber(statsData.total_surat_terbit);
+    document.getElementById('modalStatWarga').innerText = formatFullNumber(statsData.total_warga);
   }
   function renderBerita() {
     const cont = document.getElementById('beritaContainer');
@@ -911,6 +941,24 @@
   document.getElementById('chatSendBtn').addEventListener('click', handleSend);
   document.getElementById('chatInput').addEventListener('keypress', e => { if (e.key === 'Enter') handleSend(); });
 
+  // ========== FUNGSI INSTALL SIPADE UNTUK CHATBOT ==========
+  window.installSipade = function() {
+    addMessageBot("📲 Memulai proses instalasi aplikasi Sipade...", false);
+    if (window.deferredPrompt) {
+      window.deferredPrompt.prompt();
+      window.deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          addMessageBot("✅ Terima kasih! Sipade sudah terinstal di perangkat Anda. Anda dapat membukanya dari layar utama.", false);
+        } else {
+          addMessageBot("❌ Instalasi dibatalkan. Anda bisa coba lagi nanti melalui menu browser: 'Tambahkan ke layar utama'.", false);
+        }
+        window.deferredPrompt = null;
+      });
+    } else {
+      addMessageBot("⚠️ Browser Anda tidak mendukung instalasi otomatis. Namun Anda bisa memasang Sipade secara manual:\n\n1. Buka menu browser (⋮ atau titik tiga)\n2. Pilih 'Tambahkan ke layar utama' atau 'Install app'\n3. Ikuti petunjuk selanjutnya.\n\nDengan menginstal, Anda bisa mengakses Sipade seperti aplikasi native!", true);
+    }
+  };
+
   // Login handling
   function getDashboardLink(role) { if (role === 'admin') return 'dashboard_admin.html'; if (role === 'ketua_rt') return 'dashboard_ketua_rt.html'; return 'dashboard_member.html'; }
   function createUserDropdown(user) {
@@ -972,14 +1020,13 @@
   const installBtn = document.getElementById('pwaInstallBtn');
   const closePopupBtn = document.getElementById('pwaClosePopupBtn');
 
-  // Cek apakah popup pernah ditutup (simpan di sessionStorage agar muncul lagi di sesi baru)
+  window.deferredPrompt = null;
+
   const popupDismissed = sessionStorage.getItem('pwaPopupDismissed');
 
-  // Tangkap event beforeinstallprompt
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
-    deferredPrompt = e;
-    // Tampilkan popup setelah 3 detik jika belum pernah ditutup di sesi ini
+    window.deferredPrompt = e;
     if (!popupDismissed) {
       setTimeout(() => {
         popup.classList.remove('hidden');
@@ -987,7 +1034,6 @@
     }
   });
 
-  // Fungsi untuk menampilkan popup secara manual (misal jika tidak ada prompt)
   function showInstallPopupManually() {
     if (!popupDismissed) {
       setTimeout(() => {
@@ -996,39 +1042,42 @@
     }
   }
 
-  // Jika tidak ada beforeinstallprompt, tetap tampilkan popup sebagai panduan manual
   if (!window.matchMedia('(display-mode: standalone)').matches && !popupDismissed) {
-    // Cek apakah sudah diinstal (standalone)
     showInstallPopupManually();
   }
 
-  // Tombol Install
   installBtn.addEventListener('click', async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
+    if (window.deferredPrompt) {
+      window.deferredPrompt.prompt();
+      const { outcome } = await window.deferredPrompt.userChoice;
       if (outcome === 'accepted') {
         console.log('User accepted install');
       }
-      deferredPrompt = null;
+      window.deferredPrompt = null;
       popup.classList.add('hidden');
     } else {
-      // Jika prompt tidak tersedia, beri instruksi manual
       alert('Untuk menginstal: buka menu browser (⋮) lalu pilih "Tambahkan ke Layar Utama" atau "Install app".');
       popup.classList.add('hidden');
     }
     sessionStorage.setItem('pwaPopupDismissed', 'true');
   });
 
-  // Tombol tutup
   closePopupBtn.addEventListener('click', () => {
     popup.classList.add('hidden');
     sessionStorage.setItem('pwaPopupDismissed', 'true');
   });
 
-  // Sembunyikan popup jika aplikasi sudah diinstal (display-mode standalone)
   if (window.matchMedia('(display-mode: standalone)').matches) {
     popup.classList.add('hidden');
+  }
+
+  // ========== SERVICE WORKER REGISTRATION ==========
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Service Worker terdaftar', reg.scope))
+        .catch(err => console.warn('Service Worker gagal:', err));
+    });
   }
 
   (async function init() {

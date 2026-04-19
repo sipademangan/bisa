@@ -1,3 +1,4 @@
+<!-- dashboard_ketua_rt.html - Updated -->
 <!DOCTYPE html>
 <html lang="id">
 
@@ -20,6 +21,8 @@
       --header-height: 70px;
       --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
       --shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.1);
+      --bottom-nav-height: 70px;
+      --toggle-bottom-offset: 20px;
     }
 
     * {
@@ -329,6 +332,7 @@
       border-top: 1px solid rgba(0, 0, 0, 0.05);
       z-index: 1040;
       transition: transform 0.2s ease;
+      height: var(--bottom-nav-height);
     }
 
     .bottom-nav-item {
@@ -366,7 +370,6 @@
     .sidebar-toggle {
       display: none;
       position: fixed;
-      bottom: 20px;
       right: 20px;
       width: 50px;
       height: 50px;
@@ -380,6 +383,7 @@
       cursor: pointer;
       align-items: center;
       justify-content: center;
+      bottom: calc(var(--bottom-nav-height) + var(--toggle-bottom-offset));
     }
 
     @media (max-width: 991.98px) {
@@ -429,12 +433,34 @@
       }
     }
 
+    @media (max-width: 576px) {
+      .sidebar-toggle {
+        bottom: calc(var(--bottom-nav-height) + 10px);
+        width: 45px;
+        height: 45px;
+        right: 15px;
+      }
+      .bottom-nav {
+        padding: 6px 10px 10px;
+        height: 65px;
+      }
+      .bottom-nav-item i {
+        font-size: 20px;
+      }
+      .bottom-nav-item .label {
+        font-size: 10px;
+      }
+    }
+
     @media (min-width: 992px) {
       .bottom-nav {
         display: none;
       }
       body {
         padding-bottom: 0;
+      }
+      .sidebar-toggle {
+        display: none !important;
       }
     }
 

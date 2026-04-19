@@ -8,9 +8,7 @@
   <link rel="icon" type="image/webp" href="2.webp">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #2ecc71;
@@ -21,6 +19,8 @@
       --header-height: 70px;
       --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
       --shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.1);
+      --bottom-nav-height: 70px;
+      --toggle-bottom-offset: 20px;
     }
 
     * {
@@ -81,6 +81,7 @@
     .logo-wrapper {
       width: 48px;
       height: 48px;
+      background: transparent;
       border-radius: 16px;
       display: flex;
       align-items: center;
@@ -104,6 +105,7 @@
       background: linear-gradient(135deg, #2ecc71, #27ae60);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
     }
 
     .sidebar-header p {
@@ -323,10 +325,57 @@
       color: #6c757d;
     }
 
+    /* ========== BOTTOM NAVIGATION ========== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 8px 12px 12px;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      z-index: 1040;
+      height: var(--bottom-nav-height);
+    }
+
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: #6c757d;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 30px;
+    }
+
+    .bottom-nav-item i {
+      font-size: 22px;
+      margin-bottom: 2px;
+    }
+
+    .bottom-nav-item.active {
+      color: #2ecc71;
+      background: rgba(46, 204, 113, 0.12);
+    }
+
+    .bottom-nav-item .label {
+      font-size: 11px;
+    }
+
+    /* ========== TOGGLE SIDEBAR ========== */
     .sidebar-toggle {
       display: none;
       position: fixed;
-      bottom: 20px;
       right: 20px;
       width: 50px;
       height: 50px;
@@ -340,6 +389,7 @@
       cursor: pointer;
       align-items: center;
       justify-content: center;
+      bottom: calc(var(--bottom-nav-height) + var(--toggle-bottom-offset));
     }
 
     @media (max-width: 991.98px) {
@@ -349,36 +399,61 @@
         height: 100vh;
         transition: transform 0.3s ease, width 0.3s ease;
       }
-
       .sidebar.show {
         transform: translateX(0);
       }
-
       .main-content {
         padding: 1rem;
+        padding-bottom: 80px;
       }
-
       .sidebar-toggle {
         display: flex;
       }
-
+      .bottom-nav {
+        display: flex;
+      }
       .sidebar-collapsed {
         width: var(--sidebar-width);
       }
-
       .sidebar-collapsed .sidebar-brand h3,
       .sidebar-collapsed .sidebar-header p,
       .sidebar-collapsed .nav-link span {
         display: block;
       }
-
       .sidebar-collapsed .nav-link i {
         margin-right: 0.75rem;
       }
-
       .sidebar-collapsed .nav-link {
         justify-content: flex-start;
         padding: 0.75rem 1rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .sidebar-toggle {
+        bottom: calc(var(--bottom-nav-height) + 10px);
+        width: 45px;
+        height: 45px;
+        right: 15px;
+      }
+      .bottom-nav {
+        padding: 6px 10px 10px;
+        height: 65px;
+      }
+      .bottom-nav-item i {
+        font-size: 20px;
+      }
+      .bottom-nav-item .label {
+        font-size: 10px;
+      }
+    }
+
+    @media (min-width: 992px) {
+      .bottom-nav {
+        display: none;
+      }
+      .sidebar-toggle {
+        display: none !important;
       }
     }
 
@@ -407,31 +482,23 @@
         <button class="btn btn-link text-dark p-0" id="sidebarCollapseBtn"><i class="fas fa-chevron-left"></i></button>
       </div>
       <p>Padukuhan Demangan</p>
-      <ul class="nav-menu">
-        <li class="nav-item"><a href="dashboard_admin.html" class="nav-link" id="menuDashboard"><i
-              class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
-        <li class="nav-item"><a href="warga_admin.html" class="nav-link" id="menuWarga"><i class="fas fa-users"></i>
-            <span>Data Warga</span></a></li>
-        <li class="nav-item"><a href="surat_admin.html" class="nav-link" id="menuSurat"><i class="fas fa-envelope"></i>
-            <span>Surat</span></a></li>
-        <li class="nav-item"><a href="berita.html" class="nav-link" id="menuBerita"><i class="fas fa-newspaper"></i>
-            <span>Berita</span></a></li>
-        <li class="nav-item"><a href="galeri.html" class="nav-link" id="menuGaleri"><i class="fas fa-images"></i>
-            <span>Galeri</span></a></li>
-        <li class="nav-item"><a href="peta_sebaran_admin.html" class="nav-link" id="menuPeta"><i
-              class="fas fa-map-marked-alt"></i> <span>Peta Sebaran</span></a></li>
-        <li class="nav-item"><a href="pohon_keluarga.html" class="nav-link" id="menuKeluarga"><i
-              class="fas fa-tree"></i> <span>Pohon Keluarga</span></a></li>
-        <li class="nav-item"><a href="users.html" class="nav-link" id="menuUsers"><i class="fas fa-user-cog"></i>
-            <span>Kelola Pengguna</span></a></li>
-        <li class="nav-item"><a href="hash_tool.html" class="nav-link" id="menuHash"><i class="fas fa-hashtag"></i>
-            <span>Hash/Unhash SHA256</span></a></li>
-        <li class="nav-item"><a href="verifikasi_pendaftar.html" class="nav-link active" id="menuVerifikasi"><i
-              class="fas fa-user-check"></i> <span>Verifikasi Pendaftar</span></a></li>
+      <ul class="nav-menu" id="sidebarMenu">
+        <li class="nav-item"><a href="dashboard_admin.html" class="nav-link" id="menuDashboard"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+        <li class="nav-item"><a href="warga_admin.html" class="nav-link" id="menuWarga"><i class="fas fa-users"></i> <span>Data Warga</span></a></li>
+        <li class="nav-item"><a href="surat_admin.html" class="nav-link" id="menuSurat"><i class="fas fa-envelope"></i> <span>Surat</span><span class="badge-notif" id="suratNotifBadge" style="display:none;">0</span></a></li>
+        <li class="nav-item"><a href="berita.html" class="nav-link" id="menuBerita"><i class="fas fa-newspaper"></i> <span>Berita</span></a></li>
+        <li class="nav-item"><a href="galeri.html" class="nav-link" id="menuGaleri"><i class="fas fa-images"></i> <span>Galeri</span></a></li>
+        <li class="nav-item"><a href="peta_sebaran_admin.html" class="nav-link" id="menuPeta"><i class="fas fa-map-marked-alt"></i> <span>Peta Sebaran</span></a></li>
+        <li class="nav-item"><a href="pohon_keluarga.html" class="nav-link" id="menuKeluarga"><i class="fas fa-tree"></i> <span>Pohon Keluarga</span></a></li>
+        <li class="nav-item"><a href="users.html" class="nav-link" id="menuUsers"><i class="fas fa-user-cog"></i> <span>Kelola Pengguna</span></a></li>
+        <li class="nav-item"><a href="hash_tool.html" class="nav-link" id="menuHash"><i class="fas fa-hashtag"></i> <span>Hash/Unhash SHA256</span></a></li>
+        <li class="nav-item"><a href="verifikasi_pendaftar.html" class="nav-link active" id="menuVerifikasi"><i class="fas fa-user-check"></i> <span>Verifikasi Pendaftar</span></a></li>
       </ul>
     </div>
 
-    <!-- KONTEN KANAN -->
+    <!-- BOTTOM NAVIGATION (MOBILE) - Dinamis berdasarkan role -->
+    <div class="bottom-nav" id="bottomNav"></div>
+
     <div class="flex-grow-1">
       <div class="top-navbar">
         <div class="user-dropdown">
@@ -442,11 +509,8 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
               <li><a class="dropdown-item" href="profile.html"><i class="fas fa-id-card me-2"></i> Profil Saya</a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
-              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
             </ul>
           </div>
         </div>
@@ -456,10 +520,8 @@
         <div class="d-flex align-items-center justify-content-between mb-4">
           <h2 class="fw-bold mb-0"><i class="fas fa-user-check me-2 text-success"></i>Verifikasi Pendaftar Baru</h2>
           <div>
-            <button class="btn btn-outline-secondary btn-sm" id="refreshBtn"><i class="fas fa-sync-alt"></i>
-              Refresh</button>
-            <span id="refreshIndicator" class="refresh-indicator"><i class="fas fa-spinner fa-pulse"></i>
-              Memperbarui...</span>
+            <button class="btn btn-outline-secondary btn-sm" id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <span id="refreshIndicator" class="refresh-indicator"><i class="fas fa-spinner fa-pulse"></i> Memperbarui...</span>
           </div>
         </div>
         <p class="text-muted" id="scopeInfo"></p>
@@ -470,12 +532,7 @@
             <div class="table-responsive">
               <table class="table table-hover align-middle mb-0">
                 <thead>
-                  <tr>
-                    <th>Email</th>
-                    <th>Nama Lengkap</th>
-                    <th>RT</th>
-                    <th>Aksi</th>
-                  </tr>
+                  <tr><th>Email</th><th>Nama Lengkap</th><th>RT</th><th>Aksi</th></tr>
                 </thead>
                 <tbody id="pendingTableBody"></tbody>
               </table>
@@ -492,7 +549,7 @@
   <script src="assets/js/auth.js"></script>
   <script>
     (function () {
-      // ==================== SIDEBAR COLLAPSE ====================
+      // ==================== SIDEBAR COLLAPSE & TOGGLE ====================
       const sidebar = document.getElementById('sidebar');
       const collapseBtn = document.getElementById('sidebarCollapseBtn');
       const mobileToggle = document.getElementById('sidebarToggle');
@@ -528,9 +585,45 @@
 
       const isAdmin = (user.role === 'admin');
       document.getElementById('displayName').innerText = user.nama || user.email;
-      // Sesuaikan menu untuk ketua rt
+
+      // ==================== BOTTOM NAVIGATION (MOBILE) DINAMIS ====================
+      const bottomNav = document.getElementById('bottomNav');
+      if (isAdmin) {
+        bottomNav.innerHTML = `
+          <button class="bottom-nav-item" data-url="dashboard_admin.html"><i class="fas fa-tachometer-alt"></i><span class="label">Dashboard</span></button>
+          <button class="bottom-nav-item" data-url="warga_admin.html"><i class="fas fa-users"></i><span class="label">Warga</span></button>
+          <button class="bottom-nav-item" data-url="surat_admin.html"><i class="fas fa-envelope"></i><span class="label">Surat</span></button>
+          <button class="bottom-nav-item" data-url="berita.html"><i class="fas fa-newspaper"></i><span class="label">Berita</span></button>
+          <button class="bottom-nav-item" data-url="galeri.html"><i class="fas fa-images"></i><span class="label">Galeri</span></button>
+        `;
+      } else {
+        bottomNav.innerHTML = `
+          <button class="bottom-nav-item" data-url="dashboard_ketua_rt.html"><i class="fas fa-tachometer-alt"></i><span class="label">Dashboard</span></button>
+          <button class="bottom-nav-item" data-url="warga_ketua.html"><i class="fas fa-users"></i><span class="label">Warga</span></button>
+          <button class="bottom-nav-item" data-url="surat_ketua.html"><i class="fas fa-envelope"></i><span class="label">Surat</span></button>
+          <button class="bottom-nav-item" data-url="berita.html"><i class="fas fa-newspaper"></i><span class="label">Berita</span></button>
+          <button class="bottom-nav-item" data-url="verifikasi_pendaftar.html"><i class="fas fa-user-check"></i><span class="label">Verifikasi</span></button>
+        `;
+      }
+
+      const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+      bottomNavItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          const url = item.getAttribute('data-url');
+          if (url) window.location.href = url;
+        });
+        const currentPath = window.location.pathname.split('/').pop();
+        const itemUrl = item.getAttribute('data-url');
+        if (itemUrl === currentPath) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+
+      // ==================== SESUAIKAN MENU SIDEBAR UNTUK KETUA RT ====================
       if (!isAdmin) {
-        const adminMenus = ['menuUsers', 'menuHash'];
+        const adminMenus = ['menuUsers', 'menuHash', 'menuGaleri'];
         adminMenus.forEach(id => {
           const el = document.getElementById(id);
           if (el) el.closest('.nav-item').style.display = 'none';
@@ -552,7 +645,6 @@
       const refreshIndicator = document.getElementById('refreshIndicator');
       scopeInfo.innerText = isAdmin ? 'Menampilkan seluruh pendaftar dari semua RT.' : `Menampilkan pendaftar RT ${user.rt} saja.`;
 
-      // Helper escape HTML (aman untuk semua tipe)
       function escapeHtml(value) {
         if (value === null || value === undefined) return '';
         return String(value).replace(/[&<>]/g, function (m) {
@@ -563,7 +655,6 @@
         });
       }
 
-      // Render tabel dari data array
       function renderTable(pendingList) {
         if (!pendingList || pendingList.length === 0) {
           tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5"><div class="empty-state"><i class="fas fa-inbox fa-3x"></i><p class="mt-2">Tidak ada pendaftar baru yang menunggu verifikasi.</p></div></td></tr>';
@@ -576,17 +667,16 @@
           const rt = escapeHtml(p.rt);
           const row = document.createElement('tr');
           row.innerHTML = `
-        <td style="word-break:break-word;">${email}</td>
-        <td><strong>${nama}</strong></td>
-        <td><span class="badge-rt"><i class="fas fa-home"></i> RT ${rt}</span></td>
-        <td>
-          <button class="btn btn-approve btn-sm me-2" data-email="${email}"><i class="fas fa-check-circle"></i> Terima</button>
-          <button class="btn btn-reject btn-sm" data-email="${email}"><i class="fas fa-times-circle"></i> Tolak</button>
-        </td>
-      `;
+            <td style="word-break:break-word;">${email}</td>
+            <td><strong>${nama}</strong></td>
+            <td><span class="badge-rt"><i class="fas fa-home"></i> RT ${rt}</span></td>
+            <td>
+              <button class="btn btn-approve btn-sm me-2" data-email="${email}"><i class="fas fa-check-circle"></i> Terima</button>
+              <button class="btn btn-reject btn-sm" data-email="${email}"><i class="fas fa-times-circle"></i> Tolak</button>
+            </td>
+          `;
           tbody.appendChild(row);
         });
-        // Pasang event listener untuk tombol approve/reject
         document.querySelectorAll('.btn-approve').forEach(btn => {
           btn.removeEventListener('click', handleApprove);
           btn.addEventListener('click', handleApprove);
@@ -619,19 +709,16 @@
             await rejectUser(email);
             alert('❌ Pendaftar ditolak.');
           }
-          // Setelah sukses, lakukan refresh background dan update cache
-          await refreshBackground(true); // force refresh
+          await refreshBackground(true);
         } catch (err) {
           alert(`Gagal: ${err.message}`);
         }
       }
 
-      // Mengambil data dari server (tanpa mengubah tampilan, hanya return data)
       async function fetchPendingFromServer() {
         return await getPendingUsers();
       }
 
-      // Memperbarui cache dan render ulang jika data berubah
       async function refreshBackground(showIndicator = false) {
         if (showIndicator && refreshIndicator) refreshIndicator.classList.add('show');
         try {
@@ -641,14 +728,12 @@
           if (cachedRaw) {
             try { cachedData = JSON.parse(cachedRaw); } catch (e) { }
           }
-          // Bandingkan apakah ada perubahan (sederhana: JSON stringify)
           if (JSON.stringify(freshData) !== JSON.stringify(cachedData)) {
             sessionStorage.setItem(CACHE_KEY, JSON.stringify(freshData));
             renderTable(freshData);
           }
         } catch (err) {
           console.error('Background refresh gagal:', err);
-          // Jika tidak ada cache sama sekali, tampilkan error di tabel
           const cachedRaw = sessionStorage.getItem(CACHE_KEY);
           if (!cachedRaw) {
             tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4"><i class="fas fa-exclamation-triangle"></i> Gagal memuat data: ${escapeHtml(err.message)}<br><button class="btn btn-sm btn-outline-success mt-2" id="retryBtn"><i class="fas fa-sync-alt"></i> Coba Lagi</button></td></tr>`;
@@ -660,7 +745,6 @@
         }
       }
 
-      // Inisialisasi: muat dari cache (jika ada) lalu refresh background
       function initPage() {
         const cachedRaw = sessionStorage.getItem(CACHE_KEY);
         if (cachedRaw) {
@@ -669,10 +753,8 @@
             renderTable(cachedData);
           } catch (e) { }
         } else {
-          // Tidak ada cache, tampilkan pesan loading sederhana (tanpa spinner besar)
-          tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted"><i class="fas fa-circle-notch fa-spin"></i> Memuat data pertama kali...</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted"><i class="fas fa-circle-notch fa-spin"></i> Memuat data pertama kali...<\/td><\/tr>';
         }
-        // Lakukan refresh background (tanpa indikator visual agar tidak mengganggu)
         refreshBackground(false).catch(console.error);
       }
 
@@ -681,7 +763,7 @@
         if (document.visibilityState === 'visible') {
           refreshBackground(false);
         }
-      }, 30000); // setiap 30 detik
+      }, 30000);
 
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
@@ -689,7 +771,6 @@
         }
       });
 
-      // Tombol refresh manual dengan indikator
       document.getElementById('refreshBtn').addEventListener('click', () => refreshBackground(true));
       document.getElementById('logoutBtn').addEventListener('click', (e) => {
         e.preventDefault();
@@ -697,12 +778,10 @@
         window.location.href = 'index.html';
       });
 
-      // Bersihkan interval saat halaman ditutup
       window.addEventListener('beforeunload', () => clearInterval(refreshInterval));
 
       initPage();
     })();
   </script>
 </body>
-
 </html>
