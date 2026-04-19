@@ -2,10 +2,12 @@
 // api.js - Full version for SIP Demangan
 // Mendukung: login, register, warga, surat (termasuk ttd dan upload),
 // verifikasi pendaftar, manajemen ketua RT, berita, galeri, family tree,
-// knowledge base Sipade, chatbot, upload foto profil, dan pengaturan akses role.
+// knowledge base Sipade, chatbot, upload foto profil, pengaturan akses role,
+// template undangan/sertifikat, mail merge, pawartos lelayu, send document,
+// dan member documents.
 // ============================================================
 
-const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbyVRoiEoK6ZI2P-z11r8fUm_cEDePiMahUt8sVJ1skzIUeIWkTRdAgYLkbBb71UelnHnA/exec';
+const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbz1gp0w0QYMN_umIJktZZxNPc00LDQNXY7hiaaS3NtKLfR86NkRBEngbyCK1iAS2UFzew/exec';
 
 /**
  * Helper: Mendapatkan user yang login dari localStorage atau sessionStorage.
@@ -183,6 +185,11 @@ async function deleteUser(email) {
   const user = getLoggedInUser();
   if (!user || user.role !== 'admin') throw new Error('Akses ditolak');
   return apiRequest(`/users/${email}`, 'DELETE');
+}
+async function toggleUserStatus(email) {
+  const user = getLoggedInUser();
+  if (!user || user.role !== 'admin') throw new Error('Akses ditolak');
+  return apiRequest(`/users/${email}/toggle-status`, 'POST');
 }
 
 // ========== VERIFIKASI PENDaftar (Ketua RT / Admin) ==========
@@ -412,4 +419,83 @@ async function unhash(hash) {
   const user = getLoggedInUser();
   if (!user || user.role !== 'admin') throw new Error('Akses ditolak');
   return apiRequest('/unhash', 'POST', { hash });
+}
+
+// ========== TEMPLATE UNDANGAN & SERTIFIKAT ==========
+async function getTemplates() {
+  const user = getLoggedInUser();
+  if (!user) throw new Error('Anda belum login');
+  if (user.role !== 'admin' && user.role !== 'ketua_rt') throw new Error('Akses ditolak');
+  return apiRequest('/templates', 'GET');
+}
+
+async function createTemplate(data) {
+  const user = getLoggedInUser();
+  if (!user) throw new Error('Anda belum login');
+  if (user.role !== 'admin' && user.role !== 'ketua_rt') throw new Error('Akses ditolak');
+  return apiRequest('/templates', 'POST', data);
+}
+
+async function updateTemplate(id, data) {
+  const user = getLoggedInUser();
+  if (!user) throw new Error('Anda belum login');
+  if (user.role !== 'admin' && user.role !== 'ketua_rt') throw new Error('Akses ditolak');
+  return apiRequest(`/templates/${id}`, 'PUT', data);
+}
+
+async function deleteTemplate(id) {
+  const user = getLoggedInUser();
+  if (!user) throw new Error('Anda belum login');
+  if (user.role !== 'admin' && user.role !== 'ketua_rt') throw new Error('Akses ditolak');
+  return apiRequest(`/templates/${id}`, 'DELETE');
+}
+
+// ========== MAIL MERGE (GENERATE & HISTORY) ==========
+async function generateMailMerge(data) {
+  const user = getLoggedInUser();
+  if (!user) throw new Error('Anda belum login');
+  if (user.role !== 'admin' && user.role !== 'ketua_rt') throw new Error('Akses ditolak');
+  return apiRequest('/mailmerge/generate', 'POST', data);
+}
+
+async function getMailMergeHistory() {
+  const user = getLoggedInUser();
+  if (!user) throw new Error('Anda belum login');
+  if (user.role !== 'admin' && user.role !== 'ketua_rt') throw new Error('Akses ditolak');
+  return apiRequest('/mailmerge/history', 'GET');
+}
+
+// ========== PAWARTOS LELAYU ==========
+async function createPawartos(data) {
+  const user = getLoggedInUser();
+  if (!user) throw new Error('Anda belum login');
+  if (user.role !== 'admin' && user.role !== 'ketua_rt') throw new Error('Akses ditolak');
+  return apiRequest('/pawartos', 'POST', data);
+}
+
+async function getPawartosList() {
+  const user = getLoggedInUser();
+  if (!user) throw new Error('Anda belum login');
+  if (user.role !== 'admin' && user.role !== 'ketua_rt') throw new Error('Akses ditolak');
+  return apiRequest('/pawartos', 'GET');
+}
+
+// ========== PENGIRIMAN DOKUMEN KE MEMBER ==========
+/**
+ * Mengirim dokumen (email) ke daftar email atau ke semua warga.
+ * @param {Object} params - { emails?: string[], allMembers?: boolean, subject: string, message: string, attachmentUrl?: string }
+ */
+async function sendDocument(params) {
+  const user = getLoggedInUser();
+  if (!user) throw new Error('Anda belum login');
+  if (user.role !== 'admin' && user.role !== 'ketua_rt') throw new Error('Akses ditolak');
+  return apiRequest('/send-document', 'POST', params);
+}
+
+// ========== DOKUMEN YANG DITERIMA MEMBER ==========
+async function getMemberDocuments() {
+  const user = getLoggedInUser();
+  if (!user) throw new Error('Anda belum login');
+  if (user.role !== 'member') throw new Error('Akses ditolak');
+  return apiRequest('/member-documents', 'GET');
 }
